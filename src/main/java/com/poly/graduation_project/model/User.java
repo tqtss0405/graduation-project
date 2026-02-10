@@ -12,6 +12,7 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Entity 
 @NoArgsConstructor
@@ -26,7 +27,7 @@ public class User {
     @Column(unique = true, columnDefinition = "nvarchar(100)")
     private String email;
 
-    @Column(length = 250)
+    @Column(length = 250) 
     private String password;
 
     @Column(columnDefinition = "nvarchar(100)")
@@ -41,17 +42,22 @@ public class User {
     private Boolean active;
 
     @OneToMany(mappedBy = "user")
+    @ToString.Exclude
     private List<Address> addresses;
 
     @OneToMany(mappedBy = "user")
+    @ToString.Exclude
     private List<CartDetail> cartDetails;
 
     @OneToMany(mappedBy = "user")
+    @ToString.Exclude
     private List<Favourite> favourites;
 
     @OneToMany(mappedBy = "user")
+    @ToString.Exclude
     private List<Order> orders;
 
     @OneToMany(mappedBy = "user")
+    @ToString.Exclude
     private List<Review> reviews;
 }

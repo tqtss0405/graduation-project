@@ -1,0 +1,475 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BEOBOOKS - Tri thức là sức mạnh</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="/css/style.css" />
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">BEO<span style="color: var(--secondary-color)">BOOKS</span></a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/home">Trang chủ</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/products">Sản Phẩm</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" href="/blog">Blog</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" href="/contact">Liên hệ</a>
+                    </li>
+                </ul>
+
+                <div class="d-flex align-items-center gap-3">
+                    <div class="input-group d-none d-lg-flex" style="width: 200px">
+                        <input type="text" class="form-control form-control-sm border-end-0 rounded-start-pill"
+                            placeholder="Tìm sách..." />
+                        <button class="btn btn-outline-secondary border-start-0 rounded-end-pill" type="button">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </button>
+                    </div>
+                    <div class="position-relative cursor-pointer">
+                        <a href="/user/cart">
+                            <i class="fa-solid fa-cart-shopping fs-5 text-secondary"></i>
+                            <span
+                                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                                style="font-size: 10px">3</span>
+                        </a>
+
+                    </div>
+                    <div class="dropdown ms-3">
+                        <a href="#"
+                            class="d-flex align-items-center text-decoration-none text-secondary dropdown-toggle hidden-arrow"
+                            id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <img th:if="${session.currentUser != null}" th:src="${session.currentUser.image}"
+                                class="rounded-circle" width="30" height="30" alt="Avatar" />
+                            <i th:if="${session.currentUser == null}" class="fa-solid fa-circle-user fs-3"></i>
+                        </a>
+
+                        <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg p-3"
+                            aria-labelledby="userDropdown"
+                            style="min-width: 280px; border-radius: 15px; margin-top: 10px;">
+
+                            <li th:if="${session.currentUser == null}">
+                                <div class="d-flex flex-column align-items-center mb-3">
+                                    <p class="small text-muted mb-2">Chào mừng đến với BeoBooks!</p>
+                                    <a href="/login/form" class="btn btn-success w-100 rounded-pill fw-bold mb-2">Đăng
+                                        nhập</a>
+                                    <a href="/register" class="btn btn-outline-success w-100 rounded-pill fw-bold">Đăng
+                                        ký</a>
+                                </div>
+                            </li>
+
+                            <div th:if="${session.currentUser != null}">
+                                <li>
+                                    <div class="d-flex flex-column align-items-center mb-2">
+                                        <p class="small text-muted mb-1">Xin chào,</p>
+                                        <h6 class="fw-bold text-success" th:text="${session.currentUser.fullname}">User
+                                            Name</h6>
+                                    </div>
+                                </li>
+
+                                <li>
+                                    <hr class="dropdown-divider" />
+                                </li>
+
+                                <li>
+                                    <a class="dropdown-item py-2 rounded" href="/user/profile">
+                                        <i class="fa-solid fa-user me-2 text-muted"></i> Thông tin cá nhân
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a class="dropdown-item py-2 rounded" href="/user/change-password">
+                                        <i class="fa-solid fa-key me-2 text-muted"></i> Đổi mật khẩu
+                                    </a>
+                                </li>
+
+                                <li th:if="${session.currentUser.role == true}">
+                                    <a class="dropdown-item py-2 rounded" href="/admin/dashboard">
+                                        <i class="fa-solid fa-user-shield me-2 text-muted"></i> Trang Quản Trị
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a class="dropdown-item py-2 rounded" href="/user/order-details">
+                                        <i class="fa-solid fa-box-open me-2 text-muted"></i> Lịch sử mua hàng
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <hr class="dropdown-divider" />
+                                </li>
+
+                                <li>
+                                    <a href="/logout" class="dropdown-item py-2 rounded text-danger">
+                                        <i class="fa-solid fa-right-from-bracket me-2"></i> Đăng xuất
+                                    </a>
+                                </li>
+                            </div>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div id="heroCarousel" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-inner">
+            <div class="carousel-item active" style="
+                        background-image: url(&quot;https://images.unsplash.com/photo-1507842217343-583bb7270b66?auto=format&fit=crop&w=1350&q=80&quot;);
+                    ">
+                <div class="carousel-overlay">
+                    <div>
+                        <h1 class="display-4 fw-bold mb-3">
+                            Thế Giới Tri Thức Vô Tận
+                        </h1>
+                        <p class="lead mb-4">
+                            Khám phá hàng ngàn đầu sách hay với ưu đãi lên
+                            đến 50%
+                        </p>
+                        <a href="" class="btn btn-success btn-lg rounded-pill px-5 shadow">Mua ngay</a>
+                    </div>
+                </div>
+            </div>
+            <div class="carousel-item" style="
+                        background-image: url(&quot;https://images.unsplash.com/photo-1481627834876-b7833e8f5570?auto=format&fit=crop&w=1350&q=80&quot;);
+                    ">
+                <div class="carousel-overlay">
+                    <div>
+                        <h1 class="display-4 fw-bold mb-3">
+                            Sách Hay Thay Đổi Cuộc Đời
+                        </h1>
+                        <p class="lead mb-4">
+                            Cập nhật những cuốn sách bán chạy nhất tháng này
+                        </p>
+                        <a href="#" class="btn btn-light btn-lg rounded-pill px-5 shadow text-success fw-bold">Xem chi
+                            tiết</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon"></span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon"></span>
+        </button>
+    </div>
+
+    <section class="container my-5">
+        <div class="row g-4">
+            <div class="col-md-3 col-6">
+                <div class="feature-box text-center">
+                    <i class="fa-solid fa-truck-fast feature-icon"></i>
+                    <h6 class="fw-bold">Giao hàng nhanh</h6>
+                    <p class="text-muted small mb-0">
+                        Miễn phí cho đơn từ 200k
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="feature-box text-center">
+                    <i class="fa-solid fa-book-open feature-icon"></i>
+                    <h6 class="fw-bold">Sách chính hãng</h6>
+                    <p class="text-muted small mb-0">
+                        Cam kết hoàn tiền 111%
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="feature-box text-center">
+                    <i class="fa-solid fa-gift feature-icon"></i>
+                    <h6 class="fw-bold">Quà tặng hấp dẫn</h6>
+                    <p class="text-muted small mb-0">
+                        Nhiều ưu đãi mỗi ngày
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="feature-box text-center">
+                    <i class="fa-solid fa-headset feature-icon"></i>
+                    <h6 class="fw-bold">Hỗ trợ 24/7</h6>
+                    <p class="text-muted small mb-0">
+                        Luôn sẵn sàng lắng nghe
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="container mb-5">
+        <h3 class="fw-bold text-center mb-4">
+            <span style="border-bottom: 3px solid var(--primary-color)">Danh Mục Nổi Bật</span>
+        </h3>
+        <div class="row row-cols-2 row-cols-md-4 g-3 text-center">
+            <div class="col">
+                <div class="p-3 bg-light rounded cursor-pointer hover-shadow">
+                    <img src="https://cdn-icons-png.flaticon.com/512/2232/2232688.png" width="50" class="mb-2" />
+                    <h6 class="mb-0">Văn Học</h6>
+                </div>
+            </div>
+            <div class="col">
+                <div class="p-3 bg-light rounded cursor-pointer hover-shadow">
+                    <img src="https://cdn-icons-png.flaticon.com/512/3079/3079165.png" width="50" class="mb-2" />
+                    <h6 class="mb-0">Kinh Tế</h6>
+                </div>
+            </div>
+            <div class="col">
+                <div class="p-3 bg-light rounded cursor-pointer hover-shadow">
+                    <img src="https://cdn-icons-png.flaticon.com/512/4207/4207253.png" width="50" class="mb-2" />
+                    <h6 class="mb-0">Tâm Lý</h6>
+                </div>
+            </div>
+            <div class="col">
+                <div class="p-3 bg-light rounded cursor-pointer hover-shadow">
+                    <img src="https://cdn-icons-png.flaticon.com/512/2436/2436874.png" width="50" class="mb-2" />
+                    <h6 class="mb-0">Thiếu Nhi</h6>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <main class="container mb-5">
+        <div class="d-flex justify-content-between align-items-end mb-4">
+            <h2 class="fw-bold mb-0">Sách Mới & Bán Chạy</h2>
+            <a href="#" class="btn btn-outline-success btn-sm rounded-pill">Xem tất cả <i
+                    class="fa-solid fa-arrow-right ms-1"></i></a>
+        </div>
+
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+            <div class="col">
+                <a href="/product-details" class="text-decoration-none text-dark">
+                    <div class="card book-card h-100">
+                        <span class="badge-sale">-20%</span>
+                        <div class="book-img-container">
+                            <img src="https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&w=500&q=80"
+                                alt="Book" class="book-img" />
+                        </div>
+                        <div class="card-body">
+                            <div class="star-rating mb-2">
+                                <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i
+                                    class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i
+                                    class="fa-solid fa-star-half-stroke"></i>
+                            </div>
+                            <h6 class="book-title" title="Nhà Giả Kim">
+                                Nhà Giả Kim
+                            </h6>
+                            <p class="book-author">Paulo Coelho</p>
+                            <div class="d-flex justify-content-between align-items-center mt-3">
+                                <div>
+                                    <span class="text-danger fw-bold fs-5">63.000đ</span>
+                                    <span class="text-muted text-decoration-line-through small ms-1">79.000đ</span>
+                                </div>
+                                <button class="btn-add-cart" title="Thêm vào giỏ">
+                                    <i class="fa-solid fa-cart-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <div class="col">
+                <div class="card book-card h-100">
+                    <div class="book-img-container">
+                        <img src="https://images.unsplash.com/photo-1589829085413-56de8ae18c73?auto=format&fit=crop&w=500&q=80"
+                            alt="Book" class="book-img" />
+                    </div>
+                    <div class="card-body">
+                        <div class="star-rating mb-2">
+                            <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i
+                                class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i
+                                class="fa-regular fa-star"></i>
+                        </div>
+                        <h6 class="book-title" title="Đắc Nhân Tâm">
+                            Đắc Nhân Tâm
+                        </h6>
+                        <p class="book-author">Dale Carnegie</p>
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <span class="text-danger fw-bold fs-5">85.000đ</span>
+                            <button class="btn-add-cart" title="Thêm vào giỏ">
+                                <i class="fa-solid fa-cart-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="card book-card h-100">
+                    <span class="badge-sale bg-warning text-dark">HOT</span>
+                    <div class="book-img-container">
+                        <img src="https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=500&q=80"
+                            alt="Book" class="book-img" />
+                    </div>
+                    <div class="card-body">
+                        <div class="star-rating mb-2">
+                            <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i
+                                class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i
+                                class="fa-solid fa-star"></i>
+                        </div>
+                        <h6 class="book-title" title="Hành Trình Về Phương Đông">
+                            Hành Trình Về Phương Đông
+                        </h6>
+                        <p class="book-author">Baird T. Spalding</p>
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <span class="text-danger fw-bold fs-5">115.000đ</span>
+                            <button class="btn-add-cart" title="Thêm vào giỏ">
+                                <i class="fa-solid fa-cart-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="card book-card h-100">
+                    <div class="book-img-container">
+                        <img src="https://images.unsplash.com/photo-1532012197367-2d5970d7b5c3?auto=format&fit=crop&w=500&q=80"
+                            alt="Book" class="book-img" />
+                    </div>
+                    <div class="card-body">
+                        <div class="star-rating mb-2">
+                            <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i
+                                class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i
+                                class="fa-solid fa-star"></i>
+                        </div>
+                        <h6 class="book-title" title="Tư Duy Nhanh Và Chậm">
+                            Tư Duy Nhanh Và Chậm
+                        </h6>
+                        <p class="book-author">Daniel Kahneman</p>
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <span class="text-danger fw-bold fs-5">190.000đ</span>
+                            <button class="btn-add-cart" title="Thêm vào giỏ">
+                                <i class="fa-solid fa-cart-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div class="container mb-5">
+        <div class="newsletter-section text-center position-relative">
+            <div class="container" style="max-width: 600px">
+                <h3 class="fw-bold mb-3">Đăng Ký Nhận Tin</h3>
+                <p class="mb-4 text-light opacity-75">
+                    Nhận thông báo về sách mới và mã giảm giá đặc biệt hàng
+                    tuần.
+                </p>
+                <form class="d-flex gap-2">
+                    <input type="email" class="form-control rounded-pill px-4 py-2 border-0"
+                        placeholder="Nhập email của bạn..." />
+                    <button class="btn btn-success rounded-pill px-4 fw-bold">
+                        Đăng ký
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-white border-top pt-5">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-lg-4 col-md-6">
+                    <a href="index.html" class="text-decoration-none">
+                        <h3 class="fw-bold mb-3" style="color: var(--primary-color);">BEO<span
+                                style="color: var(--secondary-color);">BOOKS</span></h3>
+                    </a>
+                    <p class="text-muted small mb-4">
+                        BeoBooks là nơi lan tỏa văn hóa đọc, cung cấp những đầu sách chất lượng với trải nghiệm mua sắm
+                        tuyệt vời nhất cho độc giả.
+                    </p>
+                    <div class="d-flex flex-column gap-2 text-muted small">
+                        <p class="mb-0"><i class="fa-solid fa-location-dot me-2 text-success"></i> Đường 3/2, Ninh Kiều,
+                            Cần Thơ</p>
+                        <p class="mb-0"><i class="fa-solid fa-envelope me-2 text-success"></i> hotro@beobooks.com</p>
+                        <p class="mb-0"><i class="fa-solid fa-phone me-2 text-success"></i> 1900 6789</p>
+                    </div>
+                </div>
+
+                <div class="col-lg-2 col-md-6">
+                    <h6 class="fw-bold mb-3">Về BeoBooks</h6>
+                    <ul class="list-unstyled footer-links">
+                        <li><a href="#">Giới thiệu</a></li>
+                        <li><a href="#">Tuyển dụng</a></li>
+                        <li><a href="#">Chính sách bảo mật</a></li>
+                        <li><a href="#">Điều khoản sử dụng</a></li>
+                        <li><a href="#">Liên hệ hợp tác</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-2 col-md-6">
+                    <h6 class="fw-bold mb-3">Hỗ trợ</h6>
+                    <ul class="list-unstyled footer-links">
+                        <li><a href="#">Hướng dẫn mua hàng</a></li>
+                        <li><a href="#">Phương thức thanh toán</a></li>
+                        <li><a href="#">Chính sách vận chuyển</a></li>
+                        <li><a href="#">Chính sách đổi trả</a></li>
+                        <li><a href="#">Câu hỏi thường gặp</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-4 col-md-6">
+                    <h6 class="fw-bold mb-3">Đăng ký nhận tin</h6>
+                    <p class="text-muted small mb-3">Nhận thông tin sách mới và khuyến mãi đặc biệt.</p>
+                    <form class="input-group mb-4">
+                        <input type="email" class="form-control" placeholder="Email của bạn..."
+                            style="border-radius: 20px 0 0 20px; border-right: none;">
+                        <button class="btn btn-success" type="button" style="border-radius: 0 20px 20px 0;">Đăng
+                            ký</button>
+                    </form>
+
+                    <h6 class="fw-bold mb-3">Kết nối với chúng tôi</h6>
+                    <div class="d-flex gap-2">
+                        <a href="#" class="social-icon"><i class="fa-brands fa-facebook-f"></i></a>
+                        <a href="#" class="social-icon"><i class="fa-brands fa-instagram"></i></a>
+                        <a href="#" class="social-icon"><i class="fa-brands fa-tiktok"></i></a>
+                        <a href="#" class="social-icon"><i class="fa-brands fa-youtube"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="my-4 text-muted">
+
+            <div class="row align-items-center pb-4">
+                <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
+                    <p class="mb-0 text-muted small">© 2026 <strong>BEOBOOKS</strong>. Tất cả các quyền được bảo lưu.
+                    </p>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <div class="d-flex gap-3 justify-content-center justify-content-md-end fs-4 text-secondary">
+                        <i class="fa-brands fa-cc-visa" title="Visa"></i>
+                        <i class="fa-brands fa-cc-mastercard" title="Mastercard"></i>
+                        <i class="fa-solid fa-wallet" title="Momo/ZaloPay"></i>
+                        <i class="fa-solid fa-truck-fast" title="COD"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

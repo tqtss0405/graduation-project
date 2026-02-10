@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hồ sơ cá nhân - BEOBOOKS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+       <nav class="navbar navbar-expand-lg sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">BEO<span style="color: var(--secondary-color)">BOOKS</span></a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/home">Trang chủ</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/products">Sản Phẩm</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" href="/blog">Blog</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" href="/contact">Liên hệ</a>
+                    </li>
+                </ul>
+
+                <div class="d-flex align-items-center gap-3">
+                    <div class="input-group d-none d-lg-flex" style="width: 200px">
+                        <input type="text" class="form-control form-control-sm border-end-0 rounded-start-pill"
+                            placeholder="Tìm sách..." />
+                        <button class="btn btn-outline-secondary border-start-0 rounded-end-pill" type="button">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </button>
+                    </div>
+                    <div class="position-relative cursor-pointer">
+                        <a href="/user/cart">
+                            <i class="fa-solid fa-cart-shopping fs-5 text-secondary"></i>
+                            <span
+                                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                                style="font-size: 10px">3</span>
+                        </a>
+
+                    </div>
+                    <div class="dropdown ms-3">
+                        <a href="#"
+                            class="d-flex align-items-center text-decoration-none text-secondary dropdown-toggle hidden-arrow"
+                            id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <img th:if="${session.currentUser != null}" th:src="${session.currentUser.image}"
+                                class="rounded-circle" width="30" height="30" alt="Avatar" />
+                            <i th:if="${session.currentUser == null}" class="fa-solid fa-circle-user fs-3"></i>
+                        </a>
+
+                        <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg p-3"
+                            aria-labelledby="userDropdown"
+                            style="min-width: 280px; border-radius: 15px; margin-top: 10px;">
+
+                            <li th:if="${session.currentUser == null}">
+                                <div class="d-flex flex-column align-items-center mb-3">
+                                    <p class="small text-muted mb-2">Chào mừng đến với BeoBooks!</p>
+                                    <a href="/login/form" class="btn btn-success w-100 rounded-pill fw-bold mb-2">Đăng
+                                        nhập</a>
+                                    <a href="/register" class="btn btn-outline-success w-100 rounded-pill fw-bold">Đăng
+                                        ký</a>
+                                </div>
+                            </li>
+
+                            <div th:if="${session.currentUser != null}">
+                                <li>
+                                    <div class="d-flex flex-column align-items-center mb-2">
+                                        <p class="small text-muted mb-1">Xin chào,</p>
+                                        <h6 class="fw-bold text-success" th:text="${session.currentUser.fullname}">User
+                                            Name</h6>
+                                    </div>
+                                </li>
+
+                                <li>
+                                    <hr class="dropdown-divider" />
+                                </li>
+
+                                <li>
+                                    <a class="dropdown-item py-2 rounded" href="/user/profile">
+                                        <i class="fa-solid fa-user me-2 text-muted"></i> Thông tin cá nhân
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a class="dropdown-item py-2 rounded" href="/user/change-password">
+                                        <i class="fa-solid fa-key me-2 text-muted"></i> Đổi mật khẩu
+                                    </a>
+                                </li>
+
+                                <li th:if="${session.currentUser.role == true}">
+                                    <a class="dropdown-item py-2 rounded" href="/admin/dashboard">
+                                        <i class="fa-solid fa-user-shield me-2 text-muted"></i> Trang Quản Trị
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a class="dropdown-item py-2 rounded" href="/user/order-details">
+                                        <i class="fa-solid fa-box-open me-2 text-muted"></i> Lịch sử mua hàng
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <hr class="dropdown-divider" />
+                                </li>
+
+                                <li>
+                                    <a href="/logout" class="dropdown-item py-2 rounded text-danger">
+                                        <i class="fa-solid fa-right-from-bracket me-2"></i> Đăng xuất
+                                    </a>
+                                </li>
+                            </div>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <main class="container my-5">
+        <div class="row g-4">
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm rounded-4 text-center p-4">
+                    <div class="position-relative d-inline-block mb-3">
+                        <img th:src="${user.image != null ? user.image : '/images/default-user.png'}"
+                             class="rounded-circle border border-3 border-success"
+                             style="width: 150px; height: 150px; object-fit: cover;" alt="Avatar">
+                        <label for="avatarUpload" class="position-absolute bottom-0 end-0 bg-success text-white rounded-circle p-2 cursor-pointer" title="Đổi ảnh">
+                            <i class="fa-solid fa-camera"></i>
+                        </label>
+                    </div>
+                    <h5 class="fw-bold mb-1" th:text="${user.fullname}">Tên User</h5>
+                    <p class="text-muted small" th:text="${user.email}">user@email.com</p>
+                    
+                    <hr>
+                    <div class="list-group list-group-flush text-start">
+                        <a href="/profile" class="list-group-item list-group-item-action active bg-success border-success">
+                            <i class="fa-solid fa-user me-2"></i> Hồ sơ cá nhân
+                        </a>
+                        <a href="/my-orders" class="list-group-item list-group-item-action">
+                            <i class="fa-solid fa-box-open me-2"></i> Lịch sử đơn hàng
+                        </a>
+                        <a href="/change-password" class="list-group-item list-group-item-action">
+                            <i class="fa-solid fa-key me-2"></i> Đổi mật khẩu
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card-header bg-white border-0 pt-4 px-4">
+                        <h5 class="fw-bold"><i class="fa-solid fa-pen-to-square text-success me-2"></i>Cập nhật thông tin</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <form action="/profile/update" method="post" enctype="multipart/form-data">
+                            <input type="file" id="avatarUpload" name="imageFile" class="d-none" onchange="this.form.submit()">
+                            
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold text-muted">Họ và tên</label>
+                                    <input type="text" name="fullname" class="form-control rounded-pill" th:value="${user.fullname}" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold text-muted">Số điện thoại</label>
+                                    <input type="text" name="phone" class="form-control rounded-pill" th:value="${user.phone}">
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label small fw-bold text-muted">Giới tính</label>
+                                    <div class="d-flex gap-4">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="gender" value="true" th:checked="${user.gender == true}">
+                                            <label class="form-check-label">Nam</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="gender" value="false" th:checked="${user.gender == false}">
+                                            <label class="form-check-label">Nữ</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12 text-end">
+                                    <button type="submit" class="btn btn-success rounded-pill px-4 fw-bold">Lưu thay đổi</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card border-0 shadow-sm rounded-4">
+                    <div class="card-header bg-white border-0 pt-4 px-4 d-flex justify-content-between align-items-center">
+                        <h5 class="fw-bold mb-0"><i class="fa-solid fa-location-dot text-success me-2"></i>Sổ địa chỉ</h5>
+                        <button class="btn btn-outline-success btn-sm rounded-pill" data-bs-toggle="modal" data-bs-target="#addAddressModal">
+                            <i class="fa-solid fa-plus me-1"></i> Thêm mới
+                        </button>
+                    </div>
+                    <div class="card-body p-4">
+                        <div th:if="${user.addresses.empty}" class="text-center text-muted py-3">
+                            Chưa có địa chỉ nào. Hãy thêm địa chỉ giao hàng.
+                        </div>
+                        <div class="list-group list-group-flush">
+                            <div th:each="addr : ${user.addresses}" class="list-group-item px-0 py-3 d-flex justify-content-between align-items-center">
+                                <div>
+                                    <span class="fw-bold d-block" th:text="${addr.street}">Số nhà, Đường</span>
+                                    <span class="small text-muted" th:text="${addr.city}">Thành phố</span>
+                                </div>
+                                <a th:href="@{|/profile/address/delete/${addr.id}|}" class="btn btn-light btn-sm text-danger rounded-circle" onclick="return confirm('Bạn chắc chắn muốn xóa?')">
+                                    <i class="fa-solid fa-trash"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div class="modal fade" id="addAddressModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content rounded-4 border-0">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title fw-bold">Thêm địa chỉ mới</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="/profile/address/add" method="post">
+                        <div class="mb-3">
+                            <label class="form-label text-muted small">Địa chỉ cụ thể (Số nhà, đường)</label>
+                            <input type="text" name="street" class="form-control rounded-pill" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-muted small">Tỉnh / Thành phố</label>
+                            <input type="text" name="city" class="form-control rounded-pill" required>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-success rounded-pill fw-bold">Thêm địa chỉ</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-white border-top pt-5"> ... (Code Footer cũ) ... </footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

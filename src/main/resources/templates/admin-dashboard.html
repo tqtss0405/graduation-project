@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Báo cáo & Thống kê - Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/admin-style.css">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="/js/slidebar.js"></script>
+
+</head>
+
+<body>
+     <nav class="sidebar">
+        <div class="sidebar-brand">BEO<span style="color:white">BOOKS</span></div>
+        <ul class="nav flex-column mt-3">
+            <li class="nav-item">
+                <a href="/admin/dashboard" class="nav-link">
+                    <i class="fa-solid fa-gauge"></i> Tổng quan
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/admin/products" class="nav-link active">
+                    <i class="fa-solid fa-book"></i> Quản lý sách
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/admin/orders" class="nav-link">
+                    <i class="fa-solid fa-cart-shopping"></i> Đơn hàng
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/admin/customers" class="nav-link">
+                    <i class="fa-solid fa-users"></i> Khách hàng
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/admin/categories" class="nav-link">
+                    <i class="fa-solid fa-layer-group"></i> Danh mục
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/admin/vouchers" class="nav-link">
+                    <i class="fa-solid fa-ticket"></i> Mã giảm giá
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/admin/reviews" class="nav-link">
+                    <i class="fa-solid fa-star"></i> Đánh giá
+                </a>
+            </li>
+            <li class="nav-item mt-5">
+                <a href="/logout" class="nav-link text-danger">
+                    <i class="fa-solid fa-right-from-bracket"></i> Thoát
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h3 class="fw-bold m-0">Báo cáo & Thống kê</h3>
+                <p class="text-muted mb-0">Tổng quan hiệu suất kinh doanh</p>
+            </div>
+            <div class="d-flex gap-2">
+                <button class="btn btn-outline-success" onclick="exportReport()">
+                    <i class="fa-solid fa-file-excel me-2"></i>Xuất Excel
+                </button>
+                <button class="btn btn-outline-danger" onclick="exportPDF()">
+                    <i class="fa-solid fa-file-pdf me-2"></i>Xuất PDF
+                </button>
+            </div>
+        </div>
+
+        <!-- Filter Section -->
+        <div class="filter-section">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Khoảng thời gian</label>
+                    <select class="form-select" id="timeRange" onchange="updateCharts()">
+                        <option value="7">7 ngày qua</option>
+                        <option value="30" selected>30 ngày qua</option>
+                        <option value="90">90 ngày qua</option>
+                        <option value="365">1 năm qua</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Từ ngày</label>
+                    <input type="date" class="form-control" id="startDate">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Đến ngày</label>
+                    <input type="date" class="form-control" id="endDate">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">&nbsp;</label>
+                    <button class="btn btn-success w-100" onclick="applyFilter()">
+                        <i class="fa-solid fa-filter me-2"></i>Áp dụng
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="row g-4 mb-4">
+            <div class="col-xl-3 col-md-6">
+                <div class="stat-card blue position-relative">
+                    <i class="fa-solid fa-dollar-sign stat-icon"></i>
+                    <div class="stat-label">Tổng doanh thu</div>
+                    <div class="stat-value">285.4M</div>
+                    <div class="stat-change">
+                        <i class="fa-solid fa-arrow-up trend-up"></i>
+                        <span>+12.5% so với tháng trước</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6">
+                <div class="stat-card green position-relative">
+                    <i class="fa-solid fa-shopping-cart stat-icon"></i>
+                    <div class="stat-label">Đơn hàng</div>
+                    <div class="stat-value">1,847</div>
+                    <div class="stat-change">
+                        <i class="fa-solid fa-arrow-up trend-up"></i>
+                        <span>+8.2% so với tháng trước</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6">
+                <div class="stat-card orange position-relative">
+                    <i class="fa-solid fa-users stat-icon"></i>
+                    <div class="stat-label">Khách hàng mới</div>
+                    <div class="stat-value">456</div>
+                    <div class="stat-change">
+                        <i class="fa-solid fa-arrow-down trend-down"></i>
+                        <span>-3.1% so với tháng trước</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6">
+                <div class="stat-card purple position-relative">
+                    <i class="fa-solid fa-book stat-icon"></i>
+                    <div class="stat-label">Sản phẩm bán ra</div>
+                    <div class="stat-value">3,284</div>
+                    <div class="stat-change">
+                        <i class="fa-solid fa-arrow-up trend-up"></i>
+                        <span>+15.8% so với tháng trước</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Row 1 -->
+        <div class="row g-4 mb-4">
+            <div class="col-lg-8">
+                <div class="chart-container">
+                    <div class="chart-title">
+                        <i class="fa-solid fa-chart-line text-success me-2"></i>
+                        Doanh thu theo thời gian
+                    </div>
+                    <canvas id="revenueChart" height="80"></canvas>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="chart-container">
+                    <div class="chart-title">
+                        <i class="fa-solid fa-chart-pie text-success me-2"></i>
+                        Phân loại đơn hàng
+                    </div>
+                    <canvas id="orderStatusChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Row 2 -->
+        <div class="row g-4 mb-4">
+            <div class="col-lg-6">
+                <div class="chart-container">
+                    <div class="chart-title">
+                        <i class="fa-solid fa-layer-group text-success me-2"></i>
+                        Top danh mục bán chạy
+                    </div>
+                    <canvas id="categoryChart" height="120"></canvas>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="chart-container">
+                    <div class="chart-title">
+                        <i class="fa-solid fa-user-group text-success me-2"></i>
+                        Khách hàng mới theo tháng
+                    </div>
+                    <canvas id="customerChart" height="120"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Products Table -->
+        <div class="report-table">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Xếp hạng</th>
+                        <th>Tên sách</th>
+                        <th>Danh mục</th>
+                        <th>Đã bán</th>
+                        <th>Doanh thu</th>
+                        <th>Đánh giá</th>
+                        <th>Tồn kho</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="badge bg-warning text-dark fs-6">🥇 1</span></td>
+                        <td class="fw-bold">Nhà Giả Kim</td>
+                        <td>Văn học</td>
+                        <td><strong>284</strong> cuốn</td>
+                        <td class="text-success fw-bold">17,892,000đ</td>
+                        <td>
+                            <span class="text-warning">★★★★★</span> (4.8)
+                        </td>
+                        <td><span class="badge bg-success">152</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge bg-secondary fs-6">🥈 2</span></td>
+                        <td class="fw-bold">Đắc Nhân Tâm</td>
+                        <td>Kỹ năng sống</td>
+                        <td><strong>267</strong> cuốn</td>
+                        <td class="text-success fw-bold">16,020,000đ</td>
+                        <td>
+                            <span class="text-warning">★★★★★</span> (4.9)
+                        </td>
+                        <td><span class="badge bg-warning text-dark">45</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge bg-danger fs-6">🥉 3</span></td>
+                        <td class="fw-bold">Sapiens - Lược sử loài người</td>
+                        <td>Khoa học</td>
+                        <td><strong>198</strong> cuốn</td>
+                        <td class="text-success fw-bold">14,850,000đ</td>
+                        <td>
+                            <span class="text-warning">★★★★☆</span> (4.7)
+                        </td>
+                        <td><span class="badge bg-success">89</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge bg-light text-dark">4</span></td>
+                        <td class="fw-bold">Tâm lý học tội phạm</td>
+                        <td>Tâm lý học</td>
+                        <td><strong>156</strong> cuốn</td>
+                        <td class="text-success fw-bold">12,480,000đ</td>
+                        <td>
+                            <span class="text-warning">★★★★☆</span> (4.6)
+                        </td>
+                        <td><span class="badge bg-success">124</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge bg-light text-dark">5</span></td>
+                        <td class="fw-bold">Tuổi trẻ đáng giá bao nhiêu</td>
+                        <td>Kỹ năng sống</td>
+                        <td><strong>143</strong> cuốn</td>
+                        <td class="text-success fw-bold">10,725,000đ</td>
+                        <td>
+                            <span class="text-warning">★★★★☆</span> (4.5)
+                        </td>
+                        <td><span class="badge bg-danger">12</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Revenue Chart
+        const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+        const revenueChart = new Chart(revenueCtx, {
+            type: 'line',
+            data: {
+                labels: ['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10', 'T11', 'T12'],
+                datasets: [{
+                    label: 'Doanh thu (Triệu VNĐ)',
+                    data: [15, 18, 22, 20, 25, 28, 24, 30, 35, 32, 38, 42],
+                    borderColor: '#28a745',
+                    backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                    fill: true,
+                    tension: 0.4,
+                    borderWidth: 3
+                }, {
+                    label: 'Chi phí (Triệu VNĐ)',
+                    data: [8, 10, 12, 11, 13, 15, 13, 16, 18, 17, 20, 22],
+                    borderColor: '#dc3545',
+                    backgroundColor: 'rgba(220, 53, 69, 0.1)',
+                    fill: true,
+                    tension: 0.4,
+                    borderWidth: 3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return value + 'M';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Order Status Chart
+        const orderStatusCtx = document.getElementById('orderStatusChart').getContext('2d');
+        const orderStatusChart = new Chart(orderStatusCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Hoàn thành', 'Đang xử lý', 'Đang giao', 'Hủy'],
+                datasets: [{
+                    data: [1234, 298, 215, 100],
+                    backgroundColor: [
+                        '#28a745',
+                        '#ffc107',
+                        '#17a2b8',
+                        '#dc3545'
+                    ],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+
+        // Category Chart
+        const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+        const categoryChart = new Chart(categoryCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Văn học', 'Kỹ năng sống', 'Kinh tế', 'Thiếu nhi', 'Tâm lý', 'Khoa học'],
+                datasets: [{
+                    label: 'Số lượng bán ra',
+                    data: [458, 389, 312, 256, 198, 167],
+                    backgroundColor: [
+                        'rgba(102, 126, 234, 0.8)',
+                        'rgba(118, 75, 162, 0.8)',
+                        'rgba(237, 100, 166, 0.8)',
+                        'rgba(255, 154, 158, 0.8)',
+                        'rgba(75, 192, 192, 0.8)',
+                        'rgba(153, 102, 255, 0.8)'
+                    ],
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Customer Chart
+        const customerCtx = document.getElementById('customerChart').getContext('2d');
+        const customerChart = new Chart(customerCtx, {
+            type: 'bar',
+            data: {
+                labels: ['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10', 'T11', 'T12'],
+                datasets: [{
+                    label: 'Khách hàng mới',
+                    data: [45, 52, 48, 67, 73, 82, 78, 95, 88, 92, 105, 98],
+                    backgroundColor: 'rgba(40, 167, 69, 0.8)',
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Functions
+        function updateCharts() {
+            console.log('Updating charts...');
+            // Thêm logic cập nhật dữ liệu biểu đồ
+        }
+
+        function applyFilter() {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            console.log('Filtering from', startDate, 'to', endDate);
+            // Thêm logic lọc dữ liệu
+        }
+
+        function exportReport() {
+            alert('Xuất báo cáo Excel');
+            // Thêm logic xuất Excel
+        }
+
+        function exportPDF() {
+            alert('Xuất báo cáo PDF');
+            // Thêm logic xuất PDF
+        }
+
+        // Set default dates
+        const today = new Date();
+        const thirtyDaysAgo = new Date(today.getTime() - (30 * 24 * 60 * 60 * 1000));
+        document.getElementById('endDate').valueAsDate = today;
+        document.getElementById('startDate').valueAsDate = thirtyDaysAgo;
+    </script>
+    <script src="/js/admin-avt.js"></script>
+    <script src="/js/sidebar.js"></script>
+</body> 
+</html>

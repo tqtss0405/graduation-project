@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liên Hệ - BEOBOOKS</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+
+</head>
+
+<body>
+
+    <nav class="navbar navbar-expand-lg sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">BEO<span style="color: var(--secondary-color)">BOOKS</span></a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/home">Trang chủ</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/products">Sản Phẩm</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" href="/blog">Blog</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" href="/contact">Liên hệ</a>
+                    </li>
+                </ul>
+
+                <div class="d-flex align-items-center gap-3">
+                    <div class="input-group d-none d-lg-flex" style="width: 200px">
+                        <input type="text" class="form-control form-control-sm border-end-0 rounded-start-pill"
+                            placeholder="Tìm sách..." />
+                        <button class="btn btn-outline-secondary border-start-0 rounded-end-pill" type="button">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </button>
+                    </div>
+                    <div class="position-relative cursor-pointer">
+                        <a href="/user/cart">
+                            <i class="fa-solid fa-cart-shopping fs-5 text-secondary"></i>
+                            <span
+                                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                                style="font-size: 10px">3</span>
+                        </a>
+
+                    </div>
+                    <div class="dropdown ms-3">
+                        <a href="#"
+                            class="d-flex align-items-center text-decoration-none text-secondary dropdown-toggle hidden-arrow"
+                            id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <img th:if="${session.currentUser != null}" th:src="${session.currentUser.image}"
+                                class="rounded-circle" width="30" height="30" alt="Avatar" />
+                            <i th:if="${session.currentUser == null}" class="fa-solid fa-circle-user fs-3"></i>
+                        </a>
+
+                        <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg p-3"
+                            aria-labelledby="userDropdown"
+                            style="min-width: 280px; border-radius: 15px; margin-top: 10px;">
+
+                            <li th:if="${session.currentUser == null}">
+                                <div class="d-flex flex-column align-items-center mb-3">
+                                    <p class="small text-muted mb-2">Chào mừng đến với BeoBooks!</p>
+                                    <a href="/login/form" class="btn btn-success w-100 rounded-pill fw-bold mb-2">Đăng
+                                        nhập</a>
+                                    <a href="/register" class="btn btn-outline-success w-100 rounded-pill fw-bold">Đăng
+                                        ký</a>
+                                </div>
+                            </li>
+
+                            <div th:if="${session.currentUser != null}">
+                                <li>
+                                    <div class="d-flex flex-column align-items-center mb-2">
+                                        <p class="small text-muted mb-1">Xin chào,</p>
+                                        <h6 class="fw-bold text-success" th:text="${session.currentUser.fullname}">User
+                                            Name</h6>
+                                    </div>
+                                </li>
+
+                                <li>
+                                    <hr class="dropdown-divider" />
+                                </li>
+
+                                <li>
+                                    <a class="dropdown-item py-2 rounded" href="/user/profile">
+                                        <i class="fa-solid fa-user me-2 text-muted"></i> Thông tin cá nhân
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a class="dropdown-item py-2 rounded" href="/user/change-password">
+                                        <i class="fa-solid fa-key me-2 text-muted"></i> Đổi mật khẩu
+                                    </a>
+                                </li>
+
+                                <li th:if="${session.currentUser.role == true}">
+                                    <a class="dropdown-item py-2 rounded" href="/admin/dashboard">
+                                        <i class="fa-solid fa-user-shield me-2 text-muted"></i> Trang Quản Trị
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a class="dropdown-item py-2 rounded" href="/user/order-details">
+                                        <i class="fa-solid fa-box-open me-2 text-muted"></i> Lịch sử mua hàng
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <hr class="dropdown-divider" />
+                                </li>
+
+                                <li>
+                                    <a href="/logout" class="dropdown-item py-2 rounded text-danger">
+                                        <i class="fa-solid fa-right-from-bracket me-2"></i> Đăng xuất
+                                    </a>
+                                </li>
+                            </div>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <header class="contact-header text-center">
+        <div class="container">
+            <h1 class="display-4 fw-bold mb-3">Liên Hệ Với Chúng Tôi</h1>
+            <p class="lead mb-0">Chúng tôi luôn sẵn sàng lắng nghe và hỗ trợ bạn 24/7</p>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb justify-content-center mt-3 mb-0">
+                    <li class="breadcrumb-item"><a href="index.html" class="text-white text-decoration-none">Trang
+                            chủ</a></li>
+                    <li class="breadcrumb-item active text-white opacity-75" aria-current="page">Liên hệ</li>
+                </ol>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container mb-5">
+
+        <div class="row g-4 mb-5">
+            <div class="col-md-4">
+                <div class="info-box text-center">
+                    <div class="info-icon mx-auto"><i class="fa-solid fa-location-dot"></i></div>
+                    <h5 class="fw-bold">Địa Chỉ</h5>
+                    <p class="text-muted small">Đường 3/2, Phường Xuân Khánh,<br>Quận Ninh Kiều, TP. Cần Thơ</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="info-box text-center">
+                    <div class="info-icon mx-auto"><i class="fa-solid fa-phone"></i></div>
+                    <h5 class="fw-bold">Hotline</h5>
+                    <p class="text-muted small">090 123 4567 (Tư vấn bán hàng)<br>090 999 8888 (Hỗ trợ khiếu nại)</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="info-box text-center">
+                    <div class="info-icon mx-auto"><i class="fa-solid fa-envelope"></i></div>
+                    <h5 class="fw-bold">Email</h5>
+                    <p class="text-muted small">support@beobooks.com<br>kinhdoanh@beobooks.com</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-5">
+            <div class="col-lg-6">
+                <h3 class="fw-bold mb-4">Gửi Tin Nhắn Cho Chúng Tôi</h3>
+                <form>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="name" placeholder="Tên của bạn">
+                                <label for="name">Họ và Tên</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="email" class="form-control" id="email" placeholder="name@example.com">
+                                <label for="email">Email</label>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="subject" placeholder="Tiêu đề">
+                                <label for="subject">Tiêu đề</label>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-floating">
+                                <textarea class="form-control" placeholder="Nội dung" id="message"
+                                    style="height: 150px"></textarea>
+                                <label for="message">Nội dung tin nhắn</label>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <button class="btn btn-success w-100 py-3 fw-bold rounded-pill shadow-sm" type="submit">
+                                <i class="fa-regular fa-paper-plane me-2"></i> GỬI TIN NHẮN
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="col-lg-6">
+                <h3 class="fw-bold mb-4">Bản Đồ Chỉ Đường</h3>
+                <div class="map-container">
+                    <iframe
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3928.841518442039!2d105.7680403750516!3d10.029933690077066!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31a0895a51d60719%3A0x9d76b0035f6d53d0!2zVHLGsOG7nW5nIMSQ4bqhaSBo4buNYyBD4bqnbiBUaMah!5e0!3m2!1svi!2s!4v1708445722475!5m2!1svi!2s"
+                        width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"
+                        referrerpolicy="no-referrer-when-downgrade">
+                    </iframe>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-5 pt-5">
+            <div class="col-12 text-center mb-4">
+                <h3 class="fw-bold">Câu Hỏi Thường Gặp</h3>
+                <p class="text-muted">Những thắc mắc phổ biến của khách hàng</p>
+            </div>
+            <div class="col-lg-8 mx-auto">
+                <div class="accordion" id="faqAccordion">
+                    <div class="accordion-item border-0 shadow-sm mb-3 rounded overflow-hidden">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button fw-bold" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#faq1">
+                                1. Phí vận chuyển được tính như thế nào?
+                            </button>
+                        </h2>
+                        <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body text-muted small">
+                                Chúng tôi miễn phí vận chuyển cho đơn hàng từ 200.000đ tại nội thành và 500.000đ đối với
+                                ngoại thành. Các đơn hàng nhỏ hơn sẽ tính phí cố định 30.000đ.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item border-0 shadow-sm mb-3 rounded overflow-hidden">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#faq2">
+                                2. Tôi có thể đổi trả sách không?
+                            </button>
+                        </h2>
+                        <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body text-muted small">
+                                Có, bạn có thể đổi trả trong vòng 30 ngày nếu sách có lỗi in ấn, hư hỏng do vận chuyển.
+                                Sách đổi trả phải còn nguyên tem và chưa qua sử dụng.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item border-0 shadow-sm mb-3 rounded overflow-hidden">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#faq3">
+                                3. Cửa hàng có gói quà không?
+                            </button>
+                        </h2>
+                        <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body text-muted small">
+                                BeoBooks cung cấp dịch vụ gói quà miễn phí và tặng kèm thiệp chúc mừng cho các đơn hàng
+                                quà tặng. Bạn chỉ cần ghi chú trong đơn hàng.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <footer class="bg-white border-top pt-5">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-lg-4 col-md-6">
+                    <a href="index.html" class="text-decoration-none">
+                        <h3 class="fw-bold mb-3" style="color: var(--primary-color);">BEO<span
+                                style="color: var(--secondary-color);">BOOKS</span></h3>
+                    </a>
+                    <p class="text-muted small mb-4">
+                        BeoBooks là nơi lan tỏa văn hóa đọc, cung cấp những đầu sách chất lượng với trải nghiệm mua sắm
+                        tuyệt vời nhất cho độc giả.
+                    </p>
+                    <div class="d-flex flex-column gap-2 text-muted small">
+                        <p class="mb-0"><i class="fa-solid fa-location-dot me-2 text-success"></i> Đường 3/2, Ninh Kiều,
+                            Cần Thơ</p>
+                        <p class="mb-0"><i class="fa-solid fa-envelope me-2 text-success"></i> hotro@beobooks.com</p>
+                        <p class="mb-0"><i class="fa-solid fa-phone me-2 text-success"></i> 1900 6789</p>
+                    </div>
+                </div>
+
+                <div class="col-lg-2 col-md-6">
+                    <h6 class="fw-bold mb-3">Về BeoBooks</h6>
+                    <ul class="list-unstyled footer-links">
+                        <li><a href="#">Giới thiệu</a></li>
+                        <li><a href="#">Tuyển dụng</a></li>
+                        <li><a href="#">Chính sách bảo mật</a></li>
+                        <li><a href="#">Điều khoản sử dụng</a></li>
+                        <li><a href="#">Liên hệ hợp tác</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-2 col-md-6">
+                    <h6 class="fw-bold mb-3">Hỗ trợ</h6>
+                    <ul class="list-unstyled footer-links">
+                        <li><a href="#">Hướng dẫn mua hàng</a></li>
+                        <li><a href="#">Phương thức thanh toán</a></li>
+                        <li><a href="#">Chính sách vận chuyển</a></li>
+                        <li><a href="#">Chính sách đổi trả</a></li>
+                        <li><a href="#">Câu hỏi thường gặp</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-4 col-md-6">
+                    <h6 class="fw-bold mb-3">Đăng ký nhận tin</h6>
+                    <p class="text-muted small mb-3">Nhận thông tin sách mới và khuyến mãi đặc biệt.</p>
+                    <form class="input-group mb-4">
+                        <input type="email" class="form-control" placeholder="Email của bạn..."
+                            style="border-radius: 20px 0 0 20px; border-right: none;">
+                        <button class="btn btn-success" type="button" style="border-radius: 0 20px 20px 0;">Đăng
+                            ký</button>
+                    </form>
+
+                    <h6 class="fw-bold mb-3">Kết nối với chúng tôi</h6>
+                    <div class="d-flex gap-2">
+                        <a href="#" class="social-icon"><i class="fa-brands fa-facebook-f"></i></a>
+                        <a href="#" class="social-icon"><i class="fa-brands fa-instagram"></i></a>
+                        <a href="#" class="social-icon"><i class="fa-brands fa-tiktok"></i></a>
+                        <a href="#" class="social-icon"><i class="fa-brands fa-youtube"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="my-4 text-muted">
+
+            <div class="row align-items-center pb-4">
+                <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
+                    <p class="mb-0 text-muted small">© 2026 <strong>BEOBOOKS</strong>. Tất cả các quyền được bảo lưu.
+                    </p>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <div class="d-flex gap-3 justify-content-center justify-content-md-end fs-4 text-secondary">
+                        <i class="fa-brands fa-cc-visa" title="Visa"></i>
+                        <i class="fa-brands fa-cc-mastercard" title="Mastercard"></i>
+                        <i class="fa-solid fa-wallet" title="Momo/ZaloPay"></i>
+                        <i class="fa-solid fa-truck-fast" title="COD"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <div class="modal fade" id="authModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
+                <div class="modal-header border-0 p-0 position-relative">
+                    <button type="button" class="btn-close position-absolute top-0 end-0 m-3 z-3"
+                        data-bs-dismiss="modal" aria-label="Close"></button>
+                    <div class="w-100 bg-success d-flex align-items-center justify-content-center text-white"
+                        style="height: 100px;">
+                        <h3 class="fw-bold m-0">Chào mừng bạn!</h3>
+                    </div>
+                </div>
+                <div class="modal-body p-4">
+                    <ul class="nav nav-pills nav-fill mb-4" id="authTab" role="tablist"
+                        style="background: #f1f1f1; border-radius: 10px; padding: 5px;">
+                        <li class="nav-item" role="presentation"><button class="nav-link active fw-bold rounded-3"
+                                id="login-tab" data-bs-toggle="pill" data-bs-target="#login-panel" type="button">Đăng
+                                Nhập</button></li>
+                        <li class="nav-item" role="presentation"><button class="nav-link fw-bold rounded-3"
+                                id="register-tab" data-bs-toggle="pill" data-bs-target="#register-panel"
+                                type="button">Đăng Ký</button></li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane fade show active" id="login-panel">
+                            <form>
+                                <div class="mb-3"><input type="text" class="form-control rounded-3"
+                                        placeholder="Email / Số điện thoại"></div>
+                                <div class="mb-3"><input type="password" class="form-control rounded-3"
+                                        placeholder="Mật khẩu"></div>
+                                <button type="submit" class="btn btn-success w-100 fw-bold rounded-pill py-2">ĐĂNG NHẬP
+                                    NGAY</button>
+                            </form>
+                        </div>
+                        <div class="tab-pane fade" id="register-panel">
+                            <form>
+                                <div class="mb-3"><input type="text" class="form-control rounded-3"
+                                        placeholder="Họ và Tên"></div>
+                                <div class="mb-3"><input type="email" class="form-control rounded-3"
+                                        placeholder="Email"></div>
+                                <div class="mb-3"><input type="password" class="form-control rounded-3"
+                                        placeholder="Mật khẩu"></div>
+                                <button type="submit" class="btn btn-success w-100 fw-bold rounded-pill py-2">ĐĂNG KÝ
+                                    TÀI KHOẢN</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

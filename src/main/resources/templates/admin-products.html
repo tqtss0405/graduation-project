@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Sách - Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/admin-style.css">
+    
+</head>
+
+<body>
+    <nav class="sidebar">
+        <div class="sidebar-brand">BEO<span style="color:white">BOOKS</span></div>
+        <ul class="nav flex-column mt-3">
+            <li class="nav-item">
+                <a href="/admin/dashboard" class="nav-link">
+                    <i class="fa-solid fa-gauge"></i> Tổng quan
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/admin/products" class="nav-link active">
+                    <i class="fa-solid fa-book"></i> Quản lý sách
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/admin/orders" class="nav-link">
+                    <i class="fa-solid fa-cart-shopping"></i> Đơn hàng
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/admin/customers" class="nav-link">
+                    <i class="fa-solid fa-users"></i> Khách hàng
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/admin/categories" class="nav-link">
+                    <i class="fa-solid fa-layer-group"></i> Danh mục
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/admin/vouchers" class="nav-link">
+                    <i class="fa-solid fa-ticket"></i> Mã giảm giá
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/admin/reviews" class="nav-link">
+                    <i class="fa-solid fa-star"></i> Đánh giá
+                </a>
+            </li>
+             
+            <li class="nav-item mt-5">
+                <a href="/logout" class="nav-link text-danger">
+                    <i class="fa-solid fa-right-from-bracket"></i> Thoát
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        
+        <!-- Admin Header with Profile -->
+        <div class="admin-header">
+            <div>
+                <h4 class="fw-bold mb-0">Quản lý Sản phẩm</h4>
+                <small class="text-muted">Quản lý toàn bộ sách trong hệ thống</small>
+            </div>
+            <div class="admin-profile" data-bs-toggle="modal" data-bs-target="#profileModal">
+                <img src="https://ui-avatars.com/api/?name=Admin&background=28a745&color=fff" alt="Admin" class="admin-avatar">
+                <div class="admin-info">
+                    <h6>Admin Nguyễn</h6>
+                    <small><i class="fa-solid fa-circle text-success" style="font-size: 0.5rem;"></i> Đang hoạt động</small>
+                </div>
+                <i class="fa-solid fa-chevron-down ms-2"></i>
+            </div>
+        </div>
+
+        <!-- Filter & Search -->
+        <div class="bg-white p-3 rounded-3 shadow-sm mb-4">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white">
+                            <i class="fa-solid fa-search"></i>
+                        </span>
+                        <input type="text" class="form-control border-start-0" placeholder="Tìm kiếm tên sách, tác giả...">
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <select class="form-select">
+                        <option>Tất cả danh mục</option>
+                        <option>Văn học</option>
+                        <option>Kinh tế</option>
+                        <option>Thiếu nhi</option>
+                        <option>Kỹ năng sống</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select class="form-select">
+                        <option>Trạng thái</option>
+                        <option>Đang bán</option>
+                        <option>Ngừng bán</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select class="form-select">
+                        <option>Sắp xếp</option>
+                        <option>Mới nhất</option>
+                        <option>Cũ nhất</option>
+                        <option>Giá tăng dần</option>
+                        <option>Giá giảm dần</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button class="btn btn-success w-100" data-bs-toggle="modal" data-bs-target="#addProductModal">
+                        <i class="fa-solid fa-plus me-2"></i>Thêm sách
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Products Table -->
+        <div class="bg-white rounded-3 shadow-sm overflow-hidden">
+            <table class="table table-hover mb-0 align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th width="50">
+                            <input type="checkbox" class="form-check-input">
+                        </th>
+                        <th>ID</th>
+                        <th>Hình ảnh</th>
+                        <th>Tên sách</th>
+                        <th>Danh mục</th>
+                        <th>Tác giả</th>
+                        <th>Giá gốc</th>
+                        <th>Giá bán</th>
+                        <th>Kho</th>
+                        <th>Trạng thái</th>
+                        <th width="150">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><input type="checkbox" class="form-check-input"></td>
+                        <td class="fw-bold">#001</td>
+                        <td>
+                            <img src="https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&w=60" class="product-img" alt="Nhà Giả Kim">
+                        </td>
+                        <td>
+                            <div class="fw-bold">Nhà Giả Kim</div>
+                            <small class="text-muted">ISBN: 978-604-...</small>
+                        </td>
+                        <td><span class="badge bg-primary">Văn học</span></td>
+                        <td>Paulo Coelho</td>
+                        <td class="text-muted text-decoration-line-through">79.000đ</td>
+                        <td class="text-danger fw-bold">63.000đ</td>
+                        <td><span class="badge bg-success">120</span></td>
+                        <td><span class="status-active">Đang bán</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-light btn-action text-info" data-bs-toggle="modal" data-bs-target="#viewProductModal" title="Xem">
+                                <i class="fa-solid fa-eye"></i>
+                            </button>
+                            <button class="btn btn-sm btn-light btn-action text-primary" data-bs-toggle="modal" data-bs-target="#editProductModal" title="Sửa">
+                                <i class="fa-solid fa-pen"></i>
+                            </button>
+                            <button class="btn btn-sm btn-light btn-action text-danger" onclick="deleteProduct(1)" title="Xóa">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><input type="checkbox" class="form-check-input"></td>
+                        <td class="fw-bold">#002</td>
+                        <td>
+                            <img src="https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=60" class="product-img" alt="Đắc Nhân Tâm">
+                        </td>
+                        <td>
+                            <div class="fw-bold">Đắc Nhân Tâm</div>
+                            <small class="text-muted">ISBN: 978-604-...</small>
+                        </td>
+                        <td><span class="badge bg-warning">Kỹ năng</span></td>
+                        <td>Dale Carnegie</td>
+                        <td class="text-muted text-decoration-line-through">86.000đ</td>
+                        <td class="text-danger fw-bold">65.000đ</td>
+                        <td><span class="badge bg-warning text-dark">15</span></td>
+                        <td><span class="status-active">Đang bán</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-light btn-action text-info" title="Xem">
+                                <i class="fa-solid fa-eye"></i>
+                            </button>
+                            <button class="btn btn-sm btn-light btn-action text-primary" title="Sửa">
+                                <i class="fa-solid fa-pen"></i>
+                            </button>
+                            <button class="btn btn-sm btn-light btn-action text-danger" onclick="deleteProduct(2)" title="Xóa">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><input type="checkbox" class="form-check-input"></td>
+                        <td class="fw-bold">#003</td>
+                        <td>
+                            <img src="https://images.unsplash.com/photo-1543002588-bfa74002ed7e?auto=format&fit=crop&w=60" class="product-img" alt="Sapiens">
+                        </td>
+                        <td>
+                            <div class="fw-bold">Sapiens - Lược sử loài người</div>
+                            <small class="text-muted">ISBN: 978-604-...</small>
+                        </td>
+                        <td><span class="badge bg-info">Khoa học</span></td>
+                        <td>Yuval Noah Harari</td>
+                        <td class="text-muted text-decoration-line-through">199.000đ</td>
+                        <td class="text-danger fw-bold">169.000đ</td>
+                        <td><span class="badge bg-danger">3</span></td>
+                        <td><span class="status-active">Đang bán</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-light btn-action text-info" title="Xem">
+                                <i class="fa-solid fa-eye"></i>
+                            </button>
+                            <button class="btn btn-sm btn-light btn-action text-primary" title="Sửa">
+                                <i class="fa-solid fa-pen"></i>
+                            </button>
+                            <button class="btn btn-sm btn-light btn-action text-danger" onclick="deleteProduct(3)" title="Xóa">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Pagination -->
+        <nav class="mt-4 d-flex justify-content-between align-items-center">
+            <div class="text-muted">
+                Hiển thị <strong>1-10</strong> trong <strong>156</strong> sản phẩm
+            </div>
+            <ul class="pagination mb-0">
+                <li class="page-item disabled">
+                    <a class="page-link" href="#"><i class="fa-solid fa-chevron-left"></i></a>
+                </li>
+                <li class="page-item active">
+                    <a class="page-link bg-success border-success" href="#">1</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link text-success" href="#">2</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link text-success" href="#">3</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="#"><i class="fa-solid fa-chevron-right"></i></a>
+                </li>
+            </ul>
+        </nav>
+    </main>
+
+    <!-- Add Product Modal -->
+    <div class="modal fade" id="addProductModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title fw-bold">
+                        <i class="fa-solid fa-plus me-2"></i>Thêm Sách Mới
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addProductForm" class="row g-3">
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Hình ảnh sản phẩm</label>
+                            <div class="image-upload-preview" onclick="document.getElementById('productImage').click()">
+                                <input type="file" id="productImage" class="d-none" accept="image/*" onchange="previewImage(event)">
+                                <i class="fa-solid fa-camera upload-icon"></i>
+                            </div>
+                            <small class="text-muted">Kích thước: 600x800px</small>
+                        </div>
+                        <div class="col-md-9">
+                            <div class="row g-3">
+                                <div class="col-md-8">
+                                    <label class="form-label fw-semibold">Tên sách *</label>
+                                    <input type="text" class="form-control" placeholder="Nhập tên sách" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">ISBN</label>
+                                    <input type="text" class="form-control" placeholder="978-604-...">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Tác giả *</label>
+                                    <input type="text" class="form-control" placeholder="Nhập tên tác giả" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Nhà xuất bản</label>
+                                    <input type="text" class="form-control" placeholder="Nhập nhà xuất bản">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">Danh mục *</label>
+                                    <select class="form-select" required>
+                                        <option value="">Chọn danh mục</option>
+                                        <option>Văn học</option>
+                                        <option>Kinh tế</option>
+                                        <option>Thiếu nhi</option>
+                                        <option>Kỹ năng sống</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">Giá gốc *</label>
+                                    <input type="number" class="form-control" placeholder="0" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">Giá bán *</label>
+                                    <input type="number" class="form-control" placeholder="0" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">Số lượng *</label>
+                                    <input type="number" class="form-control" placeholder="0" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">Năm xuất bản</label>
+                                    <input type="number" class="form-control" placeholder="2024">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">Trạng thái</label>
+                                    <select class="form-select">
+                                        <option value="1">Đang bán</option>
+                                        <option value="0">Ngừng bán</option>
+                                    </select>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label fw-semibold">Mô tả ngắn</label>
+                                    <textarea class="form-control" rows="3" placeholder="Nhập mô tả sách..."></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fa-solid fa-xmark me-2"></i>Hủy
+                    </button>
+                    <button type="submit" form="addProductForm" class="btn btn-success">
+                        <i class="fa-solid fa-check me-2"></i>Lưu sản phẩm
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Product Modal (tương tự Add) -->
+    <div class="modal fade" id="editProductModal" tabindex="-1">
+        <!-- Nội dung tương tự addProductModal, nhưng điền sẵn dữ liệu -->
+    </div>
+
+    <!-- View Product Modal -->
+    <div class="modal fade" id="viewProductModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-info text-white">
+                    <h5 class="modal-title fw-bold">
+                        <i class="fa-solid fa-eye me-2"></i>Chi tiết Sản phẩm
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-4 text-center">
+                            <img src="https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&w=300" class="img-fluid rounded shadow" alt="Product">
+                        </div>
+                        <div class="col-md-8">
+                            <h4 class="fw-bold mb-3">Nhà Giả Kim</h4>
+                            <table class="table table-borderless">
+                                <tr>
+                                    <th width="150">Tác giả:</th>
+                                    <td>Paulo Coelho</td>
+                                </tr>
+                                <tr>
+                                    <th>Danh mục:</th>
+                                    <td><span class="badge bg-primary">Văn học</span></td>
+                                </tr>
+                                <tr>
+                                    <th>ISBN:</th>
+                                    <td>978-604-113-447-9</td>
+                                </tr>
+                                <tr>
+                                    <th>Giá gốc:</th>
+                                    <td class="text-decoration-line-through">79.000đ</td>
+                                </tr>
+                                <tr>
+                                    <th>Giá bán:</th>
+                                    <td class="text-danger fw-bold fs-5">63.000đ</td>
+                                </tr>
+                                <tr>
+                                    <th>Tồn kho:</th>
+                                    <td><span class="badge bg-success fs-6">120 cuốn</span></td>
+                                </tr>
+                                <tr>
+                                    <th>Trạng thái:</th>
+                                    <td><span class="status-active">Đang bán</span></td>
+                                </tr>
+                            </table>
+                            <div class="mt-3">
+                                <strong>Mô tả:</strong>
+                                <p class="text-muted mt-2">
+                                    Nhà Giả Kim là một câu chuyện ngụ ngôn về chàng chăn cừu trẻ Santiago trong hành trình đi tìm kho báu...
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Modal -->
+    <div class="modal fade" id="profileModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title fw-bold">
+                        <i class="fa-solid fa-user-circle me-2"></i>Thông tin cá nhân
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="profileForm">
+                        <div class="text-center mb-4">
+                            <div class="position-relative d-inline-block">
+                                <img src="https://ui-avatars.com/api/?name=Admin&background=28a745&color=fff&size=150" 
+                                     class="rounded-circle" width="150" height="150" id="profileAvatarPreview" alt="Avatar">
+                                <label for="avatarUpload" class="position-absolute bottom-0 end-0 btn btn-success btn-sm rounded-circle" 
+                                       style="width: 40px; height: 40px;">
+                                    <i class="fa-solid fa-camera"></i>
+                                </label>
+                                <input type="file" id="avatarUpload" class="d-none" accept="image/*" onchange="previewAvatar(event)">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Họ và tên</label>
+                            <input type="text" class="form-control" value="Admin Nguyễn" placeholder="Nhập họ tên">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Email</label>
+                            <input type="email" class="form-control" value="admin@beobooks.com" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Số điện thoại</label>
+                            <input type="tel" class="form-control" value="0123456789" placeholder="Nhập số điện thoại">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Giới tính</label>
+                            <select class="form-select">
+                                <option value="male">Nam</option>
+                                <option value="female">Nữ</option>
+                                <option value="other">Khác</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" form="profileForm" class="btn btn-success">
+                        <i class="fa-solid fa-save me-2"></i>Lưu thay đổi
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/admin-avt.js"></script>
+    <script src="/js/sidebar.js"></script>
+</body>
+</html>
