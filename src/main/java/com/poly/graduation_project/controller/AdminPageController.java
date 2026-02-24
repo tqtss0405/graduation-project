@@ -1,11 +1,16 @@
 package com.poly.graduation_project.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import com.poly.graduation_project.repository.CategoryRepository;
+
 @Controller
 public class AdminPageController {
+    @Autowired
+    CategoryRepository categoryRepo;
     @GetMapping("/admin/dashboard")
     public String dasboard(Model model) {
         return "admin-dashboard";
@@ -29,6 +34,7 @@ public class AdminPageController {
     }
     @GetMapping("/admin/categories")
     public String categories(Model model) {
+        model.addAttribute("categories", categoryRepo.findAll());
         return "admin-categories";
     }
     @GetMapping("/admin/vouchers")

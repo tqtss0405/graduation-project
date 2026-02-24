@@ -30,6 +30,10 @@ public class Category {
     @Column(columnDefinition = "nvarchar(250)")
     private String slug;
 
+    private String icon;
+
+    private String color;
+
     private Boolean active;
 
     @OneToMany(mappedBy = "category")

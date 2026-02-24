@@ -448,50 +448,65 @@ body {
     text-align: center;
 }
 
-/* Icon picker */
-.icon-grid {
-    display: grid;
-    grid-template-columns: repeat(8, 1fr);
-    gap: 10px;
-    max-height: 300px;
-    overflow-y: auto;
+/* Khung chứa Icon và Color */
+.icon-grid, .color-grid {
+    display: flex;
+    flex-wrap: wrap; /* Tự động xuống dòng nếu quá dài */
+    gap: 12px;       /* Khoảng cách giữa các ô */
+    padding: 5px 0;
 }
+
+/* Từng ô Icon */
 .icon-option {
-    width: 50px;
-    height: 50px;
+    width: 45px;
+    height: 45px;
     display: flex;
     align-items: center;
     justify-content: center;
     border: 2px solid #dee2e6;
-    border-radius: 8px;
+    border-radius: 10px;
     cursor: pointer;
-    transition: all 0.3s ease;
+    font-size: 1.2rem;
+    color: #6c757d;
+    background-color: #fff;
+    transition: all 0.2s ease-in-out;
 }
-.icon-option:hover,
+
+/* Hiệu ứng khi di chuột qua Icon */
+.icon-option:hover {
+    background-color: #f8f9fa;
+    border-color: #adb5bd;
+}
+
+/* Hiệu ứng khi Icon ĐƯỢC CHỌN */
 .icon-option.selected {
-    border-color: #28a745;
-    background-color: #28a74520;
+    border-color: #198754;
+    color: #198754;
+    background-color: #e8f5e9;
+    transform: scale(1.05); /* Phóng to nhẹ */
+    box-shadow: 0 0 0 3px rgba(25, 135, 84, 0.2); /* Viền sáng màu xanh */
+}
+
+/* Từng ô Màu sắc (Làm thành hình tròn) */
+.color-option {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%; /* Bo tròn 100% */
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    border: 2px solid white; /* Viền trắng bên trong */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.15); /* Đổ bóng nhẹ */
+}
+
+/* Hiệu ứng khi di chuột qua Màu */
+.color-option:hover {
     transform: scale(1.1);
 }
 
-/* Color picker */
-.color-grid {
-    display: grid;
-    grid-template-columns: repeat(8, 1fr);
-    gap: 10px;
-}
-.color-option {
-    width: 50px;
-    height: 50px;
-    border-radius: 8px;
-    cursor: pointer;
-    border: 3px solid transparent;
-    transition: all 0.3s ease;
-}
-.color-option:hover,
+/* Hiệu ứng khi Màu ĐƯỢC CHỌN */
 .color-option.selected {
-    border-color: #212529;
-    transform: scale(1.1);
+    transform: scale(1.15);
+    box-shadow: 0 0 0 2px #343a40; /* Thêm một vòng viền màu đen bọc ngoài cùng để nổi bật */
 }
 /* Coupon card */
 .coupon-code {
