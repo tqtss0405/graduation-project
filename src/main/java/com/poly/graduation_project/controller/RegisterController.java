@@ -85,7 +85,8 @@ public String processRegister(@Valid @ModelAttribute("registerDTO") UserRegister
 
     userRepository.save(newUser);
 
-    ra.addFlashAttribute("successMessage", "Đăng ký thành công! Vui lòng đăng nhập.");
+    ra.addFlashAttribute("message", "Đăng ký thành công! Vui lòng đăng nhập.");
+    ra.addFlashAttribute("alertClass", "alert-success");
     return "redirect:/login/form";
 }
 }

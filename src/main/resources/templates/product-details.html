@@ -13,7 +13,7 @@
 </head>
 <body>
 
-     <nav class="navbar navbar-expand-lg sticky-top">
+    <nav class="navbar navbar-expand-lg sticky-top">
         <div class="container">
             <a class="navbar-brand" href="#">BEO<span style="color: var(--secondary-color)">BOOKS</span></a>
 
@@ -30,9 +30,7 @@
                         <a class="nav-link" href="/products">Sản Phẩm</a>
                     </li>
 
-                    <li class="nav-item">
-                        <a class="nav-link text-dark" href="/blog">Blog</a>
-                    </li>
+                      
                     <li class="nav-item">
                         <a class="nav-link text-dark" href="/contact">Liên hệ</a>
                     </li>
@@ -114,7 +112,11 @@
                                         <i class="fa-solid fa-box-open me-2 text-muted"></i> Lịch sử mua hàng
                                     </a>
                                 </li>
-
+                                <li>
+                                    <a class="dropdown-item py-2 rounded" href="/user/favourites">
+                                        <i class="fa-solid fa-heart me-2 text-danger"></i> Sách yêu thích
+                                    </a>
+                                </li>
                                 <li>
                                     <hr class="dropdown-divider" />
                                 </li>
@@ -204,15 +206,28 @@
                     </div>
                 </div>
 
-                <div class="d-flex align-items-center gap-3 mb-4">
-                    <div class="input-group quantity-grp">
-                        <button class="btn btn-outline-secondary" type="button" onclick="decreaseQty()">-</button>
-                        <input type="text" class="form-control" value="1" id="qtyInput">
-                        <button class="btn btn-outline-secondary" type="button" onclick="increaseQty()">+</button>
-                    </div>
-                    <button class="btn btn-outline-success btn-lg flex-grow-1 fw-bold"><i class="fa-solid fa-cart-plus me-2"></i>Thêm vào giỏ</button>
-                    <button class="btn btn-success btn-lg flex-grow-1 fw-bold">Mua ngay</button>
-                </div>
+                <div class="d-flex align-items-center gap-2 mb-4">
+    <div class="input-group quantity-grp" style="width: 120px;">
+        <button class="btn btn-outline-secondary" type="button" onclick="decreaseQty()">-</button>
+        <input type="text" class="form-control text-center px-1" value="1" id="qtyInput" name="quantity">
+        <button class="btn btn-outline-secondary" type="button" onclick="increaseQty()">+</button>
+    </div>
+    
+    <button class="btn btn-outline-success btn-lg flex-grow-1 fw-bold fs-6 px-2"><i class="fa-solid fa-cart-plus me-1"></i>Giỏ hàng</button>
+    <button class="btn btn-success btn-lg flex-grow-1 fw-bold fs-6 px-2">Mua ngay</button>
+    
+    <button class="btn btn-outline-danger btn-lg px-3 flex-shrink-0" title="Thêm vào yêu thích">
+        <i class="fa-regular fa-heart"></i>
+    </button>
+
+    <!-- <a th:href="@{|/user/favorites/toggle/${product.id}|}" 
+        th:class="${isFavorite ? 'btn btn-danger btn-lg px-3 flex-shrink-0' : 'btn btn-outline-danger btn-lg px-3 flex-shrink-0'}" 
+   t    itle="Yêu thích">
+    
+        <i th:class="${isFavorite ? 'fa-solid fa-heart' : 'fa-regular fa-heart'}"></i>
+    
+    </a> -->
+</div>
 
             </div>
         </div>

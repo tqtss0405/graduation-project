@@ -56,6 +56,10 @@ public class IndexController {
     public String checkout(Model model) {
         return "checkout";
     }
+    @GetMapping("/user/favourites")
+    public String favourites(Model model) {
+        return "favourites";
+    }
     
     @GetMapping("/user/profile")
     public String profile(Model model) {
