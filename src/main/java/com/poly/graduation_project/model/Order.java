@@ -38,7 +38,7 @@ public class Order {
     private Integer paymentStatus;
     private Integer status;
 
-    @Column(columnDefinition = "nvarchar(max)")
+    @Column(columnDefinition = "nvarchar(255)")
     private String note;
 
     @Column(precision = 12, scale = 2)

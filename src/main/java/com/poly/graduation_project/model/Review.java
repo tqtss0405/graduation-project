@@ -26,7 +26,7 @@ public class Review {
 
     private Integer rating;
 
-    @Column(columnDefinition = "nvarchar(max)")
+    @Column(columnDefinition = "TEXT")
     private String content;
 
     private LocalDateTime createAt;

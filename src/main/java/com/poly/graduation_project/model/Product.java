@@ -41,7 +41,7 @@ public class Product {
    @Column(columnDefinition = "nvarchar(250)", unique = true)
     private String slug;
 
-    @Column(columnDefinition = "nvarchar(max)")
+    @Column(columnDefinition = "TEXT")
     private String description;
 
     @Column(precision = 12, scale = 2)
