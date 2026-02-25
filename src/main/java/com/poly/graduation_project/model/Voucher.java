@@ -26,7 +26,8 @@ public class Voucher {
 
     @Column(length = 10)
     private String code;
-
+    @Column(columnDefinition = "nvarchar(250)")
+    private String name;
     private Integer discount;
     private Integer quantity;
 
