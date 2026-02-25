@@ -5,5 +5,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.poly.graduation_project.model.Category;
 
 public interface CategoryRepository extends JpaRepository<Category, Integer> {
-
+// Kiểm tra tên khi Thêm mới
+    boolean existsByName(String name);
+    
+    // Kiểm tra tên khi Cập nhật (Loại trừ ID hiện tại)
+    boolean existsByNameAndIdNot(String name, int id);
 }

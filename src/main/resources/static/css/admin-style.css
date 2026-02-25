@@ -458,26 +458,24 @@ body {
 
 /* Từng ô Icon */
 .icon-option {
-    width: 45px;
-    height: 45px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 2px solid #dee2e6;
-    border-radius: 10px;
-    cursor: pointer;
-    font-size: 1.2rem;
-    color: #6c757d;
-    background-color: #fff;
-    transition: all 0.2s ease-in-out;
-}
+        width: 45px; height: 45px; /* Ép cứng kích thước */
+        display: flex; align-items: center; justify-content: center;
+        border: 1px solid #ced4da; border-radius: 8px;
+        color: #6c757d; background-color: #fff;
+        cursor: pointer; transition: all 0.2s ease;
+    }
 
 /* Hiệu ứng khi di chuột qua Icon */
 .icon-option:hover {
-    background-color: #f8f9fa;
-    border-color: #adb5bd;
+    transform: translateY(-3px) scale(1.05); /* Nổi lên và to ra một chút */
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1); 
+} 
+.icon-option.active {
+    background-color: #198754; /* Màu xanh success */
+    color: white;
+    border-color: #198754;
+    box-shadow: inset 0 0 0 2px rgba(255,255,255,0.5); /* Viền sáng bên trong */
 }
-
 /* Hiệu ứng khi Icon ĐƯỢC CHỌN */
 .icon-option.selected {
     border-color: #198754;
@@ -486,27 +484,29 @@ body {
     transform: scale(1.05); /* Phóng to nhẹ */
     box-shadow: 0 0 0 3px rgba(25, 135, 84, 0.2); /* Viền sáng màu xanh */
 }
-
+.icon-option:not(.active):hover {
+        background-color: #f8f9fa; transform: translateY(-2px);
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1); color: #212529;
+    }
+/* Khi icon đã được chọn (active) thì không cần hiệu ứng hover nhảy lên nữa */
+.icon-option.active:hover {
+    transform: none !important;
+    box-shadow: none !important;
+    /* Giữ nguyên màu nền xanh của trạng thái active */
+}
 /* Từng ô Màu sắc (Làm thành hình tròn) */
 .color-option {
-    width: 35px;
-    height: 35px;
-    border-radius: 50%; /* Bo tròn 100% */
-    cursor: pointer;
-    transition: all 0.2s ease-in-out;
-    border: 2px solid white; /* Viền trắng bên trong */
-    box-shadow: 0 2px 5px rgba(0,0,0,0.15); /* Đổ bóng nhẹ */
+        width: 38px; height: 38px; /* Khôi phục lại kích thước bị mất */
+        border-radius: 50%; cursor: pointer;
+        transition: all 0.2s ease; border: 2px solid transparent;
+    }
+.color-option:not(.selected):hover {
+    transform: translateY(-2px) scale(1.1);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
-
-/* Hiệu ứng khi di chuột qua Màu */
-.color-option:hover {
-    transform: scale(1.1);
-}
-
-/* Hiệu ứng khi Màu ĐƯỢC CHỌN */
 .color-option.selected {
-    transform: scale(1.15);
-    box-shadow: 0 0 0 2px #343a40; /* Thêm một vòng viền màu đen bọc ngoài cùng để nổi bật */
+    border: 2px solid #212529 !important;
+    transform: scale(1.1); /* Hơi to lên khi chọn */
 }
 /* Coupon card */
 .coupon-code {

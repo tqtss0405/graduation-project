@@ -45,11 +45,6 @@ public class AdminPageController {
     public String reports(Model model) {
         return "admin-reports";
     }
-    @GetMapping("/admin/categories")
-    public String categories(Model model) {
-        model.addAttribute("categories", categoryRepo.findAll());
-        return "admin-categories";
-    }
     @GetMapping("/admin/vouchers")
     public String vouchers(Model model) {
         return "admin-vouchers";

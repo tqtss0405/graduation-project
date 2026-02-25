@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quản lý Danh mục - Admin</title>
-
+    <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bootstrap-4/bootstrap-4.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -62,7 +62,6 @@
     </nav>
 
     <main class="main-content">
-
         <div class="admin-header">
             <div>
                 <h4 class="fw-bold mb-0">Quản lý Danh mục</h4>
@@ -115,16 +114,14 @@
                         </p>
 
                         <div class="d-flex gap-2 justify-content-center mt-auto">
-                            <button class="btn btn-sm btn-outline-primary" th:data-id="${cat.id}"
-                                th:data-name="${cat.name}" th:data-desc="${cat.description}" th:data-icon="${cat.icon}"
-                                th:data-color="${cat.color}" th:data-active="${cat.active}"
-                                onclick="openEditModal(this)">
+                            <button class="btn btn-sm btn-outline-primary rounded-circle" th:data-id="${cat.id}"
+                                th:data-name="${cat.name}" th:data-icon="${cat.icon}" th:data-color="${cat.color}"
+                                th:data-active="${cat.active}" onclick="openEditModal(this)">
                                 <i class="fa-solid fa-pen"></i>
                             </button>
 
-                            <a th:href="@{/admin/categories/delete/{id}(id=${cat.id})}"
-                                class="btn btn-sm btn-outline-danger"
-                                onclick="return confirm('Bạn có chắc chắn muốn xóa danh mục này?\nTất cả sản phẩm trong danh mục sẽ mất liên kết.')">
+                            <a href="javascript:void(0)" th:onclick="'confirmDelete(' + ${cat.id} + ')'"
+                                class="btn btn-sm btn-outline-danger rounded-circle">
                                 <i class="fa-solid fa-trash"></i>
                             </a>
                         </div>
@@ -165,28 +162,30 @@
                         </div>
                         <div class="mb-3">
                             <label class="form-label fw-semibold">Chọn biểu tượng *</label>
-                            <div class="icon-grid">
-                                <div class="icon-option" onclick="selectIcon(this, 'fa-solid fa-book')"><i
-                                        class="fa-solid fa-book"></i></div>
-                                <div class="icon-option" onclick="selectIcon(this, 'fa-solid fa-book-open')"><i
-                                        class="fa-solid fa-book-open"></i></div>
-                                <div class="icon-option selected"
+                            <div class="d-flex flex-wrap gap-2" id="iconGrid">
+                                <div class="icon-option p-2 rounded" onclick="selectIcon(this, 'fa-solid fa-book')"><i
+                                        class="fa-solid fa-book fa-fw"></i></div>
+                                <div class="icon-option p-2 rounded"
+                                    onclick="selectIcon(this, 'fa-solid fa-book-open')"><i
+                                        class="fa-solid fa-book-open fa-fw"></i></div>
+                                <div class="icon-option p-2 rounded active"
                                     onclick="selectIcon(this, 'fa-solid fa-graduation-cap')"><i
-                                        class="fa-solid fa-graduation-cap"></i></div>
-                                <div class="icon-option" onclick="selectIcon(this, 'fa-solid fa-lightbulb')"><i
-                                        class="fa-solid fa-lightbulb"></i></div>
-                                <div class="icon-option" onclick="selectIcon(this, 'fa-solid fa-brain')"><i
-                                        class="fa-solid fa-brain"></i></div>
-                                <div class="icon-option" onclick="selectIcon(this, 'fa-solid fa-flask')"><i
-                                        class="fa-solid fa-flask"></i></div>
-                                <div class="icon-option" onclick="selectIcon(this, 'fa-solid fa-heart')"><i
-                                        class="fa-solid fa-heart"></i></div>
-                                <div class="icon-option" onclick="selectIcon(this, 'fa-solid fa-child')"><i
-                                        class="fa-solid fa-child"></i></div>
-                                <div class="icon-option" onclick="selectIcon(this, 'fa-solid fa-chart-line')"><i
-                                        class="fa-solid fa-chart-line"></i></div>
-                                <div class="icon-option" onclick="selectIcon(this, 'fa-solid fa-utensils')"><i
-                                        class="fa-solid fa-utensils"></i></div>
+                                        class="fa-solid fa-graduation-cap fa-fw"></i></div>
+                                <div class="icon-option p-2 rounded"
+                                    onclick="selectIcon(this, 'fa-solid fa-lightbulb')"><i
+                                        class="fa-solid fa-lightbulb fa-fw"></i></div>
+                                <div class="icon-option p-2 rounded" onclick="selectIcon(this, 'fa-solid fa-brain')"><i
+                                        class="fa-solid fa-brain fa-fw"></i></div>
+                                <div class="icon-option p-2 rounded" onclick="selectIcon(this, 'fa-solid fa-heart')"><i
+                                        class="fa-solid fa-heart fa-fw"></i></div>
+                                <div class="icon-option p-2 rounded" onclick="selectIcon(this, 'fa-solid fa-child')"><i
+                                        class="fa-solid fa-child fa-fw"></i></div>
+                                <div class="icon-option p-2 rounded"
+                                    onclick="selectIcon(this, 'fa-solid fa-chart-line')"><i
+                                        class="fa-solid fa-chart-line fa-fw"></i></div>
+                                <div class="icon-option p-2 rounded" onclick="selectIcon(this, 'fa-solid fa-utensils')">
+                                    <i class="fa-solid fa-utensils fa-fw"></i>
+                                </div>
                             </div>
                         </div>
                         <div class="mb-3">
@@ -236,23 +235,89 @@
     </div>
 
     <div class="modal fade" id="profileModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title fw-bold">
+                        <i class="fa-solid fa-user-circle me-2"></i>Thông tin cá nhân
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="profileForm">
+                        <div class="text-center mb-4">
+                            <div class="position-relative d-inline-block">
+                                <img src="https://ui-avatars.com/api/?name=Admin&background=28a745&color=fff&size=150"
+                                    class="rounded-circle" width="150" height="150" id="profileAvatarPreview"
+                                    alt="Avatar">
+                                <label for="avatarUpload"
+                                    class="position-absolute bottom-0 end-0 btn btn-success btn-sm rounded-circle"
+                                    style="width: 40px; height: 40px;">
+                                    <i class="fa-solid fa-camera"></i>
+                                </label>
+                                <input type="file" id="avatarUpload" class="d-none" accept="image/*"
+                                    onchange="previewAvatar(event)">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Họ và tên</label>
+                            <input type="text" class="form-control" value="Admin Nguyễn" placeholder="Nhập họ tên">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Email</label>
+                            <input type="email" class="form-control" value="admin@beobooks.com" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Số điện thoại</label>
+                            <input type="tel" class="form-control" value="0123456789" placeholder="Nhập số điện thoại">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Giới tính</label>
+                            <select class="form-select">
+                                <option value="male">Nam</option>
+                                <option value="female">Nữ</option>
+                                <option value="other">Khác</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" form="profileForm" class="btn btn-success">
+                        <i class="fa-solid fa-save me-2"></i>Lưu thay đổi
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        // --- 1. XỬ LÝ LỰA CHỌN ICON VÀ MÀU ---
+        // --- 1. CHỌN ICON VÀ MÀU ---
         function selectIcon(element, iconClass) {
-            document.querySelectorAll('.icon-option').forEach(el => el.classList.remove('selected'));
-            element.classList.add('selected');
-            document.getElementById('catIcon').value = iconClass; // Cập nhật input ẩn
+            // Chỉ cần xóa class 'active' khỏi tất cả
+            document.querySelectorAll('.icon-option').forEach(el => {
+                el.classList.remove('active');
+            });
+
+            // Thêm class 'active' cho cái vừa bấm
+            element.classList.add('active');
+
+            document.getElementById('catIcon').value = iconClass;
             updatePreview();
         }
 
         function selectColor(element, colorGradient) {
-            document.querySelectorAll('.color-option').forEach(el => el.classList.remove('selected'));
+            // Chỉ cần xóa class 'selected'
+            document.querySelectorAll('.color-option').forEach(el => {
+                el.classList.remove('selected');
+            });
+
+            // Thêm class 'selected' cho cái vừa bấm
             element.classList.add('selected');
-            document.getElementById('catColor').value = colorGradient; // Cập nhật input ẩn
+
+            document.getElementById('catColor').value = colorGradient;
             updatePreview();
         }
 
@@ -267,8 +332,7 @@
             document.getElementById('previewName').textContent = e.target.value || 'Tên danh mục';
         });
 
-
-        // --- 2. XỬ LÝ MỞ MODAL THÊM / SỬA ---
+        // --- 2. MỞ MODAL THÊM / SỬA ---
 
         // Khi bấm nút "Thêm mới"
         document.querySelector('[data-bs-target="#addCategoryModal"]').addEventListener('click', () => {
@@ -276,59 +340,100 @@
             document.getElementById('addCategoryForm').reset();
             document.getElementById('catId').value = '';
             document.getElementById('previewName').textContent = 'Tên danh mục';
-            // Reset về mặc định
-            selectIcon(document.querySelector('.icon-option'), 'fa-solid fa-book');
-            selectColor(document.querySelector('.color-option'), 'linear-gradient(135deg, #667eea, #764ba2)');
+
+            // Đặt lại Icon mặc định (Nón cử nhân)
+            const defaultIcon = document.querySelector('.icon-option i.fa-graduation-cap').parentElement;
+            selectIcon(defaultIcon, 'fa-solid fa-graduation-cap');
+
+            // Đặt lại Màu mặc định (Màu tím loang đầu tiên)
+            const defaultColor = document.querySelector('.color-option');
+            selectColor(defaultColor, 'linear-gradient(135deg, #667eea, #764ba2)');
         });
 
         // Khi bấm nút "Sửa"
         function openEditModal(button) {
-            // Lấy dữ liệu từ thẻ button (th:data-*)
             const id = button.getAttribute('data-id');
             const name = button.getAttribute('data-name');
-            const desc = button.getAttribute('data-desc');
-            const icon = button.getAttribute('data-icon');
-            const color = button.getAttribute('data-color');
+            // CÓ MỘT LỖI Ở ĐÂY LÚC TRƯỚC: catDesc không tồn tại trên form
+            // const desc = button.getAttribute('data-desc'); -> Đã xóa để tránh lỗi null
+
+            const icon = button.getAttribute('data-icon') || 'fa-solid fa-graduation-cap';
+            const color = button.getAttribute('data-color') || 'linear-gradient(135deg, #667eea, #764ba2)';
             const active = button.getAttribute('data-active') === 'true';
 
-            // Điền dữ liệu vào Form
             document.getElementById('modalTitle').innerHTML = '<i class="fa-solid fa-pen me-2"></i>Sửa Danh mục';
             document.getElementById('catId').value = id;
             document.getElementById('catName').value = name;
-            document.getElementById('catDesc').value = desc;
             document.getElementById('catStatus').checked = active;
             document.getElementById('previewName').textContent = name;
 
-            // Đặt input ẩn
             document.getElementById('catIcon').value = icon;
             document.getElementById('catColor').value = color;
 
-            // Cập nhật giao diện chọn (highlight icon và color đang được chọn)
+            // Vòng lặp tìm và highlight đúng cái Icon đang lưu trong Database
             document.querySelectorAll('.icon-option').forEach(el => {
-                el.classList.remove('selected');
-                if (el.querySelector('i').className.includes(icon)) el.classList.add('selected');
+                el.classList.remove('active');
+                if (el.querySelector('i').className.includes(icon)) {
+                    el.classList.add('active');
+                }
             });
 
             document.querySelectorAll('.color-option').forEach(el => {
                 el.classList.remove('selected');
-                // So sánh chuỗi background color để gắn class selected
-                if (el.style.background.replace(/\s+/g, '') === color.replace(/\s+/g, '')) el.classList.add('selected');
+                if (el.style.background.replace(/\s+/g, '') === color.replace(/\s+/g, '')) {
+                    el.classList.add('selected');
+                }
             });
 
             updatePreview();
-
-            // Mở Modal
             new bootstrap.Modal(document.getElementById('addCategoryModal')).show();
+        }
+
+        function confirmDelete(id) {
+            Swal.fire({
+                title: 'Bạn có chắc chắn muốn xóa?',
+                text: "Hệ thống sẽ tự động Ẩn nếu danh mục có sản phẩm, hoặc Xóa vĩnh viễn nếu danh mục trống!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#198754', // Màu xanh success
+                cancelButtonColor: '#d33',     // Màu đỏ
+                confirmButtonText: 'Đồng ý',
+                cancelButtonText: 'Hủy',
+                border: 'none',
+                border_radius: '15px'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Chuyển hướng đến URL xóa của Controller
+                    window.location.href = '/admin/categories/delete/' + id;
+                }
+            })
         }
     </script>
     <script src="/js/admin-avt.js"></script>
     <script src="/js/sidebar.js"></script>
-    <script th:if="${errorMessage != null and !errorMessage.empty}">
-        document.addEventListener("DOMContentLoaded", function () {
-            var addModal = new bootstrap.Modal(document.getElementById('addCategoryModal'));
-            addModal.show();
+    <script th:if="${successMessage}">
+        const Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true
+        });
+        Toast.fire({
+            icon: 'success',
+            title: '[[${successMessage}]]'
         });
     </script>
+
+    <script th:if="${errorMessage}">
+        Swal.fire({
+            icon: 'error',
+            title: 'Lỗi rồi...',
+            text: '[[${errorMessage}]]',
+            confirmButtonColor: '#198754'
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </body>
 
 </html>
