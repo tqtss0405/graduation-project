@@ -29,6 +29,15 @@ public class Product {
     @Column(columnDefinition = "nvarchar(250)")
     private String name;
 
+    @Column(columnDefinition = "nvarchar(250)")
+    private String author;
+
+    @Column(columnDefinition = "nvarchar(250)")
+    private String publisher;
+
+    @Column(length = 250)
+    private String isbn;
+
    @Column(columnDefinition = "nvarchar(250)", unique = true)
     private String slug;
 
@@ -55,7 +64,7 @@ public class Product {
     @OneToMany(mappedBy = "product")
     private List<CartDetail> cartDetails;
 
-    @OneToMany(mappedBy = "product")
+    @OneToMany(mappedBy = "product") 
     private List<Favourite> favourites;
 
     @OneToMany(mappedBy = "product")

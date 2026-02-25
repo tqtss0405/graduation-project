@@ -84,7 +84,7 @@
 
         <!-- Stats Cards -->
         <div class="row g-4 mb-4">
-            <div class="col-md-3">
+            <div class="col-md-4">
                 <div class="stat-card">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
@@ -95,18 +95,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-3">
-                <div class="stat-card orange">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <small class="opacity-75">Chờ duyệt</small>
-                            <h2 class="fw-bold mb-0">34</h2>
-                        </div>
-                        <i class="fa-solid fa-clock fa-3x opacity-25"></i>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
+            <div class="col-md-4">
                 <div class="stat-card green">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
@@ -117,7 +106,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-4">
                 <div class="stat-card blue">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
@@ -140,14 +129,6 @@
                         </span>
                         <input type="text" class="form-control border-start-0" placeholder="Tìm theo tên khách hàng, sản phẩm...">
                     </div>
-                </div>
-                <div class="col-md-2">
-                    <select class="form-select">
-                        <option>Tất cả trạng thái</option>
-                        <option>Chờ duyệt</option>
-                        <option>Đã duyệt</option>
-                        <option>Từ chối</option>
-                    </select>
                 </div>
                 <div class="col-md-2">
                     <select class="form-select">
@@ -200,7 +181,7 @@
                                     <i class="fa-solid fa-check-circle text-success me-1"></i>Đã mua hàng
                                 </small>
                             </div>
-                            <span class="status-pending">Chờ duyệt</span>
+                            
                         </div>
                     </div>
                 </div>
@@ -228,12 +209,6 @@
                 </div>
                 
                 <div class="d-flex gap-2">
-                    <button class="btn btn-success btn-sm" onclick="approveReview(1)">
-                        <i class="fa-solid fa-check me-2"></i>Duyệt
-                    </button>
-                    <button class="btn btn-danger btn-sm" onclick="rejectReview(1)">
-                        <i class="fa-solid fa-times me-2"></i>Từ chối
-                    </button>
                     <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#replyModal">
                         <i class="fa-solid fa-reply me-2"></i>Phản hồi
                     </button>
@@ -264,7 +239,7 @@
                                     <i class="fa-solid fa-check-circle text-success me-1"></i>Đã mua hàng
                                 </small>
                             </div>
-                            <span class="status-approved">Đã duyệt</span>
+                           
                         </div>
                     </div>
                 </div>
@@ -327,7 +302,7 @@
                                     <i class="fa-solid fa-check-circle text-success me-1"></i>Đã mua hàng
                                 </small>
                             </div>
-                            <span class="status-rejected">Từ chối</span>
+                           
                         </div>
                     </div>
                 </div>
@@ -346,16 +321,11 @@
                     <p class="mb-2">
                         Sách giao chậm quá, mình đợi mãi mới nhận được. Nội dung thì ok nhưng dịch vụ không tốt.
                     </p>
-                    <div class="alert alert-danger mb-0">
-                        <small>
-                            <strong>Lý do từ chối:</strong> Đánh giá vi phạm chính sách, không phản ánh đúng chất lượng sản phẩm.
-                        </small>
-                    </div>
                 </div>
                 
                 <div class="d-flex gap-2">
-                    <button class="btn btn-success btn-sm" onclick="approveReview(3)">
-                        <i class="fa-solid fa-check me-2"></i>Duyệt lại
+                    <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#replyModal">
+                        <i class="fa-solid fa-reply me-2"></i>Phản hồi
                     </button>
                     <button class="btn btn-outline-danger btn-sm" onclick="deleteReview(3)">
                         <i class="fa-solid fa-trash"></i>
