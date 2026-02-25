@@ -13,7 +13,7 @@ import com.poly.graduation_project.model.User;
 import com.poly.graduation_project.repository.UserRepository;
 import com.poly.graduation_project.service.SessionService;
 
-@Controller
+@Controller 
 public class AuthController {
     @Autowired
     UserRepository userRepository;

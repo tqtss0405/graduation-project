@@ -43,7 +43,7 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a href="/admin/discounts" class="nav-link">
+                <a href="/admin/vouchers" class="nav-link">
                     <i class="fa-solid fa-ticket"></i> Mã giảm giá
                 </a>
             </li>
@@ -52,7 +52,7 @@
                     <i class="fa-solid fa-star"></i> Đánh giá
                 </a>
             </li>
-             
+
             <li class="nav-item mt-5">
                 <a href="/logout" class="nav-link text-danger">
                     <i class="fa-solid fa-right-from-bracket"></i> Thoát
@@ -72,14 +72,16 @@
                 <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
                     <i class="fa-solid fa-plus me-2"></i>Thêm danh mục
                 </button>
-                 <div class="admin-profile" data-bs-toggle="modal" data-bs-target="#profileModal">
-                <img src="https://ui-avatars.com/api/?name=Admin&background=28a745&color=fff" alt="Admin" class="admin-avatar">
-                <div class="admin-info">
-                    <h6>Admin Nguyễn</h6>
-                    <small><i class="fa-solid fa-circle text-success" style="font-size: 0.5rem;"></i> Đang hoạt động</small>
+                <div class="admin-profile" data-bs-toggle="modal" data-bs-target="#profileModal">
+                    <img src="https://ui-avatars.com/api/?name=Admin&background=28a745&color=fff" alt="Admin"
+                        class="admin-avatar">
+                    <div class="admin-info">
+                        <h6>Admin Nguyễn</h6>
+                        <small><i class="fa-solid fa-circle text-success" style="font-size: 0.5rem;"></i> Đang hoạt
+                            động</small>
+                    </div>
+                    <i class="fa-solid fa-chevron-down ms-2"></i>
                 </div>
-                <i class="fa-solid fa-chevron-down ms-2"></i>
-            </div>
             </div>
         </div>
 
@@ -93,39 +95,36 @@
         </div>
 
         <div class="row g-4">
-            
+
             <div th:each="cat : ${categories}" class="col-lg-3 col-md-4 col-sm-6">
                 <div class="card category-card h-100">
                     <div class="card-body position-relative">
                         <span class="position-absolute top-0 end-0 p-3">
-                            <i th:class="${cat.active} ? 'fa-solid fa-circle-check text-success' : 'fa-solid fa-circle-xmark text-danger'" 
-                               th:title="${cat.active} ? 'Đang hoạt động' : 'Đã ẩn'"></i>
+                            <i th:class="${cat.active} ? 'fa-solid fa-circle-check text-success' : 'fa-solid fa-circle-xmark text-danger'"
+                                th:title="${cat.active} ? 'Đang hoạt động' : 'Đã ẩn'"></i>
                         </span>
 
-                        <div class="category-icon mb-3" th:style="${'background: ' + (cat.color != null ? cat.color : 'linear-gradient(135deg, #667eea, #764ba2)')}">
+                        <div class="category-icon mb-3"
+                            th:style="${'background: ' + (cat.color != null ? cat.color : 'linear-gradient(135deg, #667eea, #764ba2)')}">
                             <i th:class="${cat.icon != null ? cat.icon : 'fa-solid fa-layer-group'}"></i>
                         </div>
-                        
+
                         <h5 class="fw-bold mb-2 text-truncate" th:text="${cat.name}">Tên danh mục</h5>
                         <p class="text-muted small mb-3">
                             <span th:text="${cat.products != null ? cat.products.size() : 0}">0</span> sản phẩm
                         </p>
-                        
+
                         <div class="d-flex gap-2 justify-content-center mt-auto">
-                            <button class="btn btn-sm btn-outline-primary" 
-                                    th:data-id="${cat.id}"
-                                    th:data-name="${cat.name}"
-                                    th:data-desc="${cat.description}"
-                                    th:data-icon="${cat.icon}"
-                                    th:data-color="${cat.color}"
-                                    th:data-active="${cat.active}"
-                                    onclick="openEditModal(this)">
+                            <button class="btn btn-sm btn-outline-primary" th:data-id="${cat.id}"
+                                th:data-name="${cat.name}" th:data-desc="${cat.description}" th:data-icon="${cat.icon}"
+                                th:data-color="${cat.color}" th:data-active="${cat.active}"
+                                onclick="openEditModal(this)">
                                 <i class="fa-solid fa-pen"></i>
                             </button>
-                            
-                            <a th:href="@{/admin/categories/delete/{id}(id=${cat.id})}" 
-                               class="btn btn-sm btn-outline-danger" 
-                               onclick="return confirm('Bạn có chắc chắn muốn xóa danh mục này?\nTất cả sản phẩm trong danh mục sẽ mất liên kết.')">
+
+                            <a th:href="@{/admin/categories/delete/{id}(id=${cat.id})}"
+                                class="btn btn-sm btn-outline-danger"
+                                onclick="return confirm('Bạn có chắc chắn muốn xóa danh mục này?\nTất cả sản phẩm trong danh mục sẽ mất liên kết.')">
                                 <i class="fa-solid fa-trash"></i>
                             </a>
                         </div>
@@ -154,45 +153,67 @@
                 <div class="modal-body">
                     <form id="addCategoryForm" action="/admin/categories/save" method="post">
                         <input type="hidden" name="id" id="catId">
-                        
-                        <input type="hidden" name="color" id="catColor" value="linear-gradient(135deg, #667eea, #764ba2)">
+
+                        <input type="hidden" name="color" id="catColor"
+                            value="linear-gradient(135deg, #667eea, #764ba2)">
                         <input type="hidden" name="icon" id="catIcon" value="fa-solid fa-graduation-cap">
 
                         <div class="mb-3">
                             <label class="form-label fw-semibold">Tên danh mục *</label>
-                            <input type="text" name="name" id="catName" class="form-control" placeholder="VD: Văn học, Kinh tế...">
+                            <input type="text" name="name" id="catName" class="form-control"
+                                placeholder="VD: Văn học, Kinh tế...">
                         </div>
                         <div class="mb-3">
                             <label class="form-label fw-semibold">Chọn biểu tượng *</label>
                             <div class="icon-grid">
-                                <div class="icon-option" onclick="selectIcon(this, 'fa-solid fa-book')"><i class="fa-solid fa-book"></i></div>
-                                <div class="icon-option" onclick="selectIcon(this, 'fa-solid fa-book-open')"><i class="fa-solid fa-book-open"></i></div>
-                                <div class="icon-option selected" onclick="selectIcon(this, 'fa-solid fa-graduation-cap')"><i class="fa-solid fa-graduation-cap"></i></div>
-                                <div class="icon-option" onclick="selectIcon(this, 'fa-solid fa-lightbulb')"><i class="fa-solid fa-lightbulb"></i></div>
-                                <div class="icon-option" onclick="selectIcon(this, 'fa-solid fa-brain')"><i class="fa-solid fa-brain"></i></div>
-                                <div class="icon-option" onclick="selectIcon(this, 'fa-solid fa-flask')"><i class="fa-solid fa-flask"></i></div>
-                                <div class="icon-option" onclick="selectIcon(this, 'fa-solid fa-heart')"><i class="fa-solid fa-heart"></i></div>
-                                <div class="icon-option" onclick="selectIcon(this, 'fa-solid fa-child')"><i class="fa-solid fa-child"></i></div>
-                                <div class="icon-option" onclick="selectIcon(this, 'fa-solid fa-chart-line')"><i class="fa-solid fa-chart-line"></i></div>
-                                <div class="icon-option" onclick="selectIcon(this, 'fa-solid fa-utensils')"><i class="fa-solid fa-utensils"></i></div>
+                                <div class="icon-option" onclick="selectIcon(this, 'fa-solid fa-book')"><i
+                                        class="fa-solid fa-book"></i></div>
+                                <div class="icon-option" onclick="selectIcon(this, 'fa-solid fa-book-open')"><i
+                                        class="fa-solid fa-book-open"></i></div>
+                                <div class="icon-option selected"
+                                    onclick="selectIcon(this, 'fa-solid fa-graduation-cap')"><i
+                                        class="fa-solid fa-graduation-cap"></i></div>
+                                <div class="icon-option" onclick="selectIcon(this, 'fa-solid fa-lightbulb')"><i
+                                        class="fa-solid fa-lightbulb"></i></div>
+                                <div class="icon-option" onclick="selectIcon(this, 'fa-solid fa-brain')"><i
+                                        class="fa-solid fa-brain"></i></div>
+                                <div class="icon-option" onclick="selectIcon(this, 'fa-solid fa-flask')"><i
+                                        class="fa-solid fa-flask"></i></div>
+                                <div class="icon-option" onclick="selectIcon(this, 'fa-solid fa-heart')"><i
+                                        class="fa-solid fa-heart"></i></div>
+                                <div class="icon-option" onclick="selectIcon(this, 'fa-solid fa-child')"><i
+                                        class="fa-solid fa-child"></i></div>
+                                <div class="icon-option" onclick="selectIcon(this, 'fa-solid fa-chart-line')"><i
+                                        class="fa-solid fa-chart-line"></i></div>
+                                <div class="icon-option" onclick="selectIcon(this, 'fa-solid fa-utensils')"><i
+                                        class="fa-solid fa-utensils"></i></div>
                             </div>
                         </div>
                         <div class="mb-3">
                             <label class="form-label fw-semibold">Chọn màu gradient *</label>
                             <div class="color-grid">
-                                <div class="color-option selected" style="background: linear-gradient(135deg, #667eea, #764ba2);" onclick="selectColor(this, 'linear-gradient(135deg, #667eea, #764ba2)')"></div>
-                                <div class="color-option" style="background: linear-gradient(135deg, #f093fb, #f5576c);" onclick="selectColor(this, 'linear-gradient(135deg, #f093fb, #f5576c)')"></div>
-                                <div class="color-option" style="background: linear-gradient(135deg, #4facfe, #00f2fe);" onclick="selectColor(this, 'linear-gradient(135deg, #4facfe, #00f2fe)')"></div>
-                                <div class="color-option" style="background: linear-gradient(135deg, #43e97b, #38f9d7);" onclick="selectColor(this, 'linear-gradient(135deg, #43e97b, #38f9d7)')"></div>
-                                <div class="color-option" style="background: linear-gradient(135deg, #fa709a, #fee140);" onclick="selectColor(this, 'linear-gradient(135deg, #fa709a, #fee140)')"></div>
-                                <div class="color-option" style="background: linear-gradient(135deg, #30cfd0, #330867);" onclick="selectColor(this, 'linear-gradient(135deg, #30cfd0, #330867)')"></div>
-                                <div class="color-option" style="background: linear-gradient(135deg, #a8edea, #fed6e3);" onclick="selectColor(this, 'linear-gradient(135deg, #a8edea, #fed6e3)')"></div>
+                                <div class="color-option selected"
+                                    style="background: linear-gradient(135deg, #667eea, #764ba2);"
+                                    onclick="selectColor(this, 'linear-gradient(135deg, #667eea, #764ba2)')"></div>
+                                <div class="color-option" style="background: linear-gradient(135deg, #f093fb, #f5576c);"
+                                    onclick="selectColor(this, 'linear-gradient(135deg, #f093fb, #f5576c)')"></div>
+                                <div class="color-option" style="background: linear-gradient(135deg, #4facfe, #00f2fe);"
+                                    onclick="selectColor(this, 'linear-gradient(135deg, #4facfe, #00f2fe)')"></div>
+                                <div class="color-option" style="background: linear-gradient(135deg, #43e97b, #38f9d7);"
+                                    onclick="selectColor(this, 'linear-gradient(135deg, #43e97b, #38f9d7)')"></div>
+                                <div class="color-option" style="background: linear-gradient(135deg, #fa709a, #fee140);"
+                                    onclick="selectColor(this, 'linear-gradient(135deg, #fa709a, #fee140)')"></div>
+                                <div class="color-option" style="background: linear-gradient(135deg, #30cfd0, #330867);"
+                                    onclick="selectColor(this, 'linear-gradient(135deg, #30cfd0, #330867)')"></div>
+                                <div class="color-option" style="background: linear-gradient(135deg, #a8edea, #fed6e3);"
+                                    onclick="selectColor(this, 'linear-gradient(135deg, #a8edea, #fed6e3)')"></div>
                             </div>
                         </div>
                         <div class="mb-3">
                             <label class="form-label fw-semibold">Xem trước</label>
                             <div class="text-center p-4 bg-light rounded">
-                                <div class="category-icon mb-3" id="previewIcon" style="background: linear-gradient(135deg, #667eea, #764ba2);">
+                                <div class="category-icon mb-3" id="previewIcon"
+                                    style="background: linear-gradient(135deg, #667eea, #764ba2);">
                                     <i class="fa-solid fa-graduation-cap"></i>
                                 </div>
                                 <h5 class="fw-bold" id="previewName">Tên danh mục</h5>
@@ -215,7 +236,7 @@
     </div>
 
     <div class="modal fade" id="profileModal" tabindex="-1">
-        </div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
@@ -248,7 +269,7 @@
 
 
         // --- 2. XỬ LÝ MỞ MODAL THÊM / SỬA ---
-        
+
         // Khi bấm nút "Thêm mới"
         document.querySelector('[data-bs-target="#addCategoryModal"]').addEventListener('click', () => {
             document.getElementById('modalTitle').innerHTML = '<i class="fa-solid fa-plus me-2"></i>Thêm Danh mục Mới';
@@ -302,13 +323,12 @@
     </script>
     <script src="/js/admin-avt.js"></script>
     <script src="/js/sidebar.js"></script>
-    <script th:if="${errorMessage != null}">
-    document.addEventListener("DOMContentLoaded", function() {
-        // Tự động tìm và bật lại Modal Thêm danh mục
-        var addModal = new bootstrap.Modal(document.getElementById('addCategoryModal'));
-        addModal.show();
-    });
-</script>
+    <script th:if="${errorMessage != null and !errorMessage.empty}">
+        document.addEventListener("DOMContentLoaded", function () {
+            var addModal = new bootstrap.Modal(document.getElementById('addCategoryModal'));
+            addModal.show();
+        });
+    </script>
 </body>
 
 </html>

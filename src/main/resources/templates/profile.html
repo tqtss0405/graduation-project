@@ -1,15 +1,18 @@
 <!doctype html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Hồ sơ cá nhân - BEOBOOKS</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/style.css" />
 </head>
+
 <body>
-       <nav class="navbar navbar-expand-lg sticky-top">
+    <nav class="navbar navbar-expand-lg sticky-top">
         <div class="container">
             <a class="navbar-brand" href="#">BEO<span style="color: var(--secondary-color)">BOOKS</span></a>
 
@@ -133,24 +136,27 @@
                 <div class="card border-0 shadow-sm rounded-4 text-center p-4">
                     <div class="position-relative d-inline-block mb-3">
                         <img th:src="${user.image != null ? user.image : '/images/default-user.png'}"
-                             class="rounded-circle border border-3 border-success"
-                             style="width: 150px; height: 150px; object-fit: cover;" alt="Avatar">
-                        <label for="avatarUpload" class="position-absolute bottom-0 end-0 bg-success text-white rounded-circle p-2 cursor-pointer" title="Đổi ảnh">
+                            class="rounded-circle border border-3 border-success"
+                            style="width: 150px; height: 150px; object-fit: cover;" alt="Avatar">
+                        <label for="avatarUpload"
+                            class="position-absolute bottom-0 end-0 bg-success text-white rounded-circle p-2 cursor-pointer"
+                            title="Đổi ảnh">
                             <i class="fa-solid fa-camera"></i>
                         </label>
                     </div>
                     <h5 class="fw-bold mb-1" th:text="${user.fullname}">Tên User</h5>
                     <p class="text-muted small" th:text="${user.email}">user@email.com</p>
-                    
+
                     <hr>
                     <div class="list-group list-group-flush text-start">
-                        <a href="/profile" class="list-group-item list-group-item-action active bg-success border-success">
+                        <a href="/profile"
+                            class="list-group-item list-group-item-action active bg-success border-success">
                             <i class="fa-solid fa-user me-2"></i> Hồ sơ cá nhân
                         </a>
-                        <a href="/my-orders" class="list-group-item list-group-item-action">
+                        <a href="/user/order-details" class="list-group-item list-group-item-action">
                             <i class="fa-solid fa-box-open me-2"></i> Lịch sử đơn hàng
                         </a>
-                        <a href="/change-password" class="list-group-item list-group-item-action">
+                        <a href="/user/change-password" class="list-group-item list-group-item-action">
                             <i class="fa-solid fa-key me-2"></i> Đổi mật khẩu
                         </a>
                     </div>
@@ -160,36 +166,43 @@
             <div class="col-lg-8">
                 <div class="card border-0 shadow-sm rounded-4 mb-4">
                     <div class="card-header bg-white border-0 pt-4 px-4">
-                        <h5 class="fw-bold"><i class="fa-solid fa-pen-to-square text-success me-2"></i>Cập nhật thông tin</h5>
+                        <h5 class="fw-bold"><i class="fa-solid fa-pen-to-square text-success me-2"></i>Cập nhật thông
+                            tin</h5>
                     </div>
                     <div class="card-body p-4">
-                        <form action="/profile/update" method="post" enctype="multipart/form-data">
-                            <input type="file" id="avatarUpload" name="imageFile" class="d-none" onchange="this.form.submit()">
-                            
+                        <form action="/user/profile/update" method="post" enctype="multipart/form-data">
+                            <input type="file" id="avatarUpload" name="imageFile" class="d-none"
+                                onchange="this.form.submit()">
+
                             <div class="row g-3">
                                 <div class="col-md-6">
                                     <label class="form-label small fw-bold text-muted">Họ và tên</label>
-                                    <input type="text" name="fullname" class="form-control rounded-pill" th:value="${user.fullname}" required>
+                                    <input type="text" name="fullname" class="form-control rounded-pill"
+                                        th:value="${user.fullname}">
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label small fw-bold text-muted">Số điện thoại</label>
-                                    <input type="text" name="phone" class="form-control rounded-pill" th:value="${user.phone}">
+                                    <input type="text" name="phone" class="form-control rounded-pill"
+                                        th:value="${user.phone}">
                                 </div>
                                 <div class="col-12">
                                     <label class="form-label small fw-bold text-muted">Giới tính</label>
                                     <div class="d-flex gap-4">
                                         <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="gender" value="true" th:checked="${user.gender == true}">
+                                            <input class="form-check-input" type="radio" name="gender" value="true"
+                                                th:checked="${user.gender == true}">
                                             <label class="form-check-label">Nam</label>
                                         </div>
                                         <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="gender" value="false" th:checked="${user.gender == false}">
+                                            <input class="form-check-input" type="radio" name="gender" value="false"
+                                                th:checked="${user.gender == false}">
                                             <label class="form-check-label">Nữ</label>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-12 text-end">
-                                    <button type="submit" class="btn btn-success rounded-pill px-4 fw-bold">Lưu thay đổi</button>
+                                    <button type="submit" class="btn btn-success rounded-pill px-4 fw-bold">Lưu thay
+                                        đổi</button>
                                 </div>
                             </div>
                         </form>
@@ -197,23 +210,43 @@
                 </div>
 
                 <div class="card border-0 shadow-sm rounded-4">
-                    <div class="card-header bg-white border-0 pt-4 px-4 d-flex justify-content-between align-items-center">
-                        <h5 class="fw-bold mb-0"><i class="fa-solid fa-location-dot text-success me-2"></i>Sổ địa chỉ</h5>
-                        <button class="btn btn-outline-success btn-sm rounded-pill" data-bs-toggle="modal" data-bs-target="#addAddressModal">
+                    <div
+                        class="card-header bg-white border-0 pt-4 px-4 d-flex justify-content-between align-items-center">
+                        <h5 class="fw-bold mb-0"><i class="fa-solid fa-location-dot text-success me-2"></i>Sổ địa chỉ
+                        </h5>
+                        <button class="btn btn-outline-success btn-sm rounded-pill" data-bs-toggle="modal"
+                            data-bs-target="#addAddressModal">
                             <i class="fa-solid fa-plus me-1"></i> Thêm mới
                         </button>
                     </div>
                     <div class="card-body p-4">
-                        <div th:if="${user.addresses.empty}" class="text-center text-muted py-3">
-                            Chưa có địa chỉ nào. Hãy thêm địa chỉ giao hàng.
+                        <div th:if="${user.addresses == null or user.addresses.empty}"
+                            class="text-center text-muted py-3">
+                            <i class="fa-solid fa-map-location-dot fs-1 mb-2 opacity-50"></i>
+                            <p class="mb-0">Chưa có địa chỉ nào. Hãy thêm địa chỉ giao hàng.</p>
                         </div>
+
                         <div class="list-group list-group-flush">
-                            <div th:each="addr : ${user.addresses}" class="list-group-item px-0 py-3 d-flex justify-content-between align-items-center">
-                                <div>
-                                    <span class="fw-bold d-block" th:text="${addr.street}">Số nhà, Đường</span>
-                                    <span class="small text-muted" th:text="${addr.city}">Thành phố</span>
+                            <div th:each="addr : ${user.addresses}" th:if="${addr.active}"
+                                class="list-group-item px-0 py-3 d-flex justify-content-between align-items-start border-bottom">
+
+                                <div class="pe-3">
+                                    <div class="d-flex align-items-center mb-1">
+                                        <span class="fw-semibold text-dark" th:text="${addr.address}">123 Đường Số
+                                            1</span>
+
+                                        <span th:if="${addr.isDefault}" class="badge bg-success ms-2"
+                                            style="font-size: 0.7rem;">
+                                            <i class="fa-solid fa-check me-1"></i>Mặc định
+                                        </span>
+                                    </div>
+                                    <span class="small text-muted d-block" th:text="${addr.fulladdress}">Phường A, Quận
+                                        B, TP HCM</span>
                                 </div>
-                                <a th:href="@{|/profile/address/delete/${addr.id}|}" class="btn btn-light btn-sm text-danger rounded-circle" onclick="return confirm('Bạn chắc chắn muốn xóa?')">
+
+                                <a th:href="@{|/profile/address/delete/${addr.id}|}"
+                                    class="btn btn-light btn-sm text-danger rounded-circle flex-shrink-0 mt-1"
+                                    title="Xóa địa chỉ" onclick="return confirm('Bạn chắc chắn muốn xóa địa chỉ này?')">
                                     <i class="fa-solid fa-trash"></i>
                                 </a>
                             </div>
@@ -225,24 +258,63 @@
     </main>
 
     <div class="modal fade" id="addAddressModal" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content rounded-4 border-0">
-                <div class="modal-header border-0">
-                    <h5 class="modal-title fw-bold">Thêm địa chỉ mới</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content rounded-4 border-0 shadow-lg">
+                <div class="modal-header bg-success text-white border-0 rounded-top-4">
+                    <h5 class="modal-title fw-bold"><i class="fa-solid fa-map-location-dot me-2"></i>Thêm địa chỉ giao
+                        hàng</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body">
-                    <form action="/profile/address/add" method="post">
-                        <div class="mb-3">
-                            <label class="form-label text-muted small">Địa chỉ cụ thể (Số nhà, đường)</label>
-                            <input type="text" name="street" class="form-control rounded-pill" required>
+                <div class="modal-body p-4">
+                    <form action="/profile/address/add" method="post" id="formAddress">
+
+                        <input type="hidden" name="fulladdress" id="fulladdressInput">
+                        <input type="hidden" name="active" value="true">
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-4">
+                                <label class="form-label text-muted small fw-semibold">Tỉnh / Thành phố <span
+                                        class="text-danger">*</span></label>
+                                <select class="form-select" name="provinceId" id="province" required>
+                                    <option value="" selected disabled>-- Chọn Tỉnh/Thành --</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label text-muted small fw-semibold">Quận / Huyện <span
+                                        class="text-danger">*</span></label>
+                                <select class="form-select" name="districtId" id="district" required disabled>
+                                    <option value="" selected disabled>-- Chọn Quận/Huyện --</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label text-muted small fw-semibold">Phường / Xã <span
+                                        class="text-danger">*</span></label>
+                                <select class="form-select" name="wardcode" id="ward" required disabled>
+                                    <option value="" selected disabled>-- Chọn Phường/Xã --</option>
+                                </select>
+                            </div>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label text-muted small">Tỉnh / Thành phố</label>
-                            <input type="text" name="city" class="form-control rounded-pill" required>
+
+                        <div class="mb-4">
+                            <label class="form-label text-muted small fw-semibold">Địa chỉ cụ thể (Số nhà, Tên đường)
+                                <span class="text-danger">*</span></label>
+                            <input type="text" name="address" id="streetAddress" class="form-control"
+                                placeholder="VD: 123 Đường Lê Lợi" required>
                         </div>
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-success rounded-pill fw-bold">Thêm địa chỉ</button>
+
+                        <div class="form-check form-switch mb-4">
+                            <input class="form-check-input" type="checkbox" name="isDefault" id="isDefaultCheck"
+                                value="true">
+                            <label class="form-check-label fw-semibold text-dark" for="isDefaultCheck">Đặt làm địa chỉ
+                                mặc định</label>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2">
+                            <button type="button" class="btn btn-light rounded-pill px-4"
+                                data-bs-dismiss="modal">Hủy</button>
+                            <button type="submit" class="btn btn-success rounded-pill px-4 fw-bold">Lưu địa chỉ</button>
                         </div>
                     </form>
                 </div>
@@ -252,5 +324,86 @@
 
     <footer class="bg-white border-top pt-5"> ... (Code Footer cũ) ... </footer>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const provinceSelect = document.getElementById("province");
+        const districtSelect = document.getElementById("district");
+        const wardSelect = document.getElementById("ward");
+        const streetAddress = document.getElementById("streetAddress");
+        const fulladdressInput = document.getElementById("fulladdressInput");
+        const formAddress = document.getElementById("formAddress");
+
+        // 1. Gọi API lấy danh sách Tỉnh/Thành
+        axios.get("https://provinces.open-api.vn/api/?depth=1")
+            .then(response => {
+                response.data.forEach(item => {
+                    let option = document.createElement("option");
+                    option.value = item.code; // Lưu ID Tỉnh
+                    option.text = item.name;  // Tên hiển thị
+                    // Lưu luôn tên vào attribute để ghép chuỗi fulladdress sau này
+                    option.setAttribute("data-name", item.name); 
+                    provinceSelect.appendChild(option);
+                });
+            });
+
+        // 2. Khi chọn Tỉnh -> Load danh sách Quận/Huyện
+        provinceSelect.addEventListener("change", function () {
+            districtSelect.innerHTML = '<option value="" selected disabled>-- Chọn Quận/Huyện --</option>';
+            wardSelect.innerHTML = '<option value="" selected disabled>-- Chọn Phường/Xã --</option>';
+            districtSelect.disabled = true;
+            wardSelect.disabled = true;
+
+            const provinceCode = this.value;
+            if (provinceCode) {
+                axios.get(`https://provinces.open-api.vn/api/p/${provinceCode}?depth=2`)
+                    .then(response => {
+                        response.data.districts.forEach(item => {
+                            let option = document.createElement("option");
+                            option.value = item.code;
+                            option.text = item.name;
+                            option.setAttribute("data-name", item.name);
+                            districtSelect.appendChild(option);
+                        });
+                        districtSelect.disabled = false;
+                    });
+            }
+        });
+
+        // 3. Khi chọn Quận -> Load danh sách Phường/Xã
+        districtSelect.addEventListener("change", function () {
+            wardSelect.innerHTML = '<option value="" selected disabled>-- Chọn Phường/Xã --</option>';
+            wardSelect.disabled = true;
+
+            const districtCode = this.value;
+            if (districtCode) {
+                axios.get(`https://provinces.open-api.vn/api/d/${districtCode}?depth=2`)
+                    .then(response => {
+                        response.data.wards.forEach(item => {
+                            let option = document.createElement("option");
+                            option.value = item.code;
+                            option.text = item.name;
+                            option.setAttribute("data-name", item.name);
+                            wardSelect.appendChild(option);
+                        });
+                        wardSelect.disabled = false;
+                    });
+            }
+        });
+
+        // 4. Ghép chuỗi fulladdress trước khi Submit form
+        formAddress.addEventListener("submit", function (e) {
+            // Lấy Tên hiển thị (data-name) thay vì lấy Value (ID)
+            const provName = provinceSelect.options[provinceSelect.selectedIndex].getAttribute("data-name");
+            const distName = districtSelect.options[districtSelect.selectedIndex].getAttribute("data-name");
+            const wardName = wardSelect.options[wardSelect.selectedIndex].getAttribute("data-name");
+            const street = streetAddress.value.trim();
+
+            // Nối chuỗi: "Số 12 Lên Lợi, Phường A, Quận B, Tỉnh C"
+            fulladdressInput.value = `${street}, ${wardName}, ${distName}, ${provName}`;
+        });
+    });
+</script>
 </body>
+
 </html>
