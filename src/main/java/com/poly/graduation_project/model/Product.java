@@ -35,9 +35,6 @@ public class Product {
     @Column(columnDefinition = "nvarchar(250)")
     private String publisher;
 
-    @Column(length = 250)
-    private String isbn;
-
    @Column(columnDefinition = "nvarchar(250)", unique = true)
     private String slug;
 

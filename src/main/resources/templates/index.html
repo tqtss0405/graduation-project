@@ -251,126 +251,49 @@
         </div>
     </section>
 
-    <main class="container mb-5">
-        <div class="d-flex justify-content-between align-items-end mb-4">
-            <h2 class="fw-bold mb-0">Sách Mới & Bán Chạy</h2>
-            <a href="#" class="btn btn-outline-success btn-sm rounded-pill">Xem tất cả <i
-                    class="fa-solid fa-arrow-right ms-1"></i></a>
+   <!-- THAY THẾ PHẦN "Sách Mới & Bán Chạy" TRONG index.html -->
+<!-- Tìm thẻ <main class="container mb-5"> và thay toàn bộ nội dung bên trong -->
+
+<main class="container mb-5">
+    <div class="d-flex justify-content-between align-items-end mb-4">
+        <h2 class="fw-bold mb-0">Sách Mới &amp; Bán Chạy</h2>
+        <a href="/products" class="btn btn-outline-success btn-sm rounded-pill">
+            Xem tất cả <i class="fa-solid fa-arrow-right ms-1"></i>
+        </a>
+    </div>
+
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+        <div class="col" th:each="p : ${products}">
+            <a th:href="@{'/product/' + ${p.slug}}" class="text-decoration-none text-dark">
+                <div class="card book-card h-100">
+                    <div class="book-img-container">
+                        <img th:src="${p.image != null ? p.image : '/images/default-book.png'}"
+                             alt="Book" class="book-img" />
+                    </div>
+                    <div class="card-body">
+                        <h6 class="book-title" th:text="${p.name}">Tên sách</h6>
+                        <p class="book-author" th:text="${p.author}">Tác giả</p>
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <span class="text-danger fw-bold fs-5"
+                                  th:text="${#numbers.formatDecimal(p.price, 0, 'COMMA', 0, 'POINT')} + 'đ'">
+                                0đ
+                            </span>
+                            <button class="btn-add-cart" title="Thêm vào giỏ">
+                                <i class="fa-solid fa-cart-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </a>
         </div>
 
-        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
-            <div class="col">
-                <a href="/product-details" class="text-decoration-none text-dark">
-                    <div class="card book-card h-100">
-                        <span class="badge-sale">-20%</span>
-                        <div class="book-img-container">
-                            <img src="https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&w=500&q=80"
-                                alt="Book" class="book-img" />
-                        </div>
-                        <div class="card-body">
-                            <div class="star-rating mb-2">
-                                <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i
-                                    class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i
-                                    class="fa-solid fa-star-half-stroke"></i>
-                            </div>
-                            <h6 class="book-title" title="Nhà Giả Kim">
-                                Nhà Giả Kim
-                            </h6>
-                            <p class="book-author">Paulo Coelho</p>
-                            <div class="d-flex justify-content-between align-items-center mt-3">
-                                <div>
-                                    <span class="text-danger fw-bold fs-5">63.000đ</span>
-                                    <span class="text-muted text-decoration-line-through small ms-1">79.000đ</span>
-                                </div>
-                                <button class="btn-add-cart" title="Thêm vào giỏ">
-                                    <i class="fa-solid fa-cart-plus"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </a>
-            </div>
-
-            <div class="col">
-                <div class="card book-card h-100">
-                    <div class="book-img-container">
-                        <img src="https://images.unsplash.com/photo-1589829085413-56de8ae18c73?auto=format&fit=crop&w=500&q=80"
-                            alt="Book" class="book-img" />
-                    </div>
-                    <div class="card-body">
-                        <div class="star-rating mb-2">
-                            <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i
-                                class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i
-                                class="fa-regular fa-star"></i>
-                        </div>
-                        <h6 class="book-title" title="Đắc Nhân Tâm">
-                            Đắc Nhân Tâm
-                        </h6>
-                        <p class="book-author">Dale Carnegie</p>
-                        <div class="d-flex justify-content-between align-items-center mt-3">
-                            <span class="text-danger fw-bold fs-5">85.000đ</span>
-                            <button class="btn-add-cart" title="Thêm vào giỏ">
-                                <i class="fa-solid fa-cart-plus"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col">
-                <div class="card book-card h-100">
-                    <span class="badge-sale bg-warning text-dark">HOT</span>
-                    <div class="book-img-container">
-                        <img src="https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=500&q=80"
-                            alt="Book" class="book-img" />
-                    </div>
-                    <div class="card-body">
-                        <div class="star-rating mb-2">
-                            <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i
-                                class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i
-                                class="fa-solid fa-star"></i>
-                        </div>
-                        <h6 class="book-title" title="Hành Trình Về Phương Đông">
-                            Hành Trình Về Phương Đông
-                        </h6>
-                        <p class="book-author">Baird T. Spalding</p>
-                        <div class="d-flex justify-content-between align-items-center mt-3">
-                            <span class="text-danger fw-bold fs-5">115.000đ</span>
-                            <button class="btn-add-cart" title="Thêm vào giỏ">
-                                <i class="fa-solid fa-cart-plus"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col">
-                <div class="card book-card h-100">
-                    <div class="book-img-container">
-                        <img src="https://images.unsplash.com/photo-1532012197367-2d5970d7b5c3?auto=format&fit=crop&w=500&q=80"
-                            alt="Book" class="book-img" />
-                    </div>
-                    <div class="card-body">
-                        <div class="star-rating mb-2">
-                            <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i
-                                class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i
-                                class="fa-solid fa-star"></i>
-                        </div>
-                        <h6 class="book-title" title="Tư Duy Nhanh Và Chậm">
-                            Tư Duy Nhanh Và Chậm
-                        </h6>
-                        <p class="book-author">Daniel Kahneman</p>
-                        <div class="d-flex justify-content-between align-items-center mt-3">
-                            <span class="text-danger fw-bold fs-5">190.000đ</span>
-                            <button class="btn-add-cart" title="Thêm vào giỏ">
-                                <i class="fa-solid fa-cart-plus"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <!-- Hiển thị khi không có sản phẩm nào -->
+        <div class="col-12 text-center py-5" th:if="${#lists.isEmpty(products)}">
+            <i class="fa-solid fa-book-open fa-3x text-muted mb-3 d-block"></i>
+            <p class="text-muted">Chưa có sản phẩm nào.</p>
         </div>
-    </main>
+    </div>
+</main>
 
     <div class="container mb-5">
         <div class="newsletter-section text-center position-relative">

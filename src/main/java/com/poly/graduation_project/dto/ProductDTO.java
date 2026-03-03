@@ -1,0 +1,41 @@
+package com.poly.graduation_project.dto;
+
+import jakarta.validation.constraints.*;
+import lombok.Data;
+import org.springframework.web.multipart.MultipartFile;
+import java.math.BigDecimal;
+
+@Data
+public class ProductDTO {
+
+    private Integer id;
+
+    @NotBlank(message = "Tên sách không được để trống")
+    private String name;
+
+    @NotBlank(message = "Tác giả không được để trống")
+    private String author;
+
+    @NotBlank(message = "Nhà xuất bản không được để trống")
+    private String publisher;
+
+    @NotNull(message = "Giá bán không được để trống")
+    @Min(value = 0, message = "Giá bán không được âm")
+    private BigDecimal price;
+
+    @NotNull(message = "Số lượng kho không được để trống")
+    @Min(value = 0, message = "Số lượng kho không được âm")
+    private Integer stockQuantity;
+
+    @NotNull(message = "Vui lòng chọn danh mục")
+    private Integer categoryId;
+
+    private String description;
+
+    // Checkbox active: Spring MVC gửi null nếu không check
+    // → dùng Boolean (wrapper) thay vì boolean (primitive)
+    private Boolean active;
+
+    private MultipartFile mainImage;      // Ảnh bìa chính
+    private MultipartFile[] detailImages; // Nhiều ảnh gallery
+}

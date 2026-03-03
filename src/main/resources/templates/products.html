@@ -13,7 +13,7 @@
 </head>
 
 <body>
-   <nav class="navbar navbar-expand-lg sticky-top">
+    <nav class="navbar navbar-expand-lg sticky-top">
         <div class="container">
             <a class="navbar-brand" href="#">BEO<span style="color: var(--secondary-color)">BOOKS</span></a>
 
@@ -30,7 +30,7 @@
                         <a class="nav-link" href="/products">Sản Phẩm</a>
                     </li>
 
-                      
+
                     <li class="nav-item">
                         <a class="nav-link text-dark" href="/contact">Liên hệ</a>
                     </li>
@@ -171,10 +171,14 @@
                 </div>
             </div>
 
-            <div class="col-lg-9">
+            <!-- THAY THẾ PHẦN DANH SÁCH SẢN PHẨM TRONG products.html -->
+            <!-- Tìm <div class="col-lg-9"> và thay nội dung bên trong -->
 
+            <div class="col-lg-9">
                 <div class="d-flex justify-content-between align-items-center mb-4">
-                    <span class="text-muted">Hiển thị 1-9 trong 50 kết quả</span>
+                    <span class="text-muted">
+                        Hiển thị <strong th:text="${#lists.size(products)}">0</strong> sản phẩm
+                    </span>
                     <select class="form-select w-auto">
                         <option>Mới nhất</option>
                         <option>Giá tăng dần</option>
@@ -183,98 +187,55 @@
                 </div>
 
                 <div class="row row-cols-1 row-cols-md-3 g-4">
-
-                    <div class="col">
-                        <div class="card book-card">
-                            <a href="product.html" class="text-decoration-none">
+                    <div class="col" th:each="p : ${products}">
+                        <div class="card book-card h-100">
+                            <a th:href="@{'/product/' + ${p.slug}}" class="text-decoration-none">
                                 <div class="book-img-container">
-                                    <img src="https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&w=500&q=80"
-                                        class="book-img">
+                                    <img th:src="${p.image != null ? p.image : '/images/default-book.png'}"
+                                        class="book-img" th:alt="${p.name}">
                                 </div>
-                                <div class="card-body">
-                                    <h6 class="fw-bold mb-1 text-dark">Nhà Giả Kim</h6>
-                                    <p class="text-muted small mb-2">Paulo Coelho</p>
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <span class="text-danger fw-bold">63.000đ</span>
-                                        <button class="btn btn-outline-success btn-sm rounded-circle"><i
-                                                class="fa-solid fa-cart-plus"></i></button>
+                                <div class="card-body d-flex flex-column">
+                                    <span class="badge mb-1" th:if="${p.category != null}"
+                                        th:style="'background-color:' + ${p.category.color}"
+                                        th:text="${p.category.name}">Danh mục</span>
+                                    <h6 class="fw-bold mb-1 text-dark" th:text="${p.name}">Tên sách</h6>
+                                    <p class="text-muted small mb-2" th:text="${p.author}">Tác giả</p>
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <span class="text-danger fw-bold"
+                                            th:text="${#numbers.formatDecimal(p.price, 0, 'COMMA', 0, 'POINT')} + 'đ'">
+                                            0đ
+                                        </span>
+                                        <button class="btn btn-outline-success btn-sm rounded-circle">
+                                            <i class="fa-solid fa-cart-plus"></i>
+                                        </button>
+
                                     </div>
+                                    <div class="mt-auto text-center">
+    <a th:href="@{'/product/' + ${p.slug}}"
+       class="btn btn-outline-success w-75">
+        Chi tiết sản phẩm
+    </a>
+</div>
                                 </div>
                             </a>
                         </div>
                     </div>
 
-                    <div class="col">
-                        <div class="card book-card">
-                            <a href="product.html" class="text-decoration-none">
-                                <div class="book-img-container">
-                                    <img src="https://images.unsplash.com/photo-1589829085413-56de8ae18c73?auto=format&fit=crop&w=500&q=80"
-                                        class="book-img">
-                                </div>
-                                <div class="card-body">
-                                    <h6 class="fw-bold mb-1 text-dark">Đắc Nhân Tâm</h6>
-                                    <p class="text-muted small mb-2">Dale Carnegie</p>
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <span class="text-danger fw-bold">85.000đ</span>
-                                        <button class="btn btn-outline-success btn-sm rounded-circle"><i
-                                                class="fa-solid fa-cart-plus"></i></button>
-                                    </div>
-                                </div>
-                            </a>
-                        </div>
-                    </div>
-
-                    <div class="col">
-                        <div class="card book-card">
-                            <a href="product.html" class="text-decoration-none">
-                                <div class="book-img-container">
-                                    <img src="https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=500&q=80"
-                                        class="book-img">
-                                </div>
-                                <div class="card-body">
-                                    <h6 class="fw-bold mb-1 text-dark">Hành Trình Phương Đông</h6>
-                                    <p class="text-muted small mb-2">Baird T. Spalding</p>
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <span class="text-danger fw-bold">115.000đ</span>
-                                        <button class="btn btn-outline-success btn-sm rounded-circle"><i
-                                                class="fa-solid fa-cart-plus"></i></button>
-                                    </div>
-                                </div>
-                            </a>
-                        </div>
-                    </div>
-
-                    <div class="col">
-                        <div class="card book-card">
-                            <a href="product.html" class="text-decoration-none">
-                                <div class="book-img-container">
-                                    <img src="https://images.unsplash.com/photo-1532012197367-2d5970d7b5c3?auto=format&fit=crop&w=500&q=80"
-                                        class="book-img">
-                                </div>
-                                <div class="card-body">
-                                    <h6 class="fw-bold mb-1 text-dark">Tư Duy Nhanh Và Chậm</h6>
-                                    <p class="text-muted small mb-2">Daniel Kahneman</p>
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <span class="text-danger fw-bold">190.000đ</span>
-                                        <button class="btn btn-outline-success btn-sm rounded-circle"><i
-                                                class="fa-solid fa-cart-plus"></i></button>
-                                    </div>
-                                </div>
-                            </a>
-                        </div>
+                    <!-- Khi không có sản phẩm -->
+                    <div class="col-12 text-center py-5" th:if="${#lists.isEmpty(products)}">
+                        <i class="fa-solid fa-box-open fa-3x text-muted mb-3 d-block"></i>
+                        <p class="text-muted">Không có sản phẩm nào.</p>
                     </div>
                 </div>
 
+                <!-- Phân trang (tĩnh, sau này có thể nâng cấp) -->
                 <nav class="mt-5 d-flex justify-content-center">
                     <ul class="pagination">
                         <li class="page-item disabled"><a class="page-link" href="#">Trước</a></li>
                         <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                        <li class="page-item"><a class="page-link" href="#">2</a></li>
-                        <li class="page-item"><a class="page-link" href="#">3</a></li>
                         <li class="page-item"><a class="page-link" href="#">Sau</a></li>
                     </ul>
                 </nav>
-
             </div>
         </div>
     </div>
