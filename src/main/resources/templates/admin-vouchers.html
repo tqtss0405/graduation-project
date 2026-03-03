@@ -12,7 +12,7 @@
 </head>
 
 <body>
-
+    <div id="toast-container"></div>
     <!-- Sidebar -->
     <nav class="sidebar">
         <div class="sidebar-brand">BEO<span style="color:white">BOOKS</span></div>
@@ -66,6 +66,8 @@
 
         <!-- Admin Header -->
         <div class="admin-header">
+            <!-- Flash Messages -->
+
             <div>
                 <h4 class="fw-bold mb-0">Quản lý Mã giảm giá</h4>
                 <small class="text-muted">Tạo và quản lý các chương trình khuyến mãi</small>
@@ -86,7 +88,14 @@
                 </div>
             </div>
         </div>
-
+        <div th:if="${successMsg}" class="alert alert-success d-flex align-items-center gap-2 mt-3 mb-3" role="alert">
+            <i class="fa-solid fa-circle-check"></i>
+            <span th:text="${successMsg}"></span>
+        </div>
+        <div th:if="${errorMsg}" class="alert alert-danger d-flex align-items-center gap-2 mt-3 mb-3" role="alert">
+            <i class="fa-solid fa-circle-exclamation"></i>
+            <span th:text="${errorMsg}"></span>
+        </div>
         <!-- Stats Cards -->
         <div class="row g-4 mb-4">
             <div class="col-md-3">
@@ -94,7 +103,7 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <small class="opacity-75">Tổng mã</small>
-                            <h2 class="fw-bold mb-0">24</h2>
+                            <h2 class="fw-bold mb-0" th:text="${totalVouchers}">0</h2>
                         </div>
                         <i class="fa-solid fa-ticket fa-3x opacity-25"></i>
                     </div>
@@ -105,7 +114,7 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <small class="opacity-75">Đang hoạt động</small>
-                            <h2 class="fw-bold mb-0">12</h2>
+                            <h2 class="fw-bold mb-0" th:text="${activeVouchers}">0</h2>
                         </div>
                         <i class="fa-solid fa-check-circle fa-3x opacity-25"></i>
                     </div>
@@ -115,10 +124,10 @@
                 <div class="stat-card orange">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <small class="opacity-75">Đã sử dụng</small>
-                            <h2 class="fw-bold mb-0">1,247</h2>
+                            <small class="opacity-75">Đã hết hạn</small>
+                            <h2 class="fw-bold mb-0" th:text="${expiredVouchers}">0</h2>
                         </div>
-                        <i class="fa-solid fa-shopping-cart fa-3x opacity-25"></i>
+                        <i class="fa-solid fa-clock fa-3x opacity-25"></i>
                     </div>
                 </div>
             </div>
@@ -126,10 +135,10 @@
                 <div class="stat-card blue">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <small class="opacity-75">Tiết kiệm</small>
-                            <h2 class="fw-bold mb-0">124M</h2>
+                            <small class="opacity-75">Sắp diễn ra</small>
+                            <h2 class="fw-bold mb-0" th:text="${upcomingVouchers}">0</h2>
                         </div>
-                        <i class="fa-solid fa-hand-holding-dollar fa-3x opacity-25"></i>
+                        <i class="fa-solid fa-calendar fa-3x opacity-25"></i>
                     </div>
                 </div>
             </div>
@@ -180,139 +189,62 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td class="fw-bold">1</td>
+
+                    <tr th:each="v : ${vouchers}">
+                        <td class="fw-bold" th:text="${v.id}"></td>
                         <td>
-                            <div class="fw-bold">Khuyến mãi Tết 2025</div>
-                            <small class="text-muted">Giảm 20% cho đơn từ 500k</small>
+                            <div class="fw-bold" th:text="${v.name}"></div>
                         </td>
                         <td>
-                            <span class="coupon-code">TET2025</span>
-                            <button class="btn btn-sm btn-light ms-2" onclick="copyCoupon('TET2025')" title="Copy">
+                            <span class="coupon-code" th:text="${v.code}"></span>
+                            <button class="btn btn-sm btn-light ms-2" th:data-code="${v.code}"
+                                onclick="copyCoupon(this.dataset.code)" title="Copy">
                                 <i class="fa-solid fa-copy"></i>
                             </button>
                         </td>
                         <td>
-                            <span class="discount-badge">-20%</span>
+                            <span class="discount-badge" th:text="'-' + ${v.discount} + '%'"></span>
                         </td>
-                        <td><strong>500</strong></td>
+                        <td><strong th:text="${v.quantity == 0} ? '∞' : ${v.quantity}"></strong></td>
                         <td>
-                            <div>234 / 500</div>
-                            <div class="progress mt-1" style="height: 5px;">
-                                <div class="progress-bar bg-success" style="width: 47%"></div>
+                            <div th:text="${usedCountMap[v.id]} + ' / ' + (${v.quantity == 0} ? '∞' : ${v.quantity})">
                             </div>
-                        </td>
-                        <td>01/01/2025</td>
-                        <td>31/01/2025</td>
-                        <td><span class="status-active">Đang hoạt động</span></td>
-                        <td>
-                            <button class="btn btn-sm btn-light text-primary" data-bs-toggle="modal"
-                                data-bs-target="#editCouponModal" title="Sửa">
-                                <i class="fa-solid fa-pen"></i>
-                            </button>
-                            <button class="btn btn-sm btn-light text-danger" onclick="deleteCoupon(1)" title="Xóa">
-                                <i class="fa-solid fa-trash"></i>
-                            </button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="fw-bold">2</td>
-                        <td>
-                            <div class="fw-bold">Giảm giá Black Friday</div>
-                            <small class="text-muted">Giảm 100.000đ cho đơn từ 1 triệu</small>
-                        </td>
-                        <td>
-                            <span class="coupon-code">BLACKFRIDAY</span>
-                            <button class="btn btn-sm btn-light ms-2" onclick="copyCoupon('BLACKFRIDAY')">
-                                <i class="fa-solid fa-copy"></i>
-                            </button>
-                        </td>
-                        <td>
-                            <span class="discount-badge">-100K</span>
-                        </td>
-                        <td><strong>1000</strong></td>
-                        <td>
-                            <div>876 / 1000</div>
-                            <div class="progress mt-1" style="height: 5px;">
-                                <div class="progress-bar bg-warning" style="width: 88%"></div>
+                            <div th:if="${v.quantity > 0}" class="progress mt-1" style="height: 5px;">
+                                <div class="progress-bar bg-success"
+                                    th:style="'width:' + (${usedCountMap[v.id]} * 100 / ${v.quantity}) + '%'">
+                                </div>
                             </div>
+                            <small th:if="${v.quantity == 0}" class="text-muted">Không giới hạn</small>
                         </td>
-                        <td>20/11/2024</td>
-                        <td>30/11/2024</td>
-                        <td><span class="status-expired">Đã hết hạn</span></td>
+                        <td th:text="${v.startedAt} ? ${#temporals.format(v.startedAt, 'dd/MM/yyyy')} : '-'"></td>
+                        <td th:text="${v.endAt} ? ${#temporals.format(v.endAt, 'dd/MM/yyyy')} : '-'"></td>
                         <td>
-                            <button class="btn btn-sm btn-light text-primary" title="Sửa">
+                            <span th:if="${!v.active}" class="status-expired">Đã tắt</span>
+                            <span th:if="${v.active and v.endAt != null and v.endAt.isBefore(#temporals.createNow())}"
+                                class="status-expired">Đã hết hạn</span>
+                            <span th:if="${v.active and (v.endAt == null or v.endAt.isAfter(#temporals.createNow())) 
+                         and (v.startedAt == null or v.startedAt.isAfter(#temporals.createNow()))}"
+                                class="status-upcoming">Sắp diễn ra</span>
+                            <span th:if="${v.active and (v.endAt == null or v.endAt.isAfter(#temporals.createNow())) 
+                         and (v.startedAt == null or v.startedAt.isBefore(#temporals.createNow()))}"
+                                class="status-active">Đang hoạt động</span>
+                        </td>
+                        <td>
+                            <!-- Nút Sửa: load data bằng JS rồi mở modal -->
+                            <button class="btn btn-sm btn-light text-primary" th:data-id="${v.id}"
+                                onclick="openEditModal(this.dataset.id)" title="Sửa">
                                 <i class="fa-solid fa-pen"></i>
                             </button>
-                            <button class="btn btn-sm btn-light text-danger" onclick="deleteCoupon(2)" title="Xóa">
-                                <i class="fa-solid fa-trash"></i>
-                            </button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="fw-bold">3</td>
-                        <td>
-                            <div class="fw-bold">Khách hàng mới</div>
-                            <small class="text-muted">Giảm 50.000đ cho đơn đầu tiên</small>
-                        </td>
-                        <td>
-                            <span class="coupon-code">WELCOME50</span>
-                            <button class="btn btn-sm btn-light ms-2" onclick="copyCoupon('WELCOME50')">
-                                <i class="fa-solid fa-copy"></i>
-                            </button>
-                        </td>
-                        <td>
-                            <span class="discount-badge">-50K</span>
-                        </td>
-                        <td><strong>∞</strong></td>
-                        <td>
-                            <div>1,245</div>
-                            <small class="text-muted">Không giới hạn</small>
-                        </td>
-                        <td>01/12/2024</td>
-                        <td>31/12/2025</td>
-                        <td><span class="status-active">Đang hoạt động</span></td>
-                        <td>
-                            <button class="btn btn-sm btn-light text-primary" title="Sửa">
-                                <i class="fa-solid fa-pen"></i>
-                            </button>
-                            <button class="btn btn-sm btn-light text-danger" onclick="deleteCoupon(3)" title="Xóa">
-                                <i class="fa-solid fa-trash"></i>
-                            </button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="fw-bold">4</td>
-                        <td>
-                            <div class="fw-bold">Flash Sale cuối tuần</div>
-                            <small class="text-muted">Giảm 30% tất cả sản phẩm</small>
-                        </td>
-                        <td>
-                            <span class="coupon-code">WEEKEND30</span>
-                            <button class="btn btn-sm btn-light ms-2" onclick="copyCoupon('WEEKEND30')">
-                                <i class="fa-solid fa-copy"></i>
-                            </button>
-                        </td>
-                        <td>
-                            <span class="discount-badge">-30%</span>
-                        </td>
-                        <td><strong>200</strong></td>
-                        <td>
-                            <div>0 / 200</div>
-                            <div class="progress mt-1" style="height: 5px;">
-                                <div class="progress-bar" style="width: 0%"></div>
-                            </div>
-                        </td>
-                        <td>15/02/2025</td>
-                        <td>16/02/2025</td>
-                        <td><span class="status-upcoming">Sắp diễn ra</span></td>
-                        <td>
-                            <button class="btn btn-sm btn-light text-primary" title="Sửa">
-                                <i class="fa-solid fa-pen"></i>
-                            </button>
-                            <button class="btn btn-sm btn-light text-danger" onclick="deleteCoupon(4)" title="Xóa">
-                                <i class="fa-solid fa-trash"></i>
-                            </button>
+                            <!-- Nút Xóa: submit form DELETE -->
+                            <!-- Thay thế nút xóa cũ -->
+                            <form th:action="@{/admin/vouchers/delete/{id}(id=${v.id})}" method="post"
+                                style="display:inline;" th:id="'del-form-' + ${v.id}">
+                                <button type="button" class="btn btn-sm btn-light text-danger" title="Xóa"
+                                    th:data-id="${v.id}" th:data-code="${v.code}"
+                                    onclick="showConfirm('Xóa mã ' + this.dataset.code + '?', () => document.getElementById('del-form-' + this.dataset.id).submit())">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </form>
                         </td>
                     </tr>
                 </tbody>
@@ -355,60 +287,62 @@
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="addCouponForm" class="row g-3">
+                    <form id="addCouponForm" th:action="@{/admin/vouchers/save}" th:object="${voucherDTO}" method="post"
+                        class="row g-3">
+
                         <div class="col-md-12">
                             <label class="form-label fw-semibold">Tên chương trình *</label>
-                            <input type="text" class="form-control" placeholder="VD: Khuyến mãi Tết 2025" required>
+                            <input type="text" th:field="*{name}" class="form-control"
+                                placeholder="VD: Khuyến mãi Tết 2025">
+
                         </div>
+
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Mã giảm giá *</label>
                             <div class="input-group">
-                                <input type="text" class="form-control text-uppercase" id="couponCode"
-                                    placeholder="VD: TET2025" required>
+                                <input type="text" th:field="*{code}" id="couponCode"
+                                    class="form-control text-uppercase" placeholder="VD: TET2025">
                                 <button class="btn btn-outline-secondary" type="button" onclick="generateCode()">
                                     <i class="fa-solid fa-wand-magic-sparkles"></i> Tạo tự động
                                 </button>
                             </div>
-                            <small class="text-muted">Chữ hoa, không dấu, không khoảng trắng</small>
+
+                            <small class="text-muted">Chữ hoa, không dấu, không khoảng trắng, tối đa 10 ký tự</small>
                         </div>
+
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold">Loại giảm giá *</label>
-                            <select class="form-select" id="discountType" onchange="toggleDiscountInput()" required>
-                                <option value="">Chọn loại</option>
-                                <option value="percent">Giảm theo phần trăm (%)</option>
-                                <option value="fixed">Giảm cố định (VNĐ)</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-semibold">Số tiền/phần trăm giảm *</label>
+                            <label class="form-label fw-semibold">Giảm giá (%) *</label>
                             <div class="input-group">
-                                <input type="number" class="form-control" placeholder="0" required>
-                                <span class="input-group-text" id="discountUnit">VNĐ</span>
+                                <input type="number" th:field="*{discount}" class="form-control" min="1" max="100"
+                                    placeholder="Nhập % giảm">
+                                <span class="input-group-text">%</span>
                             </div>
+
                         </div>
+
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Số lượng mã *</label>
-                            <input type="number" class="form-control" placeholder="0 = Không giới hạn" required>
+                            <input type="number" th:field="*{quantity}" class="form-control" min="0"
+                                placeholder="0 = Không giới hạn">
+
                         </div>
+
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Ngày bắt đầu *</label>
-                            <input type="date" class="form-control" required>
+                            <input type="datetime-local" name="startedAt" id="startedAt" class="form-control">
+
                         </div>
+
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Ngày hết hạn *</label>
-                            <input type="date" class="form-control" required>
+                            <input type="datetime-local" name="endAt" id="endAt" class="form-control">
+
                         </div>
-                        <div class="col-12">
-                            <label class="form-label fw-semibold">Mô tả</label>
-                            <textarea class="form-control" rows="3"
-                                placeholder="Mô tả chi tiết về chương trình..."></textarea>
-                        </div>
+
                         <div class="col-12">
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="activeStatus" checked>
-                                <label class="form-check-label" for="activeStatus">
-                                    Kích hoạt ngay sau khi tạo
-                                </label>
+                                <input class="form-check-input" type="checkbox" th:field="*{active}" id="activeStatus">
+                                <label class="form-check-label" for="activeStatus">Kích hoạt ngay sau khi tạo</label>
                             </div>
                         </div>
                     </form>
@@ -425,7 +359,66 @@
 
     <!-- Edit Coupon Modal (tương tự Add) -->
     <div class="modal fade" id="editCouponModal" tabindex="-1">
-        <!-- Nội dung tương tự addCouponModal -->
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title fw-bold">
+                        <i class="fa-solid fa-pen me-2"></i>Cập nhật Mã giảm giá
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editCouponForm" method="post" class="row g-3">
+                        <!-- action được set động bằng JS -->
+                        <input type="hidden" id="editId">
+
+                        <div class="col-md-12">
+                            <label class="form-label fw-semibold">Tên chương trình *</label>
+                            <input type="text" id="editName" name="name" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Mã giảm giá *</label>
+                            <input type="text" id="editCode" name="code" class="form-control text-uppercase"
+                                maxlength="10" required>
+                            <small class="text-muted">Tối đa 10 ký tự, chữ hoa và số</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Giảm giá (%) *</label>
+                            <div class="input-group">
+                                <input type="number" id="editDiscount" name="discount" class="form-control" min="1"
+                                    max="100" required>
+                                <span class="input-group-text">%</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Số lượng *</label>
+                            <input type="number" id="editQuantity" name="quantity" class="form-control" min="0"
+                                required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Ngày bắt đầu *</label>
+                            <input type="datetime-local" id="editStartedAt" name="startedAt" class="form-control">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Ngày hết hạn *</label>
+                            <input type="datetime-local" id="editEndAt" name="endAt" class="form-control">
+                        </div>
+                        <div class="col-12">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="editActive" name="active">
+                                <label class="form-check-label" for="editActive">Đang kích hoạt</label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" form="editCouponForm" class="btn btn-primary">
+                        <i class="fa-solid fa-save me-2"></i>Lưu thay đổi
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
     <div class="modal fade" id="profileModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
@@ -440,13 +433,16 @@
                     <form id="profileForm">
                         <div class="text-center mb-4">
                             <div class="position-relative d-inline-block">
-                                <img src="https://ui-avatars.com/api/?name=Admin&background=28a745&color=fff&size=150" 
-                                     class="rounded-circle" width="150" height="150" id="profileAvatarPreview" alt="Avatar">
-                                <label for="avatarUpload" class="position-absolute bottom-0 end-0 btn btn-success btn-sm rounded-circle" 
-                                       style="width: 40px; height: 40px;">
+                                <img src="https://ui-avatars.com/api/?name=Admin&background=28a745&color=fff&size=150"
+                                    class="rounded-circle" width="150" height="150" id="profileAvatarPreview"
+                                    alt="Avatar">
+                                <label for="avatarUpload"
+                                    class="position-absolute bottom-0 end-0 btn btn-success btn-sm rounded-circle"
+                                    style="width: 40px; height: 40px;">
                                     <i class="fa-solid fa-camera"></i>
                                 </label>
-                                <input type="file" id="avatarUpload" class="d-none" accept="image/*" onchange="previewAvatar(event)">
+                                <input type="file" id="avatarUpload" class="d-none" accept="image/*"
+                                    onchange="previewAvatar(event)">
                             </div>
                         </div>
                         <div class="mb-3">
@@ -484,44 +480,96 @@
     <script src="/js/admin-avt.js"></script>
     <script src="/js/sidebar.js"></script>
     <script>
+        /* ── TOAST ENGINE ──────────────────────────────────────── */
+        const TOAST_ICONS = { success: 'fa-circle-check', error: 'fa-circle-xmark', info: 'fa-circle-info', warning: 'fa-triangle-exclamation' };
+        const TOAST_TITLES = { success: 'Thành công', error: 'Lỗi', info: 'Thông báo', warning: 'Cảnh báo' };
+
+        function showToast(type = 'info', title = '', message = '', duration = 4000) {
+            const container = document.getElementById('toast-container');
+            const id = 'toast-' + Date.now();
+            const el = document.createElement('div');
+            el.className = `toast-item ${type}`;
+            el.id = id;
+            el.innerHTML = `
+    <div class="toast-icon"><i class="fa-solid ${TOAST_ICONS[type]}"></i></div>
+    <div class="toast-body">
+      <div class="toast-title">${title || TOAST_TITLES[type]}</div>
+      ${message ? `<div class="toast-msg">${message}</div>` : ''}
+    </div>
+    <button class="toast-close" onclick="closeToast('${id}')"><i class="fa-solid fa-xmark"></i></button>
+    <div class="toast-progress" style="animation-duration:${duration}ms"></div>
+  `;
+            container.appendChild(el);
+            setTimeout(() => closeToast(id), duration);
+        }
+
+        function closeToast(id) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.classList.add('hiding');
+            setTimeout(() => el.remove(), 320);
+        }
+
+        /* ── CONFIRM DIALOG (thay confirm()) ───────────────────── */
+        function showConfirm(message, onConfirm) {
+            const overlay = document.createElement('div');
+            overlay.style.cssText = 'position:fixed;inset:0;background:rgba(15,23,42,0.45);backdrop-filter:blur(4px);z-index:10000;display:flex;align-items:center;justify-content:center;animation:fadeIn 0.2s ease both;';
+            overlay.innerHTML = `
+    <div style="background:#fff;border-radius:18px;padding:32px 28px;max-width:360px;width:90%;
+      box-shadow:0 24px 64px rgba(0,0,0,0.18);animation:scaleIn 0.25s cubic-bezier(.22,1,.36,1) both;text-align:center;">
+      <div style="width:56px;height:56px;border-radius:50%;background:#fee2e2;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+        <i class="fa-solid fa-trash" style="color:#ef4444;font-size:22px;"></i>
+      </div>
+      <div style="font-weight:700;font-size:1rem;color:#1e293b;margin-bottom:8px;">Xác nhận xóa</div>
+      <div style="font-size:0.85rem;color:#64748b;margin-bottom:24px;line-height:1.5;">${message}</div>
+      <div style="display:flex;gap:10px;">
+        <button id="dlg-cancel" style="flex:1;padding:11px 0;border-radius:10px;border:1.5px solid #e2e8f0;background:#f8fafc;color:#475569;font-weight:600;cursor:pointer;">Hủy</button>
+        <button id="dlg-ok"     style="flex:1;padding:11px 0;border-radius:10px;border:none;background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;font-weight:700;cursor:pointer;box-shadow:0 4px 14px rgba(239,68,68,0.35);">Xóa</button>
+      </div>
+    </div>`;
+            document.body.appendChild(overlay);
+            overlay.querySelector('#dlg-cancel').onclick = () => overlay.remove();
+            overlay.querySelector('#dlg-ok').onclick = () => { overlay.remove(); onConfirm(); };
+            overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
+        }
+
+        /* ── VOUCHER FUNCTIONS ─────────────────────────────────── */
         function copyCoupon(code) {
-            navigator.clipboard.writeText(code);
-            alert('Đã copy mã: ' + code);
+            navigator.clipboard.writeText(code).then(() => {
+                showToast('info', 'Đã sao chép!', `Mã <strong>${code}</strong> đã được copy vào clipboard.`, 2500);
+            });
         }
 
         function generateCode() {
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
             let code = '';
-            for (let i = 0; i < 8; i++) {
-                code += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
+            for (let i = 0; i < 8; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
             document.getElementById('couponCode').value = code;
         }
 
-        function toggleDiscountInput() {
-            const type = document.getElementById('discountType').value;
-            const unit = document.getElementById('discountUnit');
-            unit.textContent = type === 'percent' ? '%' : 'VNĐ';
+        function openEditModal(id) {
+            fetch('/admin/vouchers/edit/' + id)
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById('editId').value = data.id;
+                    document.getElementById('editName').value = data.name;
+                    document.getElementById('editCode').value = data.code;
+                    document.getElementById('editDiscount').value = data.discount;
+                    document.getElementById('editQuantity').value = data.quantity;
+                    document.getElementById('editStartedAt').value = data.startedAt ? data.startedAt.substring(0, 16) : '';
+                    document.getElementById('editEndAt').value = data.endAt ? data.endAt.substring(0, 16) : '';
+                    document.getElementById('editActive').checked = data.active;
+                    document.getElementById('editCouponForm').action = '/admin/vouchers/update/' + id;
+                    new bootstrap.Modal(document.getElementById('editCouponModal')).show();
+                })
+                .catch(() => showToast('error', 'Lỗi', 'Không thể tải thông tin voucher.'));
         }
 
-        function deleteCoupon(id) {
-            if (confirm('Bạn có chắc chắn muốn xóa mã giảm giá này?')) {
-                console.log('Deleting coupon:', id);
-            }
-        }
-
-        document.getElementById('addCouponForm')?.addEventListener('submit', function (e) {
-            e.preventDefault();
-            alert('Tạo mã giảm giá thành công!');
-            bootstrap.Modal.getInstance(document.getElementById('addCouponModal')).hide();
-        });
-
-        // Auto uppercase coupon code
         document.getElementById('couponCode')?.addEventListener('input', function (e) {
             e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
         });
     </script>
-    
+
 </body>
 
 </html>
