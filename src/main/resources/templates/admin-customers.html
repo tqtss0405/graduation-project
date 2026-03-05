@@ -9,6 +9,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/admin-style.css">
+
+</html>
 </head>
 
 <body>
@@ -97,35 +99,32 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
+                    <tr th:each="customer : ${customers}">
                         <td>
                             <div class="d-flex align-items-center gap-2">
-                                <img src="https://ui-avatars.com/api/?name=Nguyen+A&background=random"
-                                    class="rounded-circle" width="36">
-                                <span class="fw-bold">Nguyễn Văn A</span>
+                                <img th:src="${customer.image != null and customer.image != '' ? customer.image : 'https://ui-avatars.com/api/?name=' + customer.fullname + '&background=random'}"
+                                    class="rounded-circle" width="36" alt="Avatar">
+                                <span class="fw-bold" th:text="${customer.fullname}">Tên khách hàng</span>
                             </div>
                         </td>
-                        <td class="text-muted">nguyenvana@gmail.com</td>
-                        <td>01/01/2026</td>
-                        <td>5</td>
-                        <td class="fw-bold text-success">1.250.000đ</td>
-                        <td><button class="btn btn-sm btn-light text-danger"><i class="fa-solid fa-ban"></i>
-                                Chặn</button></td>
-                    </tr>
-                    <tr>
+                        <td class="text-muted" th:text="${customer.email}">email@gmail.com</td>
+
+                        <td>Đang cập nhật</td>
+
+                        <td th:text="${#lists.size(customer.orders)}">0</td>
+
+                        <td class="fw-bold text-success">Đang cập nhật</td>
+
                         <td>
-                            <div class="d-flex align-items-center gap-2">
-                                <img src="https://ui-avatars.com/api/?name=Tran+B&background=random"
-                                    class="rounded-circle" width="36">
-                                <span class="fw-bold">Trần Thị B</span>
-                            </div>
+                            <form th:action="@{/admin/customers/toggle-status/{id}(id=${customer.id})}" method="post"
+                                style="display:inline;">
+                                <button type="submit" class="btn btn-sm btn-light"
+                                    th:classappend="${customer.active} ? 'text-danger' : 'text-success'">
+                                    <i class="fa-solid" th:classappend="${customer.active} ? 'fa-ban' : 'fa-check'"></i>
+                                    <span th:text="${customer.active} ? ' Chặn' : ' Mở chặn'"></span>
+                                </button>
+                            </form>
                         </td>
-                        <td class="text-muted">tranthib@gmail.com</td>
-                        <td>15/01/2026</td>
-                        <td>2</td>
-                        <td class="fw-bold text-success">450.000đ</td>
-                        <td><button class="btn btn-sm btn-light text-danger"><i class="fa-solid fa-ban"></i>
-                                Chặn</button></td>
                     </tr>
                 </tbody>
             </table>
