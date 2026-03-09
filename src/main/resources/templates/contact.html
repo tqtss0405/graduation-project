@@ -15,121 +15,86 @@
 
 <body>
 
-   <nav class="navbar navbar-expand-lg sticky-top">
+  <nav class="navbar navbar-expand-lg sticky-top">
         <div class="container">
             <a class="navbar-brand" href="/home">BEO<span style="color: var(--secondary-color)">BOOKS</span></a>
-
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
-
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav mx-auto">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="/home">Trang chủ</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/products">Sản Phẩm</a>
-                    </li>
-
-                     
-                    <li class="nav-item">
-                        <a class="nav-link text-dark" href="/contact">Liên hệ</a>
-                    </li>
+                    <li class="nav-item"><a class="nav-link" href="/home">Trang chủ</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/products">Sản Phẩm</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/contact">Liên hệ</a></li>
                 </ul>
-
                 <div class="d-flex align-items-center gap-3">
+
+                    <!-- Ô tìm kiếm -->
                     <div class="input-group d-none d-lg-flex" style="width: 200px">
-                        <input type="text" class="form-control form-control-sm border-end-0 rounded-start-pill"
-                            placeholder="Tìm sách..." />
-                        <button class="btn btn-outline-secondary border-start-0 rounded-end-pill" type="button">
+                        <input type="text" id="searchInput"
+                            class="form-control form-control-sm border-end-0 rounded-start-pill"
+                            placeholder="Tìm sách..." onkeydown="if(event.key==='Enter') doSearch()" />
+                        <button class="btn btn-outline-secondary border-start-0 rounded-end-pill" type="button"
+                            onclick="doSearch()">
                             <i class="fa-solid fa-magnifying-glass"></i>
                         </button>
                     </div>
-                   <div class="position-relative">
-                    <a href="/user/cart">
-                        <i class="fa-solid fa-cart-shopping fs-5 text-secondary"></i>
-                       <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-      style="font-size:10px"
-      th:text="${totalQuantity}">0</span>
-                    </a>
-                </div>
-                    <div class="dropdown ms-3">
+
+                    <!-- Icon giỏ hàng + badge tổng số lượng -->
+                    <div class="position-relative">
+                        <a href="/user/cart">
+                            <i class="fa-solid fa-cart-shopping fs-5 text-secondary"></i>
+                            <span
+                                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                                style="font-size:10px" th:text="${totalQuantity}">0</span>
+                        </a>
+                    </div>
+
+                    <!-- Dropdown user -->
+                    <div class="dropdown ms-2">
                         <a href="#"
-                            class="d-flex align-items-center text-decoration-none text-secondary dropdown-toggle hidden-arrow"
-                            id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            class="d-flex align-items-center text-decoration-none text-secondary dropdown-toggle"
+                            data-bs-toggle="dropdown">
                             <img th:if="${session.currentUser != null}" th:src="${session.currentUser.image}"
-                                class="rounded-circle" width="30" height="30" alt="Avatar" />
+                                class="rounded-circle" width="30" height="30" alt="Avatar"
+                                onerror="this.style.display='none'" />
                             <i th:if="${session.currentUser == null}" class="fa-solid fa-circle-user fs-3"></i>
                         </a>
-
                         <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg p-3"
-                            aria-labelledby="userDropdown"
-                            style="min-width: 280px; border-radius: 15px; margin-top: 10px;">
-
-                            <li th:if="${session.currentUser == null}">
-                                <div class="d-flex flex-column align-items-center mb-3">
-                                    <p class="small text-muted mb-2">Chào mừng đến với BeoBooks!</p>
-                                    <a href="/login/form" class="btn btn-success w-100 rounded-pill fw-bold mb-2">Đăng
-                                        nhập</a>
-                                    <a href="/register" class="btn btn-outline-success w-100 rounded-pill fw-bold">Đăng
-                                        ký</a>
+                            style="min-width:220px; border-radius:15px;">
+                            <li th:if="${session.currentUser != null}">
+                                <div class="text-center mb-2">
+                                    <h6 class="fw-bold text-success mb-0" th:text="${session.currentUser.fullname}">User
+                                    </h6>
                                 </div>
+                                <hr class="dropdown-divider" />
                             </li>
-
-                            <div th:if="${session.currentUser != null}">
-                                <li>
-                                    <div class="d-flex flex-column align-items-center mb-2">
-                                        <p class="small text-muted mb-1">Xin chào,</p>
-                                        <h6 class="fw-bold text-success" th:text="${session.currentUser.fullname}">User
-                                            Name</h6>
-                                    </div>
-                                </li>
-
-                                <li>
-                                    <hr class="dropdown-divider" />
-                                </li>
-
-                                <li>
-                                    <a class="dropdown-item py-2 rounded" href="/user/profile">
-                                        <i class="fa-solid fa-user me-2 text-muted"></i> Thông tin cá nhân
-                                    </a>
-                                </li>
-
-                                <li>
-                                    <a class="dropdown-item py-2 rounded" href="/user/change-password">
-                                        <i class="fa-solid fa-key me-2 text-muted"></i> Đổi mật khẩu
-                                    </a>
-                                </li>
-
-                                <li th:if="${session.currentUser.role == true}">
-                                    <a class="dropdown-item py-2 rounded" href="/admin/dashboard">
-                                        <i class="fa-solid fa-user-shield me-2 text-muted"></i> Trang Quản Trị
-                                    </a>
-                                </li>
-
-                                <li>
-                                    <a class="dropdown-item py-2 rounded" href="/user/order-details">
-                                        <i class="fa-solid fa-box-open me-2 text-muted"></i> Lịch sử mua hàng
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item py-2 rounded" href="/user/favourites">
-                                        <i class="fa-solid fa-heart me-2 text-danger"></i> Sách yêu thích
-                                    </a>
-                                </li>
-                                <li>
-                                    <hr class="dropdown-divider" />
-                                </li>
-
-                                <li>
-                                    <a href="/logout" class="dropdown-item py-2 rounded text-danger">
-                                        <i class="fa-solid fa-right-from-bracket me-2"></i> Đăng xuất
-                                    </a>
-                                </li>
-                            </div>
+                            <li><a class="dropdown-item rounded py-2" href="/user/profile">
+                                    <i class="fa-solid fa-user me-2 text-muted"></i>Thông tin cá nhân</a></li>
+                            <li>
+                                <a class="dropdown-item py-2 rounded" href="/user/change-password">
+                                    <i class="fa-solid fa-key me-2 text-muted"></i> Đổi mật khẩu
+                                </a>
+                            </li>
+                            <li><a class="dropdown-item rounded py-2" href="/user/order-details">
+                                    <i class="fa-solid fa-box-open me-2 text-muted"></i>Lịch sử mua hàng</a></li>
+                            <li th:if="${session.currentUser != null and session.currentUser.role == true}">
+                                <a class="dropdown-item rounded py-2" href="/admin/dashboard">
+                                    <i class="fa-solid fa-user-shield me-2 text-muted"></i>Trang Quản Trị</a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item py-2 rounded" href="/user/favourites">
+                                    <i class="fa-solid fa-heart me-2 text-danger"></i> Sách yêu thích
+                                </a>
+                            </li>
+                            <li>
+                                <hr class="dropdown-divider" />
+                            </li>
+                            <li><a class="dropdown-item rounded py-2 text-danger" href="/logout">
+                                    <i class="fa-solid fa-right-from-bracket me-2"></i>Đăng xuất</a></li>
                         </ul>
                     </div>
+
                 </div>
             </div>
         </div>

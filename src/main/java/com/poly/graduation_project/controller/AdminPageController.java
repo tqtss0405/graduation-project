@@ -36,15 +36,6 @@ public class AdminPageController {
     public String reports(Model model) {
         return "admin-reports";
     }
-    @GetMapping("/admin/vouchers")
-    public String vouchers(Model model) {
-        return "admin-vouchers";
-    }
-
-    @GetMapping("/admin/reviews")
-    public String reviews(Model model) {
-        return "admin-reviews";
-    }
 
     // Xử lý khi bấm nút Chặn / Mở chặn
     @PostMapping("/admin/customers/toggle-status/{id}")
