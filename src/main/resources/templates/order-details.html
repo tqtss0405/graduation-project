@@ -1,436 +1,262 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
-
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Đổi Mật Khẩu - BEOBOOKS</title>
-
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap"
-        rel="stylesheet" />
-
-    <link rel="stylesheet" href="/css/style.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lịch sử đơn hàng - BEOBOOKS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
     <style>
-        .btn-close-white {
-            filter: invert(1) grayscale(100%) brightness(200%);
+        body { font-family: 'Quicksand', sans-serif; background: #f8f9fa; }
+
+        .order-card {
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+            margin-bottom: 20px;
+            overflow: hidden;
+            border: 1px solid #f0f0f0;
         }
 
-        /* Custom Scrollbar cho Modal Body nếu danh sách quá dài */
-        .modal-body {
-            max-height: 80vh;
-            overflow-y: auto;
+        .order-header {
+            background: linear-gradient(135deg, #f8fffe, #e8f5e9);
+            padding: 14px 20px;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
         }
 
-        /* CSS cho chữ nhỏ ls-1 (Letter Spacing) */
-        .ls-1 {
-            letter-spacing: 1px;
+        .order-status {
+            font-size: 0.82rem;
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-weight: 600;
         }
 
-        /* Modal Header Gradient */
-        .modal-header {
-            background: linear-gradient(135deg, #198754 0%, #20c997 100%);
+        .status-0 { background: #fff3cd; color: #856404; }
+        .status-1 { background: #cce5ff; color: #004085; }
+        .status-2 { background: #d4edda; color: #155724; }
+        .status-3 { background: #d1ecf1; color: #0c5460; }
+        .status-4 { background: #28a745; color: #fff; }
+        .status-5 { background: #f8d7da; color: #721c24; }
+
+        .order-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 20px;
+            border-bottom: 1px solid #f8f9fa;
+        }
+
+        .order-item:last-child { border-bottom: none; }
+
+        .order-item img {
+            width: 60px;
+            height: 75px;
+            object-fit: cover;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+            flex-shrink: 0;
+        }
+
+        .item-info { flex: 1; }
+        .item-name { font-weight: 700; color: #1a1a2e; font-size: 0.95rem; }
+        .item-meta { color: #6c757d; font-size: 0.82rem; }
+        .item-price { font-weight: 700; color: #28a745; white-space: nowrap; }
+
+        .btn-review {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: #fff;
+            border: none;
+            border-radius: 50px;
+            padding: 5px 16px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            text-decoration: none;
+            white-space: nowrap;
+            transition: transform 0.12s;
+            display: inline-block;
+        }
+
+        .btn-review:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(40,167,69,0.3);
+            color: #fff;
+        }
+
+        .badge-reviewed {
+            background: #e8f5e9;
+            color: #28a745;
+            border-radius: 50px;
+            padding: 4px 12px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            border: 1px solid #c3e6cb;
+        }
+
+        .order-footer {
+            background: #fafafa;
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .order-total { font-weight: 700; font-size: 1rem; color: #1a1a2e; }
+        .order-total span { color: #28a745; font-size: 1.1rem; }
+
+        .alert-success-custom {
+            background: #d4edda;
+            border: 1.5px solid #c3e6cb;
+            color: #155724;
+            border-radius: 12px;
+            padding: 12px 20px;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: #fff;
+            border-radius: 16px;
         }
     </style>
 </head>
-
 <body>
-     <nav class="navbar navbar-expand-lg sticky-top">
-        <div class="container">
-            <a class="navbar-brand" href="#">BEO<span style="color: var(--secondary-color)">BOOKS</span></a>
 
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
+<nav class="navbar navbar-expand-lg sticky-top">
+    <div class="container">
+        <a class="navbar-brand" href="/home">BEO<span style="color: var(--secondary-color)">BOOKS</span></a>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav mx-auto">
+                <li class="nav-item"><a class="nav-link" href="/home">Trang chủ</a></li>
+                <li class="nav-item"><a class="nav-link" href="/products">Sản Phẩm</a></li>
+                <li class="nav-item"><a class="nav-link" href="/contact">Liên hệ</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
 
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav mx-auto">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="/home">Trang chủ</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/products">Sản Phẩm</a>
-                    </li>
+<div class="container py-5" style="max-width: 860px;">
+    <div class="d-flex align-items-center gap-3 mb-4">
+        <i class="fa-solid fa-box-open fa-2x text-success"></i>
+        <div>
+            <h4 class="fw-bold mb-0">Lịch sử đơn hàng</h4>
+            <small class="text-muted">Quản lý và theo dõi các đơn hàng của bạn</small>
+        </div>
+    </div>
 
-                      
-                    <li class="nav-item">
-                        <a class="nav-link text-dark" href="/contact">Liên hệ</a>
-                    </li>
-                </ul>
+    <!-- Flash messages -->
+    <div th:if="${successMessage}" class="alert-success-custom">
+        <i class="fa-solid fa-circle-check me-2"></i>
+        <span th:text="${successMessage}"></span>
+    </div>
+    <div th:if="${param.alreadyReviewed}" class="alert alert-warning rounded-3">
+        <i class="fa-solid fa-info-circle me-2"></i>Bạn đã đánh giá sản phẩm này rồi!
+    </div>
 
-                <div class="d-flex align-items-center gap-3">
-                    <div class="input-group d-none d-lg-flex" style="width: 200px">
-                        <input type="text" class="form-control form-control-sm border-end-0 rounded-start-pill"
-                            placeholder="Tìm sách..." />
-                        <button class="btn btn-outline-secondary border-start-0 rounded-end-pill" type="button">
-                            <i class="fa-solid fa-magnifying-glass"></i>
-                        </button>
-                    </div>
-                    <div class="position-relative cursor-pointer">
-                        <a href="/user/cart">
-                            <i class="fa-solid fa-cart-shopping fs-5 text-secondary"></i>
-                            <span
-                                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-                                style="font-size: 10px">3</span>
+    <!-- Không có đơn hàng -->
+    <div th:if="${orders == null or #lists.isEmpty(orders)}" class="empty-state">
+        <i class="fa-solid fa-receipt fa-4x text-muted mb-4"></i>
+        <h5 class="fw-bold text-muted">Bạn chưa có đơn hàng nào</h5>
+        <p class="text-muted mb-4">Hãy khám phá sách và đặt hàng ngay!</p>
+        <a href="/products" class="btn btn-success rounded-pill px-4 fw-bold">
+            <i class="fa-solid fa-book me-2"></i>Mua sách ngay
+        </a>
+    </div>
+
+    <!-- Danh sách đơn hàng -->
+    <div th:each="order : ${orders}" class="order-card">
+
+        <!-- Header đơn hàng -->
+        <div class="order-header">
+            <div class="d-flex align-items-center gap-3">
+                <div>
+                    <span class="fw-bold small text-muted">Đơn hàng #</span>
+                    <span class="fw-bold" th:text="${order.id}">000</span>
+                </div>
+                <span class="text-muted small"
+                      th:text="${order.createAt != null ? #temporals.format(order.createAt, 'dd/MM/yyyy HH:mm') : ''}">
+                </span>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <!-- Trạng thái -->
+                <span th:switch="${order.status}">
+                    <span th:case="0" class="order-status status-0"><i class="fa-solid fa-clock me-1"></i>Chờ xác nhận</span>
+                    <span th:case="1" class="order-status status-1"><i class="fa-solid fa-check me-1"></i>Đã xác nhận</span>
+                    <span th:case="2" class="order-status status-2"><i class="fa-solid fa-truck me-1"></i>Đang giao</span>
+                    <span th:case="3" class="order-status status-3"><i class="fa-solid fa-box me-1"></i>Đã giao</span>
+                    <span th:case="4" class="order-status status-4"><i class="fa-solid fa-circle-check me-1"></i>Hoàn thành</span>
+                    <span th:case="5" class="order-status status-5"><i class="fa-solid fa-xmark me-1"></i>Đã hủy</span>
+                    <span th:case="*" class="order-status status-0">Không xác định</span>
+                </span>
+            </div>
+        </div>
+
+        <!-- Chi tiết sản phẩm trong đơn -->
+        <div th:each="od : ${order.orderDetails}" class="order-item">
+            <a th:href="@{'/product/' + ${od.product.slug}}">
+                <img th:src="${od.product.image != null ? od.product.image : '/images/default-book.png'}"
+                     th:alt="${od.product.name}">
+            </a>
+            <div class="item-info">
+                <div class="item-name" th:text="${od.product.name}">Tên sách</div>
+                <div class="item-meta">
+                    <span th:text="${od.product.author}">Tác giả</span>
+                    <span class="mx-1">•</span>
+                    <span>x<span th:text="${od.quantity}">1</span></span>
+                </div>
+            </div>
+            <div class="d-flex flex-column align-items-end gap-2">
+                <div class="item-price"
+                     th:text="${#numbers.formatDecimal(od.price, 0, 'COMMA', 0, 'POINT')} + 'đ'">
+                    0đ
+                </div>
+                <!-- Nút đánh giá: chỉ hiện khi hoàn thành (status=4) -->
+                <div th:if="${order.status == 4}">
+                    <div th:if="${reviewedMap != null and reviewedMap[od.id] == false}">
+                        <a th:href="@{'/user/review/write/' + ${od.id}}" class="btn-review">
+                            <i class="fa-solid fa-star me-1"></i>Đánh giá
                         </a>
-
                     </div>
-                    <div class="dropdown ms-3">
-                        <a href="#"
-                            class="d-flex align-items-center text-decoration-none text-secondary dropdown-toggle hidden-arrow"
-                            id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                            <img th:if="${session.currentUser != null}" th:src="${session.currentUser.image}"
-                                class="rounded-circle" width="30" height="30" alt="Avatar" />
-                            <i th:if="${session.currentUser == null}" class="fa-solid fa-circle-user fs-3"></i>
-                        </a>
-
-                        <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg p-3"
-                            aria-labelledby="userDropdown"
-                            style="min-width: 280px; border-radius: 15px; margin-top: 10px;">
-
-                            <li th:if="${session.currentUser == null}">
-                                <div class="d-flex flex-column align-items-center mb-3">
-                                    <p class="small text-muted mb-2">Chào mừng đến với BeoBooks!</p>
-                                    <a href="/login/form" class="btn btn-success w-100 rounded-pill fw-bold mb-2">Đăng
-                                        nhập</a>
-                                    <a href="/register" class="btn btn-outline-success w-100 rounded-pill fw-bold">Đăng
-                                        ký</a>
-                                </div>
-                            </li>
-
-                            <div th:if="${session.currentUser != null}">
-                                <li>
-                                    <div class="d-flex flex-column align-items-center mb-2">
-                                        <p class="small text-muted mb-1">Xin chào,</p>
-                                        <h6 class="fw-bold text-success" th:text="${session.currentUser.fullname}">User
-                                            Name</h6>
-                                    </div>
-                                </li>
-
-                                <li>
-                                    <hr class="dropdown-divider" />
-                                </li>
-
-                                <li>
-                                    <a class="dropdown-item py-2 rounded" href="/user/profile">
-                                        <i class="fa-solid fa-user me-2 text-muted"></i> Thông tin cá nhân
-                                    </a>
-                                </li>
-
-                                <li>
-                                    <a class="dropdown-item py-2 rounded" href="/user/change-password">
-                                        <i class="fa-solid fa-key me-2 text-muted"></i> Đổi mật khẩu
-                                    </a>
-                                </li>
-
-                                <li th:if="${session.currentUser.role == true}">
-                                    <a class="dropdown-item py-2 rounded" href="/admin/dashboard">
-                                        <i class="fa-solid fa-user-shield me-2 text-muted"></i> Trang Quản Trị
-                                    </a>
-                                </li>
-
-                                <li>
-                                    <a class="dropdown-item py-2 rounded" href="/user/order-details">
-                                        <i class="fa-solid fa-box-open me-2 text-muted"></i> Lịch sử mua hàng
-                                    </a>
-                                </li>
-
-                                <li>
-                                    <hr class="dropdown-divider" />
-                                </li>
-
-                                <li>
-                                    <a href="/logout" class="dropdown-item py-2 rounded text-danger">
-                                        <i class="fa-solid fa-right-from-bracket me-2"></i> Đăng xuất
-                                    </a>
-                                </li>
-                            </div>
-                        </ul>
+                    <div th:if="${reviewedMap != null and reviewedMap[od.id] == true}">
+                        <span class="badge-reviewed">
+                            <i class="fa-solid fa-check me-1"></i>Đã đánh giá
+                        </span>
                     </div>
                 </div>
             </div>
         </div>
-    </nav>
-    <main class="container my-5">
-        <h3 class="fw-bold mb-4 text-center"><span style="border-bottom: 3px solid var(--primary-color)">Lịch Sử Mua
-                Hàng</span></h3>
 
-        <div class="card border-0 shadow-sm rounded-4">
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead class="bg-light">
-                            <tr>
-                                <th class="py-3 ps-4">Mã đơn</th>
-                                <th class="py-3">Ngày đặt</th>
-                                <th class="py-3">Địa chỉ nhận</th>
-                                <th class="py-3 text-end">Tổng tiền</th>
-                                <th class="py-3 text-center">Trạng thái</th>
-                                <th class="py-3 pe-4 text-center">Hành động</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td class="ps-4 fw-bold text-primary">#1023</td>
-                                <td>10/02/2026</td>
-                                <td class="text-muted small">123 Đường 3/2, Cần Thơ</td>
-                                <td class="text-end fw-bold text-danger">150.000 đ</td>
-                                <td class="text-center">
-                                    <span
-                                        class="badge rounded-pill bg-success bg-opacity-10 text-success px-3 py-2">Giao
-                                        thành công</span>
-                                </td>
-                                <td class="text-center pe-4">
-                                    <a href="#" class="btn btn-sm btn-outline-success rounded-pill px-3"
-                                        onclick="showOrderDetail('1023')">Chi tiết</a>
-                                </td>
-                            </tr>
-
-                            <tr>
-                                <td class="ps-4 fw-bold text-primary">#1024</td>
-                                <td>12/02/2026</td>
-                                <td class="text-muted small">Tòa nhà FPT, Quận 9, TP.HCM</td>
-                                <td class="text-end fw-bold text-danger">590.000 đ</td>
-                                <td class="text-center">
-                                    <span
-                                        class="badge rounded-pill bg-warning bg-opacity-10 text-warning px-3 py-2">Đang
-                                        giao</span>
-                                </td>
-                                <td class="text-center pe-4">
-                                    <a href="#" class="btn btn-sm btn-outline-success rounded-pill px-3">Chi tiết</a>
-                                </td>
-                            </tr>
-
-                            <tr>
-                                <td class="ps-4 fw-bold text-primary">#1025</td>
-                                <td>15/02/2026</td>
-                                <td class="text-muted small">Số 1, Đại Cồ Việt, Hà Nội</td>
-                                <td class="text-end fw-bold text-danger">85.000 đ</td>
-                                <td class="text-center">
-                                    <span class="badge rounded-pill bg-danger bg-opacity-10 text-danger px-3 py-2">Đã
-                                        hủy</span>
-                                </td>
-                                <td class="text-center pe-4">
-                                    <a href="#" class="btn btn-sm btn-outline-secondary rounded-pill px-3 disabled">Chi
-                                        tiết</a>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <div class="modal fade" id="orderDetailModal" tabindex="-1" aria-hidden="true">
-                        <div class="modal-dialog modal-dialog-centered modal-lg">
-                            <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
-
-                                <div class="modal-header bg-success text-white px-4 py-3 border-0">
-                                    <div>
-                                        <h5 class="modal-title fw-bold mb-1" id="modalOrderId">...</h5>
-                                        <div class="small opacity-75" id="modalOrderDate"><i
-                                                class="fa-regular fa-clock me-1"></i>...</div>
-                                    </div>
-                                    <button type="button" class="btn-close btn-close-white"
-                                        data-bs-dismiss="modal"></button>
-                                </div>
-
-                                <div class="modal-body p-0 bg-light" style="max-height: 80vh; overflow-y: auto;">
-
-                                    <div class="bg-white p-4 mb-2 shadow-sm">
-                                        <h6 class="fw-bold text-success text-uppercase small mb-3">
-                                            <i class="fa-solid fa-location-dot me-2"></i>Địa chỉ nhận hàng
-                                        </h6>
-                                        <div class="row text-dark small">
-                                            <div class="col-md-6 mb-1">
-                                                <span class="text-muted">Người nhận:</span> <span class="fw-bold"
-                                                    id="modalReceiver">Nguyễn Văn Khách</span>
-                                            </div>
-                                            <div class="col-md-6 mb-1">
-                                                <span class="text-muted">Số điện thoại:</span> <span
-                                                    class="fw-bold">0987654321</span>
-                                            </div>
-                                            <div class="col-12">
-                                                <span class="text-muted">Địa chỉ:</span> <span class="fw-bold"
-                                                    id="modalAddress">...</span>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="bg-white p-4 shadow-sm">
-                                        <h6 class="fw-bold text-success text-uppercase small mb-3">
-                                            <i class="fa-solid fa-bag-shopping me-2"></i>Sản phẩm
-                                        </h6>
-
-                                        <div class="table-responsive">
-                                            <table class="table table-borderless align-middle mb-0">
-                                                <thead class="bg-light text-secondary small text-uppercase fw-bold">
-                                                    <tr>
-                                                        <th class="ps-3 py-2">Tên sách</th>
-                                                        <th class="text-center py-2">SL</th>
-                                                        <th class="text-end pe-3 py-2">Thành tiền</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody id="modalProductList" class="border-top">
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-
-                                    <div class="bg-white p-4 mt-2 shadow-sm">
-                                        <div class="row justify-content-end">
-                                            <div class="col-md-6">
-                                                <div class="d-flex justify-content-between mb-2 small">
-                                                    <span class="text-muted">Tổng tiền hàng:</span>
-                                                    <span class="fw-bold" id="modalSubtotal">0 đ</span>
-                                                </div>
-
-                                                <div id="modalSavingRow"
-                                                    class="d-none justify-content-between mb-2 small">
-                                                    <span class="text-muted">Tiết kiệm:</span>
-                                                    <span class="text-danger fw-bold" id="modalSavingAmount">-0 đ</span>
-                                                </div>
-
-                                                <div class="d-flex justify-content-between mb-3 small">
-                                                    <span class="text-muted">Phí vận chuyển:</span>
-                                                    <span class="text-success fw-bold">Miễn phí</span>
-                                                </div>
-
-                                                <div
-                                                    class="border-top pt-3 d-flex justify-content-between align-items-center">
-                                                    <span class="fw-bold text-dark">Thành tiền:</span>
-                                                    <span class="fw-bold fs-4 text-success" id="modalTotal">0 đ</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="modal-footer border-0 bg-white px-4 py-3 justify-content-end shadow-sm">
-                                    <button type="button" class="btn btn-success rounded-pill fw-bold px-5 shadow">Mua
-                                        lại đơn này</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        <!-- Footer đơn hàng -->
+        <div class="order-footer">
+            <div class="text-muted small">
+                <i class="fa-solid fa-location-dot me-1 text-success"></i>
+                <span th:text="${order.address != null ? order.address : 'Chưa có địa chỉ'}">Địa chỉ</span>
+            </div>
+            <div class="order-total">
+                Tổng cộng:
+                <span th:text="${#numbers.formatDecimal(order.total, 0, 'COMMA', 0, 'POINT')} + 'đ'">0đ</span>
             </div>
         </div>
-    </main>
-    <script>
-    // 1. HÀM FORMAT TIỀN
-    const formatCurrency = (amount) => {
-        return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
-    };
+    </div>
+</div>
 
-    // 2. DỮ LIỆU CỨNG
-    const mockOrders = {
-        '1023': {
-            date: '10/02/2026 14:30',
-            address: '123 Đường 3/2, Ninh Kiều, Cần Thơ',
-            products: [
-                { name: 'Nhà Giả Kim', img: 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=100', price: 70000, originalPrice: 85000, qty: 1 },
-                { name: 'Đắc Nhân Tâm', img: 'https://images.unsplash.com/photo-1589829085413-56de8ae18c73?w=100', price: 80000, originalPrice: 100000, qty: 1 }
-            ]
-        },
-        '1024': {
-            date: '12/02/2026 09:15',
-            address: 'Tòa nhà FPT, Quận 9, TP.HCM',
-            products: [
-                { name: 'Clean Code', img: 'https://images.unsplash.com/photo-1532012197367-2d5970d7b5c3?w=100', price: 500000, originalPrice: 500000, qty: 1 }, // Không giảm
-                { name: 'Tuổi trẻ đáng giá bao nhiêu', img: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?w=100', price: 90000, originalPrice: 120000, qty: 2 } // Giảm giá
-            ]
-        }
-    };
+<!-- Footer giản lược -->
+<footer class="bg-white border-top py-4 mt-4">
+    <div class="container text-center">
+        <p class="mb-0 text-muted small">© 2026 <strong>BEOBOOKS</strong>. Tất cả các quyền được bảo lưu.</p>
+    </div>
+</footer>
 
-    function showOrderDetail(orderId) {
-        const order = mockOrders[orderId];
-        if (!order) return;
-
-        // --- KHỞI TẠO BIẾN TÍNH TOÁN ---
-        let totalListPrice = 0; // Tổng tiền theo giá NIÊM YẾT (Giá gốc)
-        let totalSaving = 0;    // Tổng tiền tiết kiệm
-        let finalTotal = 0;     // Số tiền thực trả
-
-        const listContainer = document.getElementById('modalProductList');
-        listContainer.innerHTML = '';
-
-        order.products.forEach(p => {
-            // 1. Tính toán cho từng sản phẩm
-            const currentItemTotal = p.price * p.qty; // Thành tiền thực tế của món này
-            
-            // Xác định giá gốc để cộng vào tổng tiền hàng (Nếu không có giá gốc thì lấy giá bán)
-            const itemOriginalPrice = (p.originalPrice > p.price ? p.originalPrice : p.price);
-            
-            // Cộng dồn
-            totalListPrice += itemOriginalPrice * p.qty; 
-            finalTotal += currentItemTotal;
-
-            if (p.originalPrice > p.price) {
-                totalSaving += (p.originalPrice - p.price) * p.qty;
-            }
-
-            // 2. Render giao diện dòng sản phẩm
-            let priceDisplay = `<div class="fw-bold">${formatCurrency(currentItemTotal)}</div>`;
-            
-            // Nếu có giảm giá thì hiển thị thêm dòng gạch ngang
-            if (p.originalPrice > p.price) {
-                priceDisplay = `
-                    <div class="d-flex flex-column align-items-end">
-                        <span class="fw-bold">${formatCurrency(currentItemTotal)}</span>
-                        <small class="text-muted text-decoration-line-through" style="font-size: 0.75rem">
-                            ${formatCurrency(p.originalPrice * p.qty)}
-                        </small>
-                    </div>
-                `;
-            }
-
-            const row = `
-                <tr class="border-bottom">
-                    <td class="ps-3 py-3">
-                        <div class="d-flex align-items-start">
-                            <img src="${p.img}" class="rounded border" style="width: 45px; height: 60px; object-fit: cover;">
-                            <div class="ms-3">
-                                <h6 class="mb-1 fw-bold text-dark small">${p.name}</h6>
-                                <div class="text-muted" style="font-size: 11px;">
-                                    ${formatCurrency(p.price)} 
-                                    ${p.originalPrice > p.price ? `<span class="text-decoration-line-through ms-1 text-muted opacity-75">${formatCurrency(p.originalPrice)}</span>` : ''}
-                                </div>
-                            </div>
-                        </div>
-                    </td>
-                    <td class="text-center py-3 fw-bold text-muted small">x${p.qty}</td>
-                    <td class="text-end pe-3 py-3 small text-dark">${priceDisplay}</td>
-                </tr>
-            `;
-            listContainer.innerHTML += row;
-        });
-
-        // --- ĐIỀN DỮ LIỆU CHUNG ---
-        document.getElementById('modalOrderId').innerText = 'Đơn hàng #' + orderId;
-        document.getElementById('modalOrderDate').innerText = order.date;
-        document.getElementById('modalReceiver').innerText = 'Nguyễn Văn Khách';
-        document.getElementById('modalAddress').innerText = order.address;
-        
-        // --- HIỂN THỊ TIỀN ---
-        // 1. Tổng tiền hàng (Hiển thị giá gốc chưa trừ)
-        document.getElementById('modalSubtotal').innerText = formatCurrency(totalListPrice);
-        
-        // 2. Thành tiền (Giá thực trả)
-        document.getElementById('modalTotal').innerText = formatCurrency(finalTotal);
-
-        // 3. Dòng tiết kiệm (Chỉ hiện nếu > 0)
-        const savingRow = document.getElementById('modalSavingRow');
-        if (totalSaving > 0) {
-            savingRow.classList.remove('d-none');
-            savingRow.classList.add('d-flex');
-            document.getElementById('modalSavingAmount').innerText = '-' + formatCurrency(totalSaving);
-        } else {
-            savingRow.classList.add('d-none');
-            savingRow.classList.remove('d-flex');
-        }
-
-        new bootstrap.Modal(document.getElementById('orderDetailModal')).show();
-    }
-</script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-
 </html>

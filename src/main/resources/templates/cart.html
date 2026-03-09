@@ -1,387 +1,358 @@
 <!DOCTYPE html>
-<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Giỏ Hàng - BEOBOOKS</title>
-
+    <title>Giỏ hàng - BEOBOOKS</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/style.css">
-</head>
+    <style>
+        body { font-family: 'Quicksand', sans-serif; background: #f5f7fa; }
+        .cart-wrapper { max-width: 1100px; margin: 0 auto; padding: 32px 16px 60px; }
+        .section-title { font-size: 1.4rem; font-weight: 700; color: #1a1a2e; margin-bottom: 24px; display: flex; align-items: center; gap: 10px; }
 
+        /* Table */
+        .cart-table-wrap { background: #fff; border-radius: 18px; box-shadow: 0 2px 16px rgba(0,0,0,0.06); overflow: hidden; margin-bottom: 16px; }
+        .cart-table-wrap table { margin: 0; }
+        .cart-table-wrap thead tr { background: linear-gradient(135deg, #f8fffe, #e8f5e9); }
+        .cart-table-wrap thead th { font-weight: 700; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.5px; color: #4a4a6a; border: none; padding: 14px 20px; }
+        .cart-table-wrap tbody td { padding: 16px 20px; vertical-align: middle; border-color: #f5f5f5; }
+        .cart-table-wrap tbody tr:last-child td { border-bottom: none; }
+        .cart-table-wrap tbody tr:hover { background: #fafffe; }
+
+        /* Product cell */
+        .product-cell { display: flex; align-items: center; gap: 14px; }
+        .product-cell img { width: 60px; height: 75px; object-fit: cover; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.12); flex-shrink: 0; }
+        .product-name { font-weight: 700; color: #1a1a2e; font-size: 0.93rem; margin-bottom: 2px; }
+        .product-author { color: #6c757d; font-size: 0.8rem; }
+        .product-stock { color: #adb5bd; font-size: 0.75rem; margin-top: 2px; }
+        .price-text { font-weight: 600; color: #28a745; }
+        .line-total { font-weight: 700; color: #1a1a2e; }
+
+        /* Qty */
+        .qty-control { display: inline-flex; align-items: center; border: 1.5px solid #e0e0e0; border-radius: 50px; overflow: hidden; }
+        .qty-btn { width: 32px; height: 32px; border: none; background: #f8f9fa; cursor: pointer; font-size: 1.1rem; font-weight: 600; color: #28a745; transition: background 0.12s; display: flex; align-items: center; justify-content: center; }
+        .qty-btn:hover { background: #e8f5e9; }
+        .qty-input { width: 38px; text-align: center; border: none; font-weight: 700; font-size: 0.9rem; font-family: 'Quicksand', sans-serif; outline: none; background: transparent; }
+        .remove-btn { width: 32px; height: 32px; border-radius: 50%; border: none; background: #fff0f0; color: #dc3545; cursor: pointer; font-size: 0.85rem; transition: all 0.15s; display: flex; align-items: center; justify-content: center; margin: 0 auto; }
+        .remove-btn:hover { background: #dc3545; color: #fff; }
+
+        /* Summary */
+        .summary-card { background: #fff; border-radius: 18px; box-shadow: 0 2px 16px rgba(0,0,0,0.06); padding: 24px 28px; position: sticky; top: 80px; }
+        .summary-title { font-weight: 700; font-size: 1rem; color: #1a1a2e; padding-bottom: 14px; border-bottom: 2px solid #f0f0f0; margin-bottom: 18px; }
+        .summary-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-size: 0.93rem; }
+        .summary-row .lbl { color: #6c757d; }
+        .summary-row .val { font-weight: 600; }
+        .summary-divider { height: 1px; background: #f0f0f0; margin: 16px 0; }
+        .summary-total { display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 1.05rem; }
+        .total-val { color: #28a745; font-size: 1.35rem; }
+        .btn-checkout { background: linear-gradient(135deg, #28a745, #20c997); border: none; border-radius: 50px; padding: 13px; font-weight: 700; font-size: 0.97rem; color: #fff; width: 100%; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; text-decoration: none; display: block; text-align: center; }
+        .btn-checkout:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(40,167,69,0.35); color: #fff; }
+        .secure-note { text-align: center; color: #adb5bd; font-size: 0.78rem; margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 4px; }
+
+        /* Empty */
+        .empty-cart { text-align: center; padding: 80px 20px; background: #fff; border-radius: 18px; box-shadow: 0 2px 16px rgba(0,0,0,0.06); }
+
+        /* Toast */
+        .toast-box { position: fixed; top: 80px; right: 20px; z-index: 9999; }
+        .toast-msg { background: #fff; border-radius: 12px; padding: 13px 18px; box-shadow: 0 4px 20px rgba(0,0,0,0.12); margin-bottom: 8px; font-weight: 600; font-size: 0.9rem; display: flex; align-items: center; gap: 10px; animation: slideIn 0.3s ease; }
+        @keyframes slideIn { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    </style>
+</head>
 <body>
 
-    <nav class="navbar navbar-expand-lg sticky-top">
-        <div class="container">
-            <a class="navbar-brand" href="#">BEO<span style="color: var(--secondary-color)">BOOKS</span></a>
+<nav class="navbar navbar-expand-lg sticky-top">
+    <div class="container">
+        <a class="navbar-brand" href="/home">BEO<span style="color: var(--secondary-color)">BOOKS</span></a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav mx-auto">
+                <li class="nav-item"><a class="nav-link" href="/home">Trang chủ</a></li>
+                <li class="nav-item"><a class="nav-link" href="/products">Sản Phẩm</a></li>
+                <li class="nav-item"><a class="nav-link" href="/contact">Liên hệ</a></li>
+            </ul>
+            <div class="d-flex align-items-center gap-3">
 
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav mx-auto">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="/home">Trang chủ</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/products">Sản Phẩm</a>
-                    </li>
-
-
-                    <li class="nav-item">
-                        <a class="nav-link text-dark" href="/contact">Liên hệ</a>
-                    </li>
-                </ul>
-
-                <div class="d-flex align-items-center gap-3">
-                    <div class="input-group d-none d-lg-flex" style="width: 200px">
-                        <input type="text" class="form-control form-control-sm border-end-0 rounded-start-pill"
-                            placeholder="Tìm sách..." />
-                        <button class="btn btn-outline-secondary border-start-0 rounded-end-pill" type="button">
-                            <i class="fa-solid fa-magnifying-glass"></i>
-                        </button>
-                    </div>
-                    <div class="position-relative cursor-pointer">
-                        <a href="/user/cart">
-                            <i class="fa-solid fa-cart-shopping fs-5 text-secondary"></i>
-                            <span
-                                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-                                style="font-size: 10px">3</span>
-                        </a>
-
-                    </div>
-                    <div class="dropdown ms-3">
-                        <a href="#"
-                            class="d-flex align-items-center text-decoration-none text-secondary dropdown-toggle hidden-arrow"
-                            id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                            <img th:if="${session.currentUser != null}" th:src="${session.currentUser.image}"
-                                class="rounded-circle" width="30" height="30" alt="Avatar" />
-                            <i th:if="${session.currentUser == null}" class="fa-solid fa-circle-user fs-3"></i>
-                        </a>
-
-                        <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg p-3"
-                            aria-labelledby="userDropdown"
-                            style="min-width: 280px; border-radius: 15px; margin-top: 10px;">
-
-                            <li th:if="${session.currentUser == null}">
-                                <div class="d-flex flex-column align-items-center mb-3">
-                                    <p class="small text-muted mb-2">Chào mừng đến với BeoBooks!</p>
-                                    <a href="/login/form" class="btn btn-success w-100 rounded-pill fw-bold mb-2">Đăng
-                                        nhập</a>
-                                    <a href="/register" class="btn btn-outline-success w-100 rounded-pill fw-bold">Đăng
-                                        ký</a>
-                                </div>
-                            </li>
-
-                            <div th:if="${session.currentUser != null}">
-                                <li>
-                                    <div class="d-flex flex-column align-items-center mb-2">
-                                        <p class="small text-muted mb-1">Xin chào,</p>
-                                        <h6 class="fw-bold text-success" th:text="${session.currentUser.fullname}">User
-                                            Name</h6>
-                                    </div>
-                                </li>
-
-                                <li>
-                                    <hr class="dropdown-divider" />
-                                </li>
-
-                                <li>
-                                    <a class="dropdown-item py-2 rounded" href="/user/profile">
-                                        <i class="fa-solid fa-user me-2 text-muted"></i> Thông tin cá nhân
-                                    </a>
-                                </li>
-
-                                <li>
-                                    <a class="dropdown-item py-2 rounded" href="/user/change-password">
-                                        <i class="fa-solid fa-key me-2 text-muted"></i> Đổi mật khẩu
-                                    </a>
-                                </li>
-
-                                <li th:if="${session.currentUser.role == true}">
-                                    <a class="dropdown-item py-2 rounded" href="/admin/dashboard">
-                                        <i class="fa-solid fa-user-shield me-2 text-muted"></i> Trang Quản Trị
-                                    </a>
-                                </li>
-
-                                <li>
-                                    <a class="dropdown-item py-2 rounded" href="/user/order-details">
-                                        <i class="fa-solid fa-box-open me-2 text-muted"></i> Lịch sử mua hàng
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item py-2 rounded" href="/user/favourites">
-                                        <i class="fa-solid fa-heart me-2 text-danger"></i> Sách yêu thích
-                                    </a>
-                                </li>
-                                <li>
-                                    <hr class="dropdown-divider" />
-                                </li>
-
-                                <li>
-                                    <a href="/logout" class="dropdown-item py-2 rounded text-danger">
-                                        <i class="fa-solid fa-right-from-bracket me-2"></i> Đăng xuất
-                                    </a>
-                                </li>
-                            </div>
-                        </ul>
-                    </div>
+                <!-- Ô tìm kiếm -->
+                <div class="input-group d-none d-lg-flex" style="width: 200px">
+                    <input type="text" id="searchInput"
+                           class="form-control form-control-sm border-end-0 rounded-start-pill"
+                           placeholder="Tìm sách..."
+                           onkeydown="if(event.key==='Enter') doSearch()"/>
+                    <button class="btn btn-outline-secondary border-start-0 rounded-end-pill"
+                            type="button" onclick="doSearch()">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </button>
                 </div>
+
+                <!-- Icon giỏ hàng + badge tổng số lượng -->
+                <div class="position-relative">
+                    <a href="/user/cart">
+                        <i class="fa-solid fa-cart-shopping fs-5 text-secondary"></i>
+                       <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+      style="font-size:10px"
+      th:text="${totalQuantity}">0</span>
+                    </a>
+                </div>
+
+                <!-- Dropdown user -->
+                <div class="dropdown ms-2">
+                    <a href="#" class="d-flex align-items-center text-decoration-none text-secondary dropdown-toggle"
+                       data-bs-toggle="dropdown">
+                        <img th:if="${session.currentUser != null}" th:src="${session.currentUser.image}"
+                             class="rounded-circle" width="30" height="30" alt="Avatar"
+                             onerror="this.style.display='none'"/>
+                        <i th:if="${session.currentUser == null}" class="fa-solid fa-circle-user fs-3"></i>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg p-3"
+                        style="min-width:220px; border-radius:15px;">
+                        <li th:if="${session.currentUser != null}">
+                            <div class="text-center mb-2">
+                                <h6 class="fw-bold text-success mb-0"
+                                    th:text="${session.currentUser.fullname}">User</h6>
+                            </div>
+                            <hr class="dropdown-divider"/>
+                        </li>
+                        <li><a class="dropdown-item rounded py-2" href="/user/profile">
+                            <i class="fa-solid fa-user me-2 text-muted"></i>Thông tin cá nhân</a></li>
+                        <li><a class="dropdown-item rounded py-2" href="/user/order-details">
+                            <i class="fa-solid fa-box-open me-2 text-muted"></i>Lịch sử mua hàng</a></li>
+                        <li th:if="${session.currentUser != null and session.currentUser.role == true}">
+                            <a class="dropdown-item rounded py-2" href="/admin/dashboard">
+                            <i class="fa-solid fa-user-shield me-2 text-muted"></i>Trang Quản Trị</a></li>
+                        <li><hr class="dropdown-divider"/></li>
+                        <li><a class="dropdown-item rounded py-2 text-danger" href="/logout">
+                            <i class="fa-solid fa-right-from-bracket me-2"></i>Đăng xuất</a></li>
+                    </ul>
+                </div>
+
             </div>
         </div>
-    </nav>
+    </div>
+</nav>
 
-    <div class="container mt-4">
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="/home" class="text-decoration-none text-muted">Trang chủ</a></li>
-                <li class="breadcrumb-item active fw-bold text-success" aria-current="page">Giỏ hàng của bạn</li>
-            </ol>
-        </nav>
-        <h2 class="fw-bold mb-4">Giỏ Hàng (3 sản phẩm)</h2>
+<div class="toast-box" id="toastContainer"></div>
+
+<div class="cart-wrapper">
+    <div class="section-title">
+        <i class="fa-solid fa-cart-shopping text-success"></i>
+        Giỏ hàng của bạn
+        <span class="badge bg-success rounded-pill ms-1"
+              th:text="${#lists.size(cartItems)} + ' sản phẩm'">0 sản phẩm</span>
     </div>
 
-    <section class="container mb-5">
-        <div class="row g-4">
+    <!-- TRỐNG -->
+    <div th:if="${cartItems == null or #lists.isEmpty(cartItems)}" class="empty-cart">
+        <div style="font-size:5rem; margin-bottom:20px; opacity:0.2;">🛒</div>
+        <h4 class="fw-bold text-muted mb-2">Giỏ hàng trống</h4>
+        <p class="text-muted mb-4">Hãy thêm sách vào giỏ hàng để tiếp tục mua sắm!</p>
+        <a href="/products" class="btn btn-success rounded-pill px-5 fw-bold">
+            <i class="fa-solid fa-book me-2"></i>Khám phá sách
+        </a>
+    </div>
 
-            <div class="col-lg-8">
-                <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
-                    <div class="card-body p-0">
-                        <div class="table-responsive">
-                            <table class="table table-hover align-middle mb-0">
-                                <thead class="bg-light">
-                                    <tr>
-                                        <th class="py-3 ps-4">Sản phẩm</th>
-                                        <th class="py-3">Đơn giá</th>
-                                        <th class="py-3">Số lượng</th>
-                                        <th class="py-3">Tạm tính</th>
-                                        <th class="py-3"></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td class="ps-4">
-                                            <div class="d-flex align-items-center gap-3">
-                                                <img src="https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&w=150&q=80"
-                                                    class="cart-item-img border">
-                                                <div>
-                                                    <h6 class="fw-bold mb-1">Nhà Giả Kim</h6>
-                                                    <p class="text-muted small mb-0">Bìa mềm</p>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td class="fw-bold">63.000đ</td>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                <button class="qty-btn rounded-start"
-                                                    onclick="updateQty(this, -1)">-</button>
-                                                <input type="text" class="qty-input" value="1" readonly>
-                                                <button class="qty-btn rounded-end"
-                                                    onclick="updateQty(this, 1)">+</button>
-                                            </div>
-                                        </td>
-                                        <td class="fw-bold text-success">63.000đ</td>
-                                        <td><button class="btn btn-sm text-danger"><i
-                                                    class="fa-solid fa-trash-can"></i></button></td>
-                                    </tr>
+    <!-- CÓ SẢN PHẨM -->
+    <div th:if="${cartItems != null and not #lists.isEmpty(cartItems)}" class="row g-4">
 
-                                    <tr>
-                                        <td class="ps-4">
-                                            <div class="d-flex align-items-center gap-3">
-                                                <img src="https://images.unsplash.com/photo-1589829085413-56de8ae18c73?auto=format&fit=crop&w=150&q=80"
-                                                    class="cart-item-img border">
-                                                <div>
-                                                    <h6 class="fw-bold mb-1">Đắc Nhân Tâm</h6>
-                                                    <p class="text-muted small mb-0">Tái bản 2024</p>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td class="fw-bold">85.000đ</td>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                <button class="qty-btn rounded-start"
-                                                    onclick="updateQty(this, -1)">-</button>
-                                                <input type="text" class="qty-input" value="2" readonly>
-                                                <button class="qty-btn rounded-end"
-                                                    onclick="updateQty(this, 1)">+</button>
-                                            </div>
-                                        </td>
-                                        <td class="fw-bold text-success">170.000đ</td>
-                                        <td><button class="btn btn-sm text-danger"><i
-                                                    class="fa-solid fa-trash-can"></i></button></td>
-                                    </tr>
-
-                                    <tr>
-                                        <td class="ps-4">
-                                            <div class="d-flex align-items-center gap-3">
-                                                <img src="https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=150&q=80"
-                                                    class="cart-item-img border">
-                                                <div>
-                                                    <h6 class="fw-bold mb-1">Hành Trình Về Phương Đông</h6>
-                                                    <p class="text-muted small mb-0">Bìa cứng</p>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td class="fw-bold">115.000đ</td>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                <button class="qty-btn rounded-start"
-                                                    onclick="updateQty(this, -1)">-</button>
-                                                <input type="text" class="qty-input" value="1" readonly>
-                                                <button class="qty-btn rounded-end"
-                                                    onclick="updateQty(this, 1)">+</button>
-                                            </div>
-                                        </td>
-                                        <td class="fw-bold text-success">115.000đ</td>
-                                        <td><button class="btn btn-sm text-danger"><i
-                                                    class="fa-solid fa-trash-can"></i></button></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div class="card-footer bg-white p-3">
-                        <a href="/products" class="text-decoration-none text-muted"><i
-                                class="fa-solid fa-arrow-left me-2"></i>Tiếp tục mua sắm</a>
-                    </div>
-                </div>
+        <!-- Bảng sản phẩm -->
+        <div class="col-lg-8">
+            <div class="cart-table-wrap">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Sản phẩm</th>
+                            <th class="text-center">Đơn giá</th>
+                            <th class="text-center">Số lượng</th>
+                            <th class="text-center">Thành tiền</th>
+                            <th class="text-center">Xóa</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cartBody">
+                        <tr th:each="item : ${cartItems}" th:id="'row-' + ${item.id}">
+                            <td>
+                                <div class="product-cell">
+                                    <a th:href="@{'/product/' + ${item.product.slug}}">
+                                        <img th:src="${item.product.image != null ? item.product.image : '/images/default-book.png'}"
+                                             th:alt="${item.product.name}">
+                                    </a>
+                                    <div>
+                                        <div class="product-name" th:text="${item.product.name}">Tên sách</div>
+                                        <div class="product-author" th:text="${item.product.author}">Tác giả</div>
+                                        <div class="product-stock">Còn <span th:text="${item.product.stockQuantity}">0</span> cuốn</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <span class="price-text"
+                                      th:text="${#numbers.formatDecimal(item.product.price, 0, 'COMMA', 0, 'POINT')} + 'đ'">0đ</span>
+                            </td>
+                            <td class="text-center">
+                                <div class="qty-control">
+                                    <button class="qty-btn" type="button"
+                                            th:attr="onclick='updateQty(' + ${item.id} + ', -1, ' + ${item.product.stockQuantity} + ')'">−</button>
+                                    <input type="text" class="qty-input"
+                                           th:id="'qty-' + ${item.id}"
+                                           th:value="${item.quantity}" readonly>
+                                    <button class="qty-btn" type="button"
+                                            th:attr="onclick='updateQty(' + ${item.id} + ', 1, ' + ${item.product.stockQuantity} + ')'">+</button>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <span class="line-total"
+                                      th:id="'line-' + ${item.id}"
+                                     th:text="${#numbers.formatDecimal(item.product.price.multiply(new java.math.BigDecimal(item.quantity)), 0, 'COMMA', 0, 'POINT')} + 'đ'">0đ</span>
+                            </td>
+                            <td class="text-center">
+                                <button class="remove-btn"
+                                        th:attr="onclick='removeItem(' + ${item.id} + ')'">
+                                    <i class="fa-solid fa-xmark"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
 
-            <div class="col-lg-4">
-                <div class="summary-card">
-                    <h5 class="fw-bold mb-4">Tổng Đơn Hàng</h5>
-
-                    <div class="d-flex justify-content-between mb-2">
-                        <span class="text-muted">Tạm tính:</span>
-                        <span class="fw-bold">348.000đ</span>
-                    </div>
-                    <div class="d-flex justify-content-between mb-3 border-bottom pb-3">
-                        <span class="text-muted">Phí vận chuyển:</span>
-                        <span class="text-success">Miễn phí</span>
-                    </div>
-                    <div class="d-flex justify-content-between mb-4">
-                        <span class="fw-bold fs-5">Tổng cộng:</span>
-                        <span class="fw-bold fs-4 text-danger">348.000đ</span>
-                    </div>
-
-                    <a href="/user/checkout"
-                        class="btn btn-success w-100 py-3 rounded-pill fw-bold shadow-sm mb-3 text-uppercase">Thanh Toán
-                        Ngay</a>
-
-                    <div class="input-group">
-                        <input type="text" class="form-control rounded-start-pill" placeholder="Mã giảm giá">
-                        <button class="btn btn-dark rounded-end-pill">Áp dụng</button>
-                    </div>
-
-                    <div class="mt-4 pt-3 border-top">
-                        <div class="d-flex gap-3 justify-content-center text-muted fs-4">
-                            <i class="fa-brands fa-cc-visa"></i>
-                            <i class="fa-brands fa-cc-mastercard"></i>
-                            <i class="fa-solid fa-money-bill-wave"></i>
-                        </div>
-                        <p class="text-center small text-muted mt-2">Bảo mật thanh toán 100%</p>
-                    </div>
-                </div>
-            </div>
-
+            <a href="/products" class="btn btn-outline-success rounded-pill mt-2">
+                <i class="fa-solid fa-arrow-left me-2"></i>Tiếp tục mua sắm
+            </a>
         </div>
-    </section>
 
-    <footer class="bg-white border-top pt-5">
-        <div class="container">
-            <div class="row g-4">
-                <div class="col-lg-4 col-md-6">
-                    <a href="index.html" class="text-decoration-none">
-                        <h3 class="fw-bold mb-3" style="color: var(--primary-color);">BEO<span
-                                style="color: var(--secondary-color);">BOOKS</span></h3>
+        <!-- Summary -->
+        <div class="col-lg-4">
+            <div class="summary-card">
+                <div class="summary-title">
+                    <i class="fa-solid fa-receipt text-success me-2"></i>Tóm tắt đơn hàng
+                </div>
+
+                <!-- Freeship progress -->
+                <div class="mb-3">
+                    <small id="shipMsg" class="text-muted"></small>
+                    <div class="progress mt-1" style="height:6px;">
+                        <div class="progress-bar bg-success" id="shipProgress"
+                             role="progressbar" style="width:0%"></div>
+                    </div>
+                </div>
+
+                <div class="summary-row">
+                    <span class="lbl">Tạm tính</span>
+                    <span class="val" id="subtotalDisplay"
+                          th:text="${#numbers.formatDecimal(subtotal, 0, 'COMMA', 0, 'POINT')} + 'đ'">0đ</span>
+                </div>
+                <div class="summary-row">
+                    <span class="lbl">Phí vận chuyển</span>
+                    <span class="val" id="shipFeeDisplay"
+                          th:text="${shippingFee.signum() == 0 ? 'Miễn phí 🎉' : #numbers.formatDecimal(shippingFee, 0, 'COMMA', 0, 'POINT') + 'đ'}">0đ</span>
+                </div>
+
+                <div class="summary-divider"></div>
+
+                <div class="summary-total">
+                    <span>Tổng cộng</span>
+                    <span class="total-val" id="totalDisplay"
+                          th:text="${#numbers.formatDecimal(total, 0, 'COMMA', 0, 'POINT')} + 'đ'">0đ</span>
+                </div>
+
+                <div class="mt-4">
+                    <a href="/user/checkout" class="btn-checkout">
+                        <i class="fa-solid fa-lock me-2"></i>Tiến hành đặt hàng
                     </a>
-                    <p class="text-muted small mb-4">
-                        BeoBooks là nơi lan tỏa văn hóa đọc, cung cấp những đầu sách chất lượng với trải nghiệm mua sắm
-                        tuyệt vời nhất cho độc giả.
-                    </p>
-                    <div class="d-flex flex-column gap-2 text-muted small">
-                        <p class="mb-0"><i class="fa-solid fa-location-dot me-2 text-success"></i> Đường 3/2, Ninh Kiều,
-                            Cần Thơ</p>
-                        <p class="mb-0"><i class="fa-solid fa-envelope me-2 text-success"></i> hotro@beobooks.com</p>
-                        <p class="mb-0"><i class="fa-solid fa-phone me-2 text-success"></i> 1900 6789</p>
-                    </div>
                 </div>
-
-                <div class="col-lg-2 col-md-6">
-                    <h6 class="fw-bold mb-3">Về BeoBooks</h6>
-                    <ul class="list-unstyled footer-links">
-                        <li><a href="#">Giới thiệu</a></li>
-                        <li><a href="#">Tuyển dụng</a></li>
-                        <li><a href="#">Chính sách bảo mật</a></li>
-                        <li><a href="#">Điều khoản sử dụng</a></li>
-                        <li><a href="#">Liên hệ hợp tác</a></li>
-                    </ul>
-                </div>
-
-                <div class="col-lg-2 col-md-6">
-                    <h6 class="fw-bold mb-3">Hỗ trợ</h6>
-                    <ul class="list-unstyled footer-links">
-                        <li><a href="#">Hướng dẫn mua hàng</a></li>
-                        <li><a href="#">Phương thức thanh toán</a></li>
-                        <li><a href="#">Chính sách vận chuyển</a></li>
-                        <li><a href="#">Chính sách đổi trả</a></li>
-                        <li><a href="#">Câu hỏi thường gặp</a></li>
-                    </ul>
-                </div>
-
-                <div class="col-lg-4 col-md-6">
-                    <h6 class="fw-bold mb-3">Đăng ký nhận tin</h6>
-                    <p class="text-muted small mb-3">Nhận thông tin sách mới và khuyến mãi đặc biệt.</p>
-                    <form class="input-group mb-4">
-                        <input type="email" class="form-control" placeholder="Email của bạn..."
-                            style="border-radius: 20px 0 0 20px; border-right: none;">
-                        <button class="btn btn-success" type="button" style="border-radius: 0 20px 20px 0;">Đăng
-                            ký</button>
-                    </form>
-
-                    <h6 class="fw-bold mb-3">Kết nối với chúng tôi</h6>
-                    <div class="d-flex gap-2">
-                        <a href="#" class="social-icon"><i class="fa-brands fa-facebook-f"></i></a>
-                        <a href="#" class="social-icon"><i class="fa-brands fa-instagram"></i></a>
-                        <a href="#" class="social-icon"><i class="fa-brands fa-tiktok"></i></a>
-                        <a href="#" class="social-icon"><i class="fa-brands fa-youtube"></i></a>
-                    </div>
-                </div>
-            </div>
-
-            <hr class="my-4 text-muted">
-
-            <div class="row align-items-center pb-4">
-                <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
-                    <p class="mb-0 text-muted small">© 2026 <strong>BEOBOOKS</strong>. Tất cả các quyền được bảo lưu.
-                    </p>
-                </div>
-                <div class="col-md-6 text-center text-md-end">
-                    <div class="d-flex gap-3 justify-content-center justify-content-md-end fs-4 text-secondary">
-                        <i class="fa-brands fa-cc-visa" title="Visa"></i>
-                        <i class="fa-brands fa-cc-mastercard" title="Mastercard"></i>
-                        <i class="fa-solid fa-wallet" title="Momo/ZaloPay"></i>
-                        <i class="fa-solid fa-truck-fast" title="COD"></i>
-                    </div>
+                <div class="secure-note">
+                    <i class="fa-solid fa-shield-halved text-success"></i>
+                    Thanh toán an toàn & bảo mật
                 </div>
             </div>
         </div>
-    </footer>
+    </div>
+</div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        function updateQty(btn, change) {
-            const input = btn.parentElement.querySelector('input');
-            let newValue = parseInt(input.value) + change;
-            if (newValue < 1) newValue = 1;
-            input.value = newValue;
-            // Ở đây bạn có thể thêm logic cập nhật lại Tổng tiền
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    const FREE_SHIP = 150000;
+    const SHIP_FEE = 30000;
+
+    function formatMoney(n) {
+        return Number(n).toLocaleString('vi-VN') + 'đ';
+    }
+
+    function showToast(msg, type) {
+        const container = document.getElementById('toastContainer');
+        const toast = document.createElement('div');
+        toast.className = 'toast-msg';
+        toast.style.borderLeft = '4px solid ' + (type === 'error' ? '#dc3545' : '#28a745');
+        toast.innerHTML = '<i class="fa-solid fa-' + (type === 'error' ? 'xmark-circle' : 'check-circle') + '" style="color:' + (type === 'error' ? '#dc3545' : '#28a745') + '"></i> ' + msg;
+        container.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+    }
+
+    function updateShipProgress(subtotal) {
+        const pct = Math.min((subtotal / FREE_SHIP) * 100, 100);
+        document.getElementById('shipProgress').style.width = pct + '%';
+        const msg = document.getElementById('shipMsg');
+        if (subtotal >= FREE_SHIP) {
+            msg.innerHTML = '<span class="text-success fw-bold">🎉 Bạn được miễn phí vận chuyển!</span>';
+        } else {
+            msg.innerHTML = 'Mua thêm <strong>' + formatMoney(FREE_SHIP - subtotal) + '</strong> để được miễn phí ship 🚚';
         }
-    </script>
-</body>
+    }
 
+    function updateSummaryUI(data) {
+        document.getElementById('subtotalDisplay').textContent = formatMoney(data.subtotal);
+        document.getElementById('shipFeeDisplay').textContent =
+            Number(data.shippingFee) === 0 ? 'Miễn phí 🎉' : formatMoney(data.shippingFee);
+        document.getElementById('totalDisplay').textContent = formatMoney(data.total);
+        document.getElementById('cartBadge').textContent = data.cartCount || 0;
+        updateShipProgress(Number(data.subtotal));
+    }
+
+    async function updateQty(cartDetailId, delta, maxStock) {
+        const qtyEl = document.getElementById('qty-' + cartDetailId);
+        let newQty = parseInt(qtyEl.value) + delta;
+        if (newQty < 1) newQty = 1;
+        if (newQty > maxStock) { showToast('Chỉ còn ' + maxStock + ' cuốn trong kho!', 'error'); return; }
+
+        const res = await fetch('/user/cart/update', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: 'cartDetailId=' + cartDetailId + '&quantity=' + newQty
+        });
+        const data = await res.json();
+        if (data.success) {
+            qtyEl.value = data.quantity;
+            document.getElementById('line-' + cartDetailId).textContent = formatMoney(data.lineTotal);
+            updateSummaryUI(data);
+        }
+    }
+
+    async function removeItem(cartDetailId) {
+        if (!confirm('Bạn có muốn xóa sản phẩm này?')) return;
+        const res = await fetch('/user/cart/remove/' + cartDetailId, { method: 'POST' });
+        const data = await res.json();
+        if (data.success) {
+            document.getElementById('row-' + cartDetailId)?.remove();
+            updateSummaryUI(data);
+            showToast('Đã xóa sản phẩm khỏi giỏ hàng!');
+            if (data.isEmpty) setTimeout(() => location.reload(), 600);
+        }
+    }
+
+    // Khởi tạo progress khi load trang
+    window.addEventListener('DOMContentLoaded', () => {
+        const txt = document.getElementById('subtotalDisplay')?.textContent || '0';
+        const num = parseFloat(txt.replace(/[^0-9]/g, '')) || 0;
+        updateShipProgress(num);
+    });
+    function doSearch() {
+        const keyword = document.getElementById('searchInput').value.trim();
+        if (keyword) {
+            window.location.href = '/products?keyword=' + encodeURIComponent(keyword);
+        }
+    }
+</script>
+</body>
 </html>

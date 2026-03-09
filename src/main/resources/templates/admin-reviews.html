@@ -8,487 +8,399 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/admin-style.css">
-    
+    <style>
+        .reviews-container { display: flex; flex-direction: column; gap: 16px; }
+
+        .review-card {
+            background: #fff;
+            border-radius: 14px;
+            padding: 20px 22px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            border: 1px solid #f0f0f0;
+            transition: box-shadow 0.2s;
+        }
+
+        .review-card:hover { box-shadow: 0 4px 24px rgba(0,0,0,0.10); }
+
+        .user-avatar {
+            width: 46px; height: 46px;
+            border-radius: 50%;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .star-rating { color: #ffc107; font-size: 0.9rem; }
+        .star-rating .empty { color: #dee2e6; }
+
+        .product-thumb {
+            width: 50px; height: 62px;
+            object-fit: cover;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+        }
+
+        .admin-reply-box {
+            background: linear-gradient(135deg, #f8fffe, #e8f5e9);
+            border-left: 3px solid #28a745;
+            border-radius: 10px;
+            padding: 12px 16px;
+            margin-top: 12px;
+        }
+
+        .filter-bar {
+            background: #fff;
+            border-radius: 14px;
+            padding: 16px 20px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            margin-bottom: 20px;
+        }
+
+        .star-filter-btn {
+            border-radius: 50px !important;
+            font-size: 0.82rem;
+            padding: 5px 14px;
+            font-weight: 600;
+        }
+
+        .star-filter-btn.active-filter {
+            background: #ffc107;
+            border-color: #ffc107;
+            color: #fff;
+        }
+
+        .badge-rating {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: #fff8e1;
+            color: #e65100;
+            border-radius: 50px;
+            padding: 3px 10px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            border: 1px solid #ffcc80;
+        }
+    </style>
 </head>
 
 <body>
+<!-- Sidebar -->
+<nav class="sidebar">
+    <div class="sidebar-brand">BEO<span style="color:white">BOOKS</span></div>
+    <ul class="nav flex-column mt-3">
+        <li class="nav-item">
+            <a href="/admin/dashboard" class="nav-link">
+                <i class="fa-solid fa-gauge"></i> Tổng quan
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="/admin/products" class="nav-link">
+                <i class="fa-solid fa-book"></i> Quản lý sách
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="/admin/orders" class="nav-link">
+                <i class="fa-solid fa-cart-shopping"></i> Đơn hàng
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="/admin/customers" class="nav-link">
+                <i class="fa-solid fa-users"></i> Khách hàng
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="/admin/categories" class="nav-link">
+                <i class="fa-solid fa-layer-group"></i> Danh mục
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="/admin/vouchers" class="nav-link">
+                <i class="fa-solid fa-ticket"></i> Mã giảm giá
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="/admin/reviews" class="nav-link active">
+                <i class="fa-solid fa-star"></i> Đánh giá
+            </a>
+        </li>
+        <li class="nav-item mt-5">
+            <a href="/logout" class="nav-link text-danger">
+                <i class="fa-solid fa-right-from-bracket"></i> Thoát
+            </a>
+        </li>
+    </ul>
+</nav>
 
-    <!-- Sidebar -->
-   <nav class="sidebar">
-        <div class="sidebar-brand">BEO<span style="color:white">BOOKS</span></div>
-        <ul class="nav flex-column mt-3">
-            <li class="nav-item">
-                <a href="/admin/dashboard" class="nav-link">
-                    <i class="fa-solid fa-gauge"></i> Tổng quan
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="/admin/products" class="nav-link active">
-                    <i class="fa-solid fa-book"></i> Quản lý sách
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="/admin/orders" class="nav-link">
-                    <i class="fa-solid fa-cart-shopping"></i> Đơn hàng
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="/admin/customers" class="nav-link">
-                    <i class="fa-solid fa-users"></i> Khách hàng
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="/admin/categories" class="nav-link">
-                    <i class="fa-solid fa-layer-group"></i> Danh mục
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="/admin/vouchers" class="nav-link">
-                    <i class="fa-solid fa-ticket"></i> Mã giảm giá
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="/admin/reviews" class="nav-link">
-                    <i class="fa-solid fa-star"></i> Đánh giá
-                </a>
-            </li>
-             
-            <li class="nav-item mt-5">
-                <a href="/logout" class="nav-link text-danger">
-                    <i class="fa-solid fa-right-from-bracket"></i> Thoát
-                </a>
-            </li>
-        </ul>
-    </nav>
+<!-- Main Content -->
+<main class="main-content">
 
-    <!-- Main Content -->
-    <main class="main-content">
-        
-        <!-- Admin Header -->
-        <div class="admin-header">
-            <div>
-                <h4 class="fw-bold mb-0">Quản lý Đánh giá</h4>
-                <small class="text-muted">Kiểm duyệt và quản lý đánh giá từ khách hàng</small>
-            </div>
-           <div class="admin-profile" data-bs-toggle="modal" data-bs-target="#profileModal">
-                <img src="https://ui-avatars.com/api/?name=Admin&background=28a745&color=fff" alt="Admin"
-                    class="admin-avatar">
-                <div class="admin-info">
-                    <h6>Admin Nguyễn</h6>
-                    <small><i class="fa-solid fa-circle text-success" style="font-size: 0.5rem;"></i> Đang hoạt
-                        động</small>
-                </div>
-                <i class="fa-solid fa-chevron-down ms-2"></i>
-            </div>
+    <!-- Header -->
+    <div class="admin-header">
+        <div>
+            <h4 class="fw-bold mb-0">Quản lý Đánh giá</h4>
+            <small class="text-muted">Kiểm duyệt và phản hồi đánh giá từ khách hàng</small>
         </div>
+        <div class="admin-profile" data-bs-toggle="modal" data-bs-target="#profileModal">
+            <img src="https://ui-avatars.com/api/?name=Admin&background=28a745&color=fff"
+                 alt="Admin" class="admin-avatar">
+            <div class="admin-info">
+                <h6>Admin</h6>
+                <small><i class="fa-solid fa-circle text-success" style="font-size:0.5rem;"></i> Đang hoạt động</small>
+            </div>
+            <i class="fa-solid fa-chevron-down ms-2"></i>
+        </div>
+    </div>
 
-        <!-- Stats Cards -->
-        <div class="row g-4 mb-4">
-            <div class="col-md-4">
-                <div class="stat-card">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <small class="opacity-75">Tổng đánh giá</small>
-                            <h2 class="fw-bold mb-0">1,247</h2>
-                        </div>
-                        <i class="fa-solid fa-star fa-3x opacity-25"></i>
+    <!-- Flash messages -->
+    <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show rounded-3 mb-3" role="alert">
+        <i class="fa-solid fa-circle-check me-2"></i>
+        <span th:text="${successMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show rounded-3 mb-3" role="alert">
+        <i class="fa-solid fa-circle-xmark me-2"></i>
+        <span th:text="${errorMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <small class="opacity-75">Tổng đánh giá</small>
+                        <h2 class="fw-bold mb-0" th:text="${totalReviews}">0</h2>
                     </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="stat-card green">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <small class="opacity-75">Đánh giá trung bình</small>
-                            <h2 class="fw-bold mb-0">4.6 ⭐</h2>
-                        </div>
-                        <i class="fa-solid fa-thumbs-up fa-3x opacity-25"></i>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="stat-card blue">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <small class="opacity-75">Tháng này</small>
-                            <h2 class="fw-bold mb-0">+156</h2>
-                        </div>
-                        <i class="fa-solid fa-chart-line fa-3x opacity-25"></i>
-                    </div>
+                    <i class="fa-solid fa-star fa-3x opacity-25"></i>
                 </div>
             </div>
         </div>
+        <div class="col-md-4">
+            <div class="stat-card green">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <small class="opacity-75">Điểm trung bình</small>
+                        <h2 class="fw-bold mb-0">
+                            <span th:text="${avgRating}">0</span> ⭐
+                        </h2>
+                    </div>
+                    <i class="fa-solid fa-thumbs-up fa-3x opacity-25"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card blue">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <small class="opacity-75">Tháng này</small>
+                        <h2 class="fw-bold mb-0">+<span th:text="${thisMonth}">0</span></h2>
+                    </div>
+                    <i class="fa-solid fa-chart-line fa-3x opacity-25"></i>
+                </div>
+            </div>
+        </div>
+    </div>
 
-        <!-- Filter -->
-        <div class="bg-white p-3 rounded-3 shadow-sm mb-4">
-            <div class="row g-3">
-                <div class="col-md-4">
-                    <div class="input-group">
-                        <span class="input-group-text bg-white">
-                            <i class="fa-solid fa-search"></i>
+    <!-- Filter theo số sao -->
+    <div class="filter-bar mb-4">
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+            <span class="fw-semibold text-muted me-1">Lọc theo sao:</span>
+            <a href="/admin/reviews"
+               th:classappend="${selectedRating == null} ? 'active-filter' : ''"
+               class="btn btn-outline-secondary star-filter-btn">
+                Tất cả
+            </a>
+            <a th:each="i : ${#numbers.sequence(5, 1, -1)}"
+               th:href="@{/admin/reviews(rating=${i})}"
+               th:classappend="${selectedRating == i} ? 'active-filter' : ''"
+               class="btn btn-outline-warning star-filter-btn">
+                <i class="fa-solid fa-star me-1"></i>
+                <span th:text="${i}">5</span> sao
+            </a>
+        </div>
+    </div>
+
+    <!-- Danh sách review -->
+    <div class="reviews-container" th:if="${reviews != null and not #lists.isEmpty(reviews)}">
+        <div th:each="review : ${reviews}" class="review-card">
+
+            <div class="d-flex gap-3 mb-3">
+                <!-- Avatar user -->
+                <img th:src="@{'https://ui-avatars.com/api/?name=' + ${review.user.fullname} + '&background=667eea&color=fff'}"
+                     class="user-avatar" th:alt="${review.user.fullname}">
+
+                <div class="flex-grow-1">
+                    <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+                        <div>
+                            <h6 class="fw-bold mb-1" th:text="${review.user.fullname}">Khách hàng</h6>
+                            <!-- Stars -->
+                            <div class="star-rating mb-1">
+                                <span th:each="i : ${#numbers.sequence(1,5)}">
+                                    <i th:class="${i <= review.rating} ? 'fa-solid fa-star' : 'fa-regular fa-star empty'"></i>
+                                </span>
+                                <span class="badge-rating ms-1">
+                                    <i class="fa-solid fa-star"></i>
+                                    <span th:text="${review.rating}">5</span>/5
+                                </span>
+                            </div>
+                            <small class="text-muted">
+                                <i class="fa-solid fa-clock me-1"></i>
+                                <span th:text="${review.createAt != null ? #temporals.format(review.createAt, 'dd/MM/yyyy HH:mm') : ''}"></span>
+                                <span class="mx-2">•</span>
+                                <i class="fa-solid fa-envelope me-1"></i>
+                                <span th:text="${review.user.email}">email@example.com</span>
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sản phẩm được review -->
+            <div class="mb-3" th:if="${review.orderDetail != null and review.orderDetail.product != null}">
+                <div class="d-flex align-items-center gap-3">
+                    <img th:src="${review.orderDetail.product.image != null ? review.orderDetail.product.image : '/images/default-book.png'}"
+                         class="product-thumb"
+                         th:alt="${review.orderDetail.product.name}">
+                    <div>
+                        <div class="fw-bold small" th:text="${review.orderDetail.product.name}">Tên sách</div>
+                        <div class="text-muted small">
+                            <span th:text="${review.orderDetail.product.author}">Tác giả</span>
+                            <span th:if="${review.orderDetail.product.category != null}">
+                                • <span th:text="${review.orderDetail.product.category.name}">Danh mục</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Nội dung review -->
+            <div class="mb-3">
+                <p class="mb-0 text-secondary" th:text="${review.content}"></p>
+            </div>
+
+            <!-- Phản hồi của shop (nếu có) -->
+            <div th:if="${review.adminReply != null}" class="admin-reply-box mb-3">
+                <div class="d-flex gap-2 align-items-start">
+                    <i class="fa-solid fa-store text-success mt-1"></i>
+                    <div>
+                        <strong class="text-success small">Phản hồi của Shop:</strong>
+                        <span class="text-muted small ms-2"
+                              th:text="${review.adminReplyAt != null ? #temporals.format(review.adminReplyAt, 'dd/MM/yyyy') : ''}">
                         </span>
-                        <input type="text" class="form-control border-start-0" placeholder="Tìm theo tên khách hàng, sản phẩm...">
+                        <p class="mb-0 mt-1 small" th:text="${review.adminReply}"></p>
                     </div>
                 </div>
-                <div class="col-md-2">
-                    <select class="form-select">
-                        <option>Số sao</option>
-                        <option>⭐⭐⭐⭐⭐ (5 sao)</option>
-                        <option>⭐⭐⭐⭐ (4 sao)</option>
-                        <option>⭐⭐⭐ (3 sao)</option>
-                        <option>⭐⭐ (2 sao)</option>
-                        <option>⭐ (1 sao)</option>
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <select class="form-select">
-                        <option>Sắp xếp</option>
-                        <option>Mới nhất</option>
-                        <option>Cũ nhất</option>
-                        <option>Sao cao nhất</option>
-                        <option>Sao thấp nhất</option>
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <button class="btn btn-outline-success w-100">
-                        <i class="fa-solid fa-filter me-2"></i>Lọc
+            </div>
+
+            <!-- Actions -->
+            <div class="d-flex gap-2">
+                <!-- Nút phản hồi -->
+                <button class="btn btn-outline-secondary btn-sm"
+                        th:data-review-id="${review.id}"
+                        th:data-current-reply="${review.adminReply}"
+                        onclick="openReplyModal(this)"
+                        data-bs-toggle="modal" data-bs-target="#replyModal">
+                    <i class="fa-solid fa-reply me-1"></i>
+                    <span th:text="${review.adminReply != null} ? 'Sửa phản hồi' : 'Phản hồi'">Phản hồi</span>
+                </button>
+
+                <!-- Nút xóa -->
+                <form th:action="@{'/admin/reviews/delete/' + ${review.id}}" method="post"
+                      onsubmit="return confirm('Bạn có chắc chắn muốn xóa đánh giá này không?')">
+                    <button type="submit" class="btn btn-outline-danger btn-sm">
+                        <i class="fa-solid fa-trash me-1"></i>Xóa
                     </button>
-                </div>
+                </form>
             </div>
         </div>
+    </div>
 
-        <!-- Reviews List -->
-        <div class="reviews-container">
-            
-            <!-- Review 1 -->
-            <div class="review-card">
-                <div class="d-flex gap-3 mb-3">
-                    <img src="https://ui-avatars.com/api/?name=Nguyen+Van+A&background=667eea&color=fff" class="user-avatar" alt="User">
-                    <div class="flex-grow-1">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div>
-                                <h6 class="fw-bold mb-1">Nguyễn Văn A</h6>
-                                <div class="star-rating mb-1">
-                                    <i class="fa-solid fa-star"></i>
-                                    <i class="fa-solid fa-star"></i>
-                                    <i class="fa-solid fa-star"></i>
-                                    <i class="fa-solid fa-star"></i>
-                                    <i class="fa-solid fa-star"></i>
-                                </div>
-                                <small class="text-muted">
-                                    <i class="fa-solid fa-clock me-1"></i>2 ngày trước
-                                    <span class="mx-2">•</span>
-                                    <i class="fa-solid fa-check-circle text-success me-1"></i>Đã mua hàng
-                                </small>
-                            </div>
-                            
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="mb-3">
-                    <div class="d-flex align-items-center gap-3 mb-2">
-                        <img src="https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&w=60" class="product-thumb" alt="Product">
-                        <div>
-                            <strong>Nhà Giả Kim</strong>
-                            <div class="text-muted small">Văn học • Paulo Coelho</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="mb-3">
-                    <p class="mb-2">
-                        Sách rất hay, nội dung sâu sắc và ý nghĩa. Giao hàng nhanh, đóng gói cẩn thận. 
-                        Mình đã đọc xong và rất thích. Sẽ tiếp tục ủng hộ shop! 📚❤️
-                    </p>
-                    <div class="review-images">
-                        <img src="https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&w=200" alt="Review 1" data-bs-toggle="modal" data-bs-target="#imageModal">
-                        <img src="https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=200" alt="Review 2" data-bs-toggle="modal" data-bs-target="#imageModal">
-                        <img src="https://images.unsplash.com/photo-1543002588-bfa74002ed7e?auto=format&fit=crop&w=200" alt="Review 3" data-bs-toggle="modal" data-bs-target="#imageModal">
-                    </div>
-                </div>
-                
-                <div class="d-flex gap-2">
-                    <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#replyModal">
-                        <i class="fa-solid fa-reply me-2"></i>Phản hồi
-                    </button>
-                    <button class="btn btn-outline-danger btn-sm" onclick="deleteReview(1)">
-                        <i class="fa-solid fa-trash"></i>
-                    </button>
-                </div>
+    <!-- Không có review -->
+    <div th:if="${reviews == null or #lists.isEmpty(reviews)}"
+         class="text-center py-5 bg-white rounded-3 shadow-sm">
+        <i class="fa-regular fa-star fa-4x text-muted mb-3"></i>
+        <h5 class="text-muted fw-bold">Chưa có đánh giá nào</h5>
+        <p class="text-muted small">
+            <span th:if="${selectedRating != null}">Không có đánh giá <span th:text="${selectedRating}">5</span> sao nào.</span>
+            <span th:if="${selectedRating == null}">Chưa có khách hàng nào gửi đánh giá.</span>
+        </p>
+        <a href="/admin/reviews" th:if="${selectedRating != null}" class="btn btn-outline-success btn-sm rounded-pill">
+            Xem tất cả đánh giá
+        </a>
+    </div>
+
+</main>
+
+<!-- Modal Phản hồi -->
+<div class="modal fade" id="replyModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-success text-white rounded-top">
+                <h5 class="modal-title fw-bold">
+                    <i class="fa-solid fa-reply me-2"></i>Phản hồi đánh giá
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
-
-            <!-- Review 2 -->
-            <div class="review-card">
-                <div class="d-flex gap-3 mb-3">
-                    <img src="https://ui-avatars.com/api/?name=Tran+Thi+B&background=f093fb&color=fff" class="user-avatar" alt="User">
-                    <div class="flex-grow-1">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div>
-                                <h6 class="fw-bold mb-1">Trần Thị B</h6>
-                                <div class="star-rating mb-1">
-                                    <i class="fa-solid fa-star"></i>
-                                    <i class="fa-solid fa-star"></i>
-                                    <i class="fa-solid fa-star"></i>
-                                    <i class="fa-solid fa-star"></i>
-                                    <i class="fa-regular fa-star"></i>
-                                </div>
-                                <small class="text-muted">
-                                    <i class="fa-solid fa-clock me-1"></i>5 ngày trước
-                                    <span class="mx-2">•</span>
-                                    <i class="fa-solid fa-check-circle text-success me-1"></i>Đã mua hàng
-                                </small>
-                            </div>
-                           
-                        </div>
+            <form id="replyForm" method="post">
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Nội dung phản hồi của Shop</label>
+                        <textarea class="form-control rounded-3" id="replyContent" name="adminReply"
+                                  rows="4" placeholder="Nhập phản hồi của shop..." required
+                                  style="font-family: 'Quicksand', sans-serif;"></textarea>
+                    </div>
+                    <div class="text-muted small">
+                        <i class="fa-solid fa-info-circle me-1 text-success"></i>
+                        Phản hồi sẽ được hiển thị công khai dưới đánh giá của khách hàng.
                     </div>
                 </div>
-                
-                <div class="mb-3">
-                    <div class="d-flex align-items-center gap-3 mb-2">
-                        <img src="https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=60" class="product-thumb" alt="Product">
-                        <div>
-                            <strong>Đắc Nhân Tâm</strong>
-                            <div class="text-muted small">Kỹ năng sống • Dale Carnegie</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="mb-3">
-                    <p class="mb-0">
-                        Sách hay, bìa đẹp. Nội dung rất bổ ích cho cuộc sống. Đọc xong cảm thấy nhiều điều hay ho. 
-                        Shop giao hàng khá nhanh, đóng gói cẩn thận.
-                    </p>
-                </div>
-                
-                <div class="bg-light p-3 rounded mb-3">
-                    <div class="d-flex gap-2 align-items-start">
-                        <i class="fa-solid fa-reply text-success"></i>
-                        <div>
-                            <strong class="text-success">Phản hồi của Shop:</strong>
-                            <p class="mb-0 mt-1">Cảm ơn bạn đã tin tưởng và ủng hộ shop! Chúc bạn có những trải nghiệm đọc sách tuyệt vời ❤️</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="d-flex gap-2">
-                    <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#replyModal">
-                        <i class="fa-solid fa-reply me-2"></i>Phản hồi
-                    </button>
-                    <button class="btn btn-outline-danger btn-sm" onclick="deleteReview(2)">
-                        <i class="fa-solid fa-trash"></i>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Review 3 -->
-            <div class="review-card">
-                <div class="d-flex gap-3 mb-3">
-                    <img src="https://ui-avatars.com/api/?name=Le+Van+C&background=4facfe&color=fff" class="user-avatar" alt="User">
-                    <div class="flex-grow-1">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div>
-                                <h6 class="fw-bold mb-1">Lê Văn C</h6>
-                                <div class="star-rating mb-1">
-                                    <i class="fa-solid fa-star"></i>
-                                    <i class="fa-solid fa-star"></i>
-                                    <i class="fa-regular fa-star"></i>
-                                    <i class="fa-regular fa-star"></i>
-                                    <i class="fa-regular fa-star"></i>
-                                </div>
-                                <small class="text-muted">
-                                    <i class="fa-solid fa-clock me-1"></i>1 tuần trước
-                                    <span class="mx-2">•</span>
-                                    <i class="fa-solid fa-check-circle text-success me-1"></i>Đã mua hàng
-                                </small>
-                            </div>
-                           
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="mb-3">
-                    <div class="d-flex align-items-center gap-3 mb-2">
-                        <img src="https://images.unsplash.com/photo-1543002588-bfa74002ed7e?auto=format&fit=crop&w=60" class="product-thumb" alt="Product">
-                        <div>
-                            <strong>Sapiens - Lược sử loài người</strong>
-                            <div class="text-muted small">Khoa học • Yuval Noah Harari</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="mb-3">
-                    <p class="mb-2">
-                        Sách giao chậm quá, mình đợi mãi mới nhận được. Nội dung thì ok nhưng dịch vụ không tốt.
-                    </p>
-                </div>
-                
-                <div class="d-flex gap-2">
-                    <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#replyModal">
-                        <i class="fa-solid fa-reply me-2"></i>Phản hồi
-                    </button>
-                    <button class="btn btn-outline-danger btn-sm" onclick="deleteReview(3)">
-                        <i class="fa-solid fa-trash"></i>
-                    </button>
-                </div>
-            </div>
-
-        </div>
-
-        <!-- Pagination -->
-        <nav class="mt-4 d-flex justify-content-between align-items-center">
-            <div class="text-muted">
-                Hiển thị <strong>1-10</strong> trong <strong>1,247</strong> đánh giá
-            </div>
-            <ul class="pagination mb-0">
-                <li class="page-item disabled">
-                    <a class="page-link" href="#"><i class="fa-solid fa-chevron-left"></i></a>
-                </li>
-                <li class="page-item active">
-                    <a class="page-link bg-success border-success" href="#">1</a>
-                </li>
-                <li class="page-item">
-                    <a class="page-link text-success" href="#">2</a>
-                </li>
-                <li class="page-item">
-                    <a class="page-link text-success" href="#">3</a>
-                </li>
-                <li class="page-item">
-                    <a class="page-link" href="#"><i class="fa-solid fa-chevron-right"></i></a>
-                </li>
-            </ul>
-        </nav>
-    </main>
-
-    <!-- Reply Modal -->
-    <div class="modal fade" id="replyModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header bg-success text-white">
-                    <h5 class="modal-title fw-bold">
-                        <i class="fa-solid fa-reply me-2"></i>Phản hồi đánh giá
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="replyForm">
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">Nội dung phản hồi</label>
-                            <textarea class="form-control" rows="4" placeholder="Nhập phản hồi của bạn..." required></textarea>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="submit" form="replyForm" class="btn btn-success">
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-success rounded-pill px-4">
                         <i class="fa-solid fa-paper-plane me-2"></i>Gửi phản hồi
                     </button>
                 </div>
-            </div>
+            </form>
         </div>
     </div>
+</div>
 
-    <!-- Image Modal -->
-    <div class="modal fade" id="imageModal" tabindex="-1">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-body p-0">
-                    <img src="" class="w-100" id="modalImage" alt="Review Image">
-                </div>
-            </div>
-        </div>
-    </div>
+<!-- Profile Modal -->
 <div class="modal fade" id="profileModal" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header bg-success text-white">
-                    <h5 class="modal-title fw-bold">
-                        <i class="fa-solid fa-user-circle me-2"></i>Thông tin cá nhân
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title fw-bold">
+                    <i class="fa-solid fa-user-circle me-2"></i>Thông tin cá nhân
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center mb-3">
+                    <img src="https://ui-avatars.com/api/?name=Admin&background=28a745&color=fff&size=100"
+                         class="rounded-circle" width="100" height="100" alt="Avatar">
                 </div>
-                <div class="modal-body">
-                    <form id="profileForm">
-                        <div class="text-center mb-4">
-                            <div class="position-relative d-inline-block">
-                                <img src="https://ui-avatars.com/api/?name=Admin&background=28a745&color=fff&size=150" 
-                                     class="rounded-circle" width="150" height="150" id="profileAvatarPreview" alt="Avatar">
-                                <label for="avatarUpload" class="position-absolute bottom-0 end-0 btn btn-success btn-sm rounded-circle" 
-                                       style="width: 40px; height: 40px;">
-                                    <i class="fa-solid fa-camera"></i>
-                                </label>
-                                <input type="file" id="avatarUpload" class="d-none" accept="image/*" onchange="previewAvatar(event)">
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">Họ và tên</label>
-                            <input type="text" class="form-control" value="Admin Nguyễn" placeholder="Nhập họ tên">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">Email</label>
-                            <input type="email" class="form-control" value="admin@beobooks.com" readonly>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">Số điện thoại</label>
-                            <input type="tel" class="form-control" value="0123456789" placeholder="Nhập số điện thoại">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">Giới tính</label>
-                            <select class="form-select">
-                                <option value="male">Nam</option>
-                                <option value="female">Nữ</option>
-                                <option value="other">Khác</option>
-                            </select>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="submit" form="profileForm" class="btn btn-success">
-                        <i class="fa-solid fa-save me-2"></i>Lưu thay đổi
-                    </button>
-                </div>
+                <p class="text-center text-muted">Admin BEOBOOKS</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
             </div>
         </div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/js/admin-avt.js"></script>
-    <script src="/js/sidebar.js"></script>
-    <script>
-        function approveReview(id) {
-            if (confirm('Xác nhận duyệt đánh giá này?')) {
-                console.log('Approving review:', id);
-                alert('Đã duyệt đánh giá!');
-            }
-        }
+</div>
 
-        function rejectReview(id) {
-            const reason = prompt('Nhập lý do từ chối:');
-            if (reason) {
-                console.log('Rejecting review:', id, 'Reason:', reason);
-                alert('Đã từ chối đánh giá!');
-            }
-        }
-
-        function deleteReview(id) {
-            if (confirm('Bạn có chắc chắn muốn xóa đánh giá này?')) {
-                console.log('Deleting review:', id);
-                alert('Đã xóa đánh giá!');
-            }
-        }
-
-        document.getElementById('replyForm')?.addEventListener('submit', function(e) {
-            e.preventDefault();
-            alert('Đã gửi phản hồi thành công!');
-            bootstrap.Modal.getInstance(document.getElementById('replyModal')).hide();
-        });
-
-        // Show image in modal
-        document.querySelectorAll('.review-images img').forEach(img => {
-            img.addEventListener('click', function() {
-                document.getElementById('modalImage').src = this.src;
-            });
-        });
-    </script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/sidebar.js"></script>
+<script>
+    function openReplyModal(btn) {
+        const reviewId = btn.getAttribute('data-review-id');
+        const currentReply = btn.getAttribute('data-current-reply');
+        // Cập nhật action của form
+        document.getElementById('replyForm').action = '/admin/reviews/reply/' + reviewId;
+        // Điền nội dung phản hồi cũ (nếu có)
+        document.getElementById('replyContent').value = currentReply || '';
+    }
+</script>
 </body>
 </html>

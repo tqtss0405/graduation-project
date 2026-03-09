@@ -6,15 +6,27 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import com.poly.graduation_project.model.CartDetail;
+import com.poly.graduation_project.model.Order;
+import com.poly.graduation_project.model.OrderDetail;
 import com.poly.graduation_project.model.Product;
+import com.poly.graduation_project.model.Review;
 import com.poly.graduation_project.model.User;
 import com.poly.graduation_project.repository.AddressRepository;
+import com.poly.graduation_project.repository.CartDetailRepository;
 import com.poly.graduation_project.repository.CategoryRepository;
+import com.poly.graduation_project.repository.OrderDetailRepository;
+import com.poly.graduation_project.repository.OrderRepository;
 import com.poly.graduation_project.repository.ProductRepository;
+import com.poly.graduation_project.repository.ReviewRepository;
 import com.poly.graduation_project.repository.UserRepository;
 import com.poly.graduation_project.service.SessionService;
 
+import jakarta.servlet.http.HttpSession;
+
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 public class IndexController {
@@ -29,13 +41,28 @@ public class IndexController {
     ProductRepository productRepository;
     @Autowired
     CategoryRepository categoryRepository;
+    @Autowired
+    ReviewRepository reviewRepository;
+    @Autowired
+    OrderRepository orderRepository;
+    @Autowired
+    OrderDetailRepository orderDetailRepository;
+
+    @Autowired
+    CartDetailRepository cartDetailRepository;
 
     // ================================================
-    // Trang chủ: lấy 8 sản phẩm mới nhất (active=true)
+    // Trang chủ
     // ================================================
     @GetMapping("/home")
-    public String home(Model model) {
+    public String home(Model model, HttpSession session) {
+        User currentUser = (User) session.getAttribute("currentUser");
         List<Product> products = productRepository.findTop8ByActiveTrueOrderByIdDesc();
+        List<CartDetail> cartItems = cartDetailRepository.findByUser(currentUser);
+        int totalQuantity = cartItems.stream()
+                .mapToInt(CartDetail::getQuantity)
+                .sum();
+        model.addAttribute("totalQuantity", totalQuantity);
         model.addAttribute("products", products);
         model.addAttribute("categories", categoryRepository.findAll());
         return "index";
@@ -45,10 +72,16 @@ public class IndexController {
     // Trang tất cả sản phẩm
     // ================================================
     @GetMapping("/products")
-    public String products(Model model) {
+    public String products(Model model , HttpSession session) {
+        User currentUser = (User) session.getAttribute("currentUser");
+            List<CartDetail> cartItems = cartDetailRepository.findByUser(currentUser);
+        int totalQuantity = cartItems.stream()
+                .mapToInt(CartDetail::getQuantity)
+                .sum();
         List<Product> products = productRepository.findByActiveTrue();
         model.addAttribute("products", products);
         model.addAttribute("categories", categoryRepository.findAll());
+        model.addAttribute("totalQuantity", totalQuantity);
         return "products";
     }
 
@@ -56,62 +89,130 @@ public class IndexController {
     // Trang chi tiết sản phẩm theo slug
     // ================================================
     @GetMapping("/product/{slug}")
-    public String productDetail(@PathVariable("slug") String slug, Model model) {
+    public String productDetail(@PathVariable("slug") String slug, Model model, HttpSession session) {
+        User currentUser = (User) session.getAttribute("currentUser");
         Product product = productRepository.findBySlug(slug);
         if (product == null)
             return "redirect:/products";
-
-        // Lấy sản phẩm cùng danh mục (gợi ý)
+            List<CartDetail> cartItems = cartDetailRepository.findByUser(currentUser);
+        int totalQuantity = cartItems.stream()
+                .mapToInt(CartDetail::getQuantity)
+                .sum();
+        model.addAttribute("totalQuantity", totalQuantity);
+        // Lấy sản phẩm cùng danh mục
         List<Product> related = productRepository
                 .findTop4ByCategoryAndIdNotAndActiveTrue(product.getCategory(), product.getId());
 
+        // Lấy danh sách review của sản phẩm
+        List<Review> reviews = reviewRepository.findByProductId(product.getId());
+        long reviewCount = reviewRepository.countByProductId(product.getId());
+        Double avgRating = reviewRepository.avgRatingByProductId(product.getId());
+
         model.addAttribute("product", product);
         model.addAttribute("relatedProducts", related);
+        model.addAttribute("reviews", reviews);
+        model.addAttribute("reviewCount", reviewCount);
+        model.addAttribute("avgRating", avgRating != null ? Math.round(avgRating * 10.0) / 10.0 : 0.0);
+
+        // Kiểm tra user đã mua & chưa review orderDetail nào chưa
+        // để hiển thị nút "Viết đánh giá" đúng orderDetailId
+        
+        Integer reviewableOrderDetailId = null;
+        if (currentUser != null) {
+            List<Order> completedOrders = orderRepository.findCompletedOrdersByUser(currentUser);
+            outer: for (Order order : completedOrders) {
+                if (order.getOrderDetails() != null) {
+                    for (OrderDetail od : order.getOrderDetails()) {
+                        if (od.getProduct() != null
+                                && od.getProduct().getId().equals(product.getId())
+                                && !reviewRepository.existsByOrderDetail(od)) {
+                            reviewableOrderDetailId = od.getId();
+                            break outer;
+                        }
+                    }
+                }
+            }
+        }
+        model.addAttribute("reviewableOrderDetailId", reviewableOrderDetailId);
+
         return "product-details";
     }
 
     @GetMapping("/about")
-    public String about(Model model) {
+    public String about(Model model, HttpSession session) {
+        User currentUser = (User) session.getAttribute("currentUser");
+        // Do something with currentUser if needed
+            List<CartDetail> cartItems = cartDetailRepository.findByUser(currentUser);
+        int totalQuantity = cartItems.stream()
+                .mapToInt(CartDetail::getQuantity)
+                .sum();
+        model.addAttribute("totalQuantity", totalQuantity);
         return "about";
     }
 
     @GetMapping("/contact")
-    public String contact(Model model) {
+    public String contact(Model model, HttpSession session) {
+        User currentUser = (User) session.getAttribute("currentUser");
+        // Do something with currentUser if needed
+            List<CartDetail> cartItems = cartDetailRepository.findByUser(currentUser);
+        int totalQuantity = cartItems.stream()
+                .mapToInt(CartDetail::getQuantity)
+                .sum();
+        model.addAttribute("totalQuantity", totalQuantity);
         return "contact";
     }
 
-    @GetMapping("/blog")
-    public String blog(Model model) {
-        return "blog";
-    }
-
-    @GetMapping("/user/cart")
-    public String cart(Model model) {
-        return "cart";
-    }
-
-    @GetMapping("/user/checkout")
-    public String checkout(Model model) {
-        return "checkout";
-    }
-
     @GetMapping("/user/favourites")
-    public String favourites(Model model) {
+    public String favourites(Model model, HttpSession session) {
+        User currentUser = (User) session.getAttribute("currentUser");
+        // Do something with currentUser if needed
+            List<CartDetail> cartItems = cartDetailRepository.findByUser(currentUser);
+        int totalQuantity = cartItems.stream()
+                .mapToInt(CartDetail::getQuantity)
+                .sum();
+        model.addAttribute("totalQuantity", totalQuantity);
         return "favourites";
     }
 
     @GetMapping("/user/profile")
-    public String profile(Model model) {
-        User currentUser = sessionService.getAttribute("currentUser");
-        if (currentUser == null)
-            return "redirect:/login/form";
+    public String profile(Model model, HttpSession session) {
+        User currentUser = (User) session.getAttribute("currentUser");
+
         User user = userRepository.findById(currentUser.getId()).orElse(null);
+            List<CartDetail> cartItems = cartDetailRepository.findByUser(currentUser);
+        int totalQuantity = cartItems.stream()
+                .mapToInt(CartDetail::getQuantity)
+                .sum();
+        model.addAttribute("totalQuantity", totalQuantity);
         model.addAttribute("user", user);
         return "profile";
     }
 
+    // ================================================
+    // Trang lịch sử mua hàng - hiển thị nút "Đánh giá"
+    // ================================================
     @GetMapping("/user/order-details")
-    public String orderDetails(Model model) {
+    public String orderDetails(Model model, HttpSession session) {
+        User currentUser = (User) session.getAttribute("currentUser");
+        List<CartDetail> cartItems = cartDetailRepository.findByUser(currentUser);
+        int totalQuantity = cartItems.stream()
+                .mapToInt(CartDetail::getQuantity)
+                .sum();
+        model.addAttribute("totalQuantity", totalQuantity);
+        List<Order> orders = orderRepository.findByUserOrderByCreateAtDesc(currentUser);
+
+        // Map: orderDetailId -> đã review chưa
+        Map<Integer, Boolean> reviewedMap = new HashMap<>();
+        for (Order order : orders) {
+            if (order.getOrderDetails() != null) {
+                for (OrderDetail od : order.getOrderDetails()) {
+                    reviewedMap.put(od.getId(), reviewRepository.existsByOrderDetail(od));
+                }
+            }
+        }
+
+        model.addAttribute("orders", orders);
+        model.addAttribute("reviewedMap", reviewedMap);
         return "order-details";
     }
 }

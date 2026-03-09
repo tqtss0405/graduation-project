@@ -1,371 +1,693 @@
 <!DOCTYPE html>
-<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thanh Toán - BEOBOOKS</title>
-    
+    <title>Đặt hàng - BEOBOOKS</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/style.css">
+    <style>
+        body { font-family: 'Quicksand', sans-serif; background: #f5f7fa; }
+
+        .checkout-wrapper { max-width: 1100px; margin: 0 auto; padding: 32px 16px 60px; }
+
+        .section-card {
+            background: #fff;
+            border-radius: 18px;
+            box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+            padding: 24px 28px;
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-weight: 700;
+            font-size: 1rem;
+            color: #1a1a2e;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-title i { color: #28a745; }
+
+        /* Address options */
+        .address-option {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 14px 16px;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.15s;
+            margin-bottom: 10px;
+        }
+
+        .address-option:hover { border-color: #28a745; background: #f8fffe; }
+        .address-option.selected { border-color: #28a745; background: #f0faf4; }
+
+        .address-option input[type="radio"] { accent-color: #28a745; margin-top: 3px; flex-shrink: 0; }
+
+        .address-label { font-weight: 600; font-size: 0.9rem; margin-bottom: 2px; }
+        .address-text { color: #6c757d; font-size: 0.85rem; }
+        .default-badge {
+            background: #d4edda; color: #155724;
+            border-radius: 50px; padding: 1px 8px;
+            font-size: 0.72rem; font-weight: 700;
+            margin-left: 6px;
+        }
+
+        /* New address form */
+        .new-address-toggle {
+            padding: 12px 16px;
+            border: 2px dashed #c8e6c9;
+            border-radius: 12px;
+            cursor: pointer;
+            text-align: center;
+            color: #28a745;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.15s;
+            margin-bottom: 10px;
+        }
+
+        .new-address-toggle:hover { border-color: #28a745; background: #f0faf4; }
+
+        /* Order items preview */
+        .order-item-preview {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid #f5f5f5;
+        }
+
+        .order-item-preview:last-child { border-bottom: none; }
+
+        .order-item-preview img {
+            width: 52px; height: 65px;
+            object-fit: cover;
+            border-radius: 8px;
+            flex-shrink: 0;
+        }
+
+        /* Payment methods */
+        .payment-option {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 18px;
+            border: 2px solid #e9ecef;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.15s;
+            margin-bottom: 10px;
+        }
+
+        .payment-option:hover { border-color: #28a745; background: #f8fffe; }
+        .payment-option.selected { border-color: #28a745; background: #f0faf4; }
+
+        .payment-option input[type="radio"] { accent-color: #28a745; }
+
+        .payment-icon {
+            width: 48px; height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            flex-shrink: 0;
+        }
+
+        .payment-icon.cod { background: #fff3e0; color: #e65100; }
+        .payment-icon.vnpay { background: #e8f5e9; }
+
+        /* Voucher */
+        .voucher-input-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .voucher-result {
+            margin-top: 10px;
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            display: none;
+        }
+
+        .voucher-result.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .voucher-result.error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; display: block; }
+
+        /* Summary */
+        .summary-card {
+            background: #fff;
+            border-radius: 18px;
+            box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+            padding: 24px;
+            position: sticky;
+            top: 80px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 0.92rem;
+        }
+
+        .summary-row .label { color: #6c757d; }
+        .summary-row .value { font-weight: 600; }
+
+        .summary-total {
+            display: flex;
+            justify-content: space-between;
+            font-weight: 700;
+            font-size: 1.1rem;
+            border-top: 2px solid #f0f0f0;
+            padding-top: 14px;
+            margin-top: 8px;
+        }
+
+        .total-amount { color: #28a745; font-size: 1.35rem; }
+
+        .btn-place-order {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            border: none;
+            border-radius: 50px;
+            padding: 14px;
+            font-weight: 700;
+            font-size: 1rem;
+            color: #fff;
+            width: 100%;
+            cursor: pointer;
+            transition: transform 0.15s, box-shadow 0.15s;
+            margin-top: 16px;
+        }
+
+        .btn-place-order:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(40,167,69,0.35);
+        }
+
+        .btn-place-order:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .secure-note {
+            text-align: center;
+            color: #adb5bd;
+            font-size: 0.78rem;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+
+        /* Form inputs */
+        .form-control, .form-select {
+            border-radius: 10px;
+            border: 1.5px solid #e0e0e0;
+            font-family: 'Quicksand', sans-serif;
+            font-weight: 500;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #28a745;
+            box-shadow: 0 0 0 3px rgba(40,167,69,0.12);
+        }
+    </style>
 </head>
 <body>
 
-   <nav class="navbar navbar-expand-lg sticky-top">
-        <div class="container">
-            <a class="navbar-brand" href="#">BEO<span style="color: var(--secondary-color)">BOOKS</span></a>
-
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav mx-auto">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="/home">Trang chủ</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/products">Sản Phẩm</a>
-                    </li>
-
-                     
-                    <li class="nav-item">
-                        <a class="nav-link text-dark" href="/contact">Liên hệ</a>
-                    </li>
-                </ul>
-
-                <div class="d-flex align-items-center gap-3">
-                    <div class="input-group d-none d-lg-flex" style="width: 200px">
-                        <input type="text" class="form-control form-control-sm border-end-0 rounded-start-pill"
-                            placeholder="Tìm sách..." />
-                        <button class="btn btn-outline-secondary border-start-0 rounded-end-pill" type="button">
-                            <i class="fa-solid fa-magnifying-glass"></i>
-                        </button>
-                    </div>
-                    <div class="position-relative cursor-pointer">
-                        <a href="/user/cart">
-                            <i class="fa-solid fa-cart-shopping fs-5 text-secondary"></i>
-                            <span
-                                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-                                style="font-size: 10px">3</span>
-                        </a>
-
-                    </div>
-                    <div class="dropdown ms-3">
-                        <a href="#"
-                            class="d-flex align-items-center text-decoration-none text-secondary dropdown-toggle hidden-arrow"
-                            id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                            <img th:if="${session.currentUser != null}" th:src="${session.currentUser.image}"
-                                class="rounded-circle" width="30" height="30" alt="Avatar" />
-                            <i th:if="${session.currentUser == null}" class="fa-solid fa-circle-user fs-3"></i>
-                        </a>
-
-                        <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg p-3"
-                            aria-labelledby="userDropdown"
-                            style="min-width: 280px; border-radius: 15px; margin-top: 10px;">
-
-                            <li th:if="${session.currentUser == null}">
-                                <div class="d-flex flex-column align-items-center mb-3">
-                                    <p class="small text-muted mb-2">Chào mừng đến với BeoBooks!</p>
-                                    <a href="/login/form" class="btn btn-success w-100 rounded-pill fw-bold mb-2">Đăng
-                                        nhập</a>
-                                    <a href="/register" class="btn btn-outline-success w-100 rounded-pill fw-bold">Đăng
-                                        ký</a>
-                                </div>
-                            </li>
-
-                            <div th:if="${session.currentUser != null}">
-                                <li>
-                                    <div class="d-flex flex-column align-items-center mb-2">
-                                        <p class="small text-muted mb-1">Xin chào,</p>
-                                        <h6 class="fw-bold text-success" th:text="${session.currentUser.fullname}">User
-                                            Name</h6>
-                                    </div>
-                                </li>
-
-                                <li>
-                                    <hr class="dropdown-divider" />
-                                </li>
-
-                                <li>
-                                    <a class="dropdown-item py-2 rounded" href="/user/profile">
-                                        <i class="fa-solid fa-user me-2 text-muted"></i> Thông tin cá nhân
-                                    </a>
-                                </li>
-
-                                <li>
-                                    <a class="dropdown-item py-2 rounded" href="/user/change-password">
-                                        <i class="fa-solid fa-key me-2 text-muted"></i> Đổi mật khẩu
-                                    </a>
-                                </li>
-
-                                <li th:if="${session.currentUser.role == true}">
-                                    <a class="dropdown-item py-2 rounded" href="/admin/dashboard">
-                                        <i class="fa-solid fa-user-shield me-2 text-muted"></i> Trang Quản Trị
-                                    </a>
-                                </li>
-
-                                <li>
-                                    <a class="dropdown-item py-2 rounded" href="/user/order-details">
-                                        <i class="fa-solid fa-box-open me-2 text-muted"></i> Lịch sử mua hàng
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item py-2 rounded" href="/user/favourites">
-                                        <i class="fa-solid fa-heart me-2 text-danger"></i> Sách yêu thích
-                                    </a>
-                                </li>
-                                <li>
-                                    <hr class="dropdown-divider" />
-                                </li>
-
-                                <li>
-                                    <a href="/logout" class="dropdown-item py-2 rounded text-danger">
-                                        <i class="fa-solid fa-right-from-bracket me-2"></i> Đăng xuất
-                                    </a>
-                                </li>
-                            </div>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </nav>
-
-    <div class="container mt-4">
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="/home" class="text-decoration-none text-muted">Trang chủ</a></li>
-                <li class="breadcrumb-item"><a href="/user/cart" class="text-decoration-none text-muted">Giỏ hàng</a></li>
-                <li class="breadcrumb-item active fw-bold text-success" aria-current="page">Thanh toán</li>
-            </ol>
-        </nav>
-        <h2 class="fw-bold mb-4">Thông Tin Giao Hàng</h2>
-    </div>
-
-    <section class="container mb-5">
-        <form action="#" method="POST"> <div class="row g-4">
-                
-                <div class="col-lg-7">
-                    <div class="card checkout-card p-4 mb-4">
-                        <h5 class="fw-bold mb-3"><i class="fa-regular fa-id-card me-2 text-success"></i>Thông tin người nhận</h5>
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label">Họ và Tên <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" placeholder="Nhập họ tên" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Số điện thoại <span class="text-danger">*</span></label>
-                                <input type="tel" class="form-control" placeholder="Nhập số điện thoại" required>
-                            </div>
-                            <div class="col-12">
-                                <label class="form-label">Email (Để nhận hóa đơn)</label>
-                                <input type="email" class="form-control" placeholder="name@example.com">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card checkout-card p-4">
-                        <h5 class="fw-bold mb-3"><i class="fa-solid fa-map-location-dot me-2 text-success"></i>Địa chỉ giao hàng</h5>
-                        <div class="row g-3">
-                            <div class="col-md-4">
-                                <label class="form-label">Tỉnh / Thành phố <span class="text-danger">*</span></label>
-                                <select class="form-select" required>
-                                    <option selected disabled value="">Chọn Tỉnh/Thành</option>
-                                    <option>Hồ Chí Minh</option>
-                                    <option>Hà Nội</option>
-                                    <option>Cần Thơ</option>
-                                    </select>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label">Quận / Huyện <span class="text-danger">*</span></label>
-                                <select class="form-select" required>
-                                    <option selected disabled value="">Chọn Quận/Huyện</option>
-                                    <option>Ninh Kiều</option>
-                                    <option>Cái Răng</option>
-                                </select>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label">Phường / Xã <span class="text-danger">*</span></label>
-                                <select class="form-select" required>
-                                    <option selected disabled value="">Chọn Phường/Xã</option>
-                                    <option>Xuân Khánh</option>
-                                    <option>Hưng Lợi</option>
-                                </select>
-                            </div>
-                            <div class="col-12">
-                                <label class="form-label">Địa chỉ cụ thể <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" placeholder="Số nhà, tên đường..." required>
-                            </div>
-                            <div class="col-12">
-                                <label class="form-label">Ghi chú đơn hàng (Tùy chọn)</label>
-                                <textarea class="form-control" rows="2" placeholder="Ví dụ: Giao hàng giờ hành chính..."></textarea>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-lg-5">
-                    
-                    <div class="card checkout-card p-4 mb-4">
-                        <h5 class="fw-bold mb-3">Đơn hàng (3 sản phẩm)</h5>
-                        <div class="d-flex gap-3 mb-3 border-bottom pb-3">
-                            <img src="https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&w=150" class="summary-item-img border">
-                            <div class="flex-grow-1">
-                                <h6 class="mb-1 small fw-bold">Nhà Giả Kim</h6>
-                                <div class="d-flex justify-content-between">
-                                    <span class="text-muted small">x1</span>
-                                    <span class="fw-bold small">63.000đ</span>
-                                </div>
-                            </div>
-                        </div>
-                         <div class="d-flex gap-3 mb-3 border-bottom pb-3">
-                            <img src="https://images.unsplash.com/photo-1589829085413-56de8ae18c73?auto=format&fit=crop&w=150" class="summary-item-img border">
-                            <div class="flex-grow-1">
-                                <h6 class="mb-1 small fw-bold">Đắc Nhân Tâm</h6>
-                                <div class="d-flex justify-content-between">
-                                    <span class="text-muted small">x2</span>
-                                    <span class="fw-bold small">170.000đ</span>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="d-flex justify-content-between mb-2 small">
-                            <span class="text-muted">Tạm tính:</span>
-                            <span class="fw-bold">233.000đ</span>
-                        </div>
-                         <div class="d-flex justify-content-between mb-3 small border-bottom pb-3">
-                            <span class="text-muted">Phí vận chuyển:</span>
-                            <span class="text-success fw-bold">Miễn phí</span>
-                        </div>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <span class="fw-bold fs-5">Tổng cộng:</span>
-                            <span class="fw-bold fs-4 text-danger">233.000đ</span>
-                        </div>
-                    </div>
-
-                    <div class="card checkout-card p-4 mb-4">
-                        <h5 class="fw-bold mb-3">Phương thức thanh toán</h5>
-                        
-                        <div class="mb-2">
-                            <input type="radio" class="btn-check" name="payment" id="cod" checked>
-                            <label class="payment-option w-100 d-flex align-items-center gap-3" for="cod">
-                                <i class="fa-solid fa-money-bill-wave text-success fs-4"></i>
-                                <div>
-                                    <div class="fw-bold small">Thanh toán khi nhận hàng (COD)</div>
-                                    <div class="text-muted" style="font-size: 0.8rem;">Thanh toán tiền mặt cho shipper</div>
-                                </div>
-                            </label>
-                        </div>
-
-                        <div class="mb-2">
-                            <input type="radio" class="btn-check" name="payment" id="banking">
-                            <label class="payment-option w-100 d-flex align-items-center gap-3" for="banking">
-                                <i class="fa-solid fa-building-columns text-primary fs-4"></i>
-                                <div>
-                                    <div class="fw-bold small">Chuyển khoản ngân hàng</div>
-                                    <div class="text-muted" style="font-size: 0.8rem;">VietQR / Internet Banking</div>
-                                </div>
-                            </label>
-                        </div>
-                         <div class="mb-2">
-                            <input type="radio" class="btn-check" name="payment" id="momo">
-                            <label class="payment-option w-100 d-flex align-items-center gap-3" for="momo">
-                                <i class="fa-solid fa-wallet text-danger fs-4"></i>
-                                <div>
-                                    <div class="fw-bold small">Ví VNPay</div>
-                                </div>
-                            </label>
-                        </div>
-                    </div>
-
-                    <button class="btn btn-success w-100 py-3 rounded-pill fw-bold shadow text-uppercase" onclick="alert('Đặt hàng thành công!')">
-                        Hoàn tất đơn hàng
-                    </button>
-                    <p class="text-center mt-3 small text-muted">Bằng việc đặt hàng, bạn đồng ý với điều khoản của BeoBooks.</p>
-
-                </div>
-            </div>
-        </form>
-    </section>
-
-    <footer class="bg-white border-top pt-5">
+<nav class="navbar navbar-expand-lg sticky-top">
     <div class="container">
-        <div class="row g-4">
-            <div class="col-lg-4 col-md-6">
-                <a href="index.html" class="text-decoration-none">
-                    <h3 class="fw-bold mb-3" style="color: var(--primary-color);">BEO<span style="color: var(--secondary-color);">BOOKS</span></h3>
-                </a>
-                <p class="text-muted small mb-4">
-                    BeoBooks là nơi lan tỏa văn hóa đọc, cung cấp những đầu sách chất lượng với trải nghiệm mua sắm tuyệt vời nhất cho độc giả.
-                </p>
-                <div class="d-flex flex-column gap-2 text-muted small">
-                    <p class="mb-0"><i class="fa-solid fa-location-dot me-2 text-success"></i> Đường 3/2, Ninh Kiều, Cần Thơ</p>
-                    <p class="mb-0"><i class="fa-solid fa-envelope me-2 text-success"></i> hotro@beobooks.com</p>
-                    <p class="mb-0"><i class="fa-solid fa-phone me-2 text-success"></i> 1900 6789</p>
+        <a class="navbar-brand" href="/home">BEO<span style="color: var(--secondary-color)">BOOKS</span></a>
+        <div class="d-flex align-items-center gap-3 ms-auto">
+            <div class="position-relative">
+                    <a href="/user/cart">
+                        <i class="fa-solid fa-cart-shopping fs-5 text-secondary"></i>
+                       <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+      style="font-size:10px"
+      th:text="${totalQuantity}">0</span>
+                    </a>
+                </div>
+        </div>
+    </div>
+</nav>
+
+<!-- Flash: VNPay error -->
+<div th:if="${paymentError}" class="container mt-3">
+    <div class="alert alert-danger rounded-3 alert-dismissible fade show">
+        <i class="fa-solid fa-circle-xmark me-2"></i>
+        <span th:text="${paymentError}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+</div>
+
+<div class="checkout-wrapper">
+    <div class="section-title mb-4" style="font-size:1.4rem; font-weight:700; color:#1a1a2e; display:flex; align-items:center; gap:10px;">
+        <i class="fa-solid fa-bag-shopping text-success"></i>
+        Đặt hàng
+    </div>
+
+    <div class="row g-4">
+        <!-- CỘT TRÁI -->
+        <div class="col-lg-7">
+
+            <!-- 1. Thông tin nhận hàng -->
+            <div class="section-card">
+                <div class="card-title">
+                    <i class="fa-solid fa-location-dot"></i>
+                    Địa chỉ nhận hàng
+                </div>
+
+                <!-- Địa chỉ đã có -->
+                <div th:if="${addresses != null and not #lists.isEmpty(addresses)}">
+                    <div th:each="addr : ${addresses}" class="address-option"
+                         th:classappend="${defaultAddress != null and addr.id == defaultAddress.id} ? 'selected' : ''"
+                         th:onclick="'selectAddress(this, \'' + ${addr.fulladdress != null ? addr.fulladdress : addr.address} + '\')'">
+                        <input type="radio" name="addrRadio"
+                               th:value="${addr.id}"
+                               th:checked="${defaultAddress != null and addr.id == defaultAddress.id}">
+                        <div>
+                            <div class="address-label">
+                                <span th:text="${currentUser.fullname}">Tên</span>
+                                <span th:if="${addr.isDefault == true}" class="default-badge">Mặc định</span>
+                            </div>
+                            <div class="address-text" th:text="${addr.fulladdress != null ? addr.fulladdress : addr.address}">
+                                Địa chỉ
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Nhập địa chỉ mới -->
+                <div class="new-address-toggle" onclick="toggleNewAddress()">
+                    <i class="fa-solid fa-plus me-2"></i>Thêm địa chỉ mới
+                </div>
+                <div id="newAddressForm" style="display:none;">
+    <div class="row g-2">
+        <!-- Tỉnh/Thành -->
+        <div class="col-md-4">
+            <label class="form-label small fw-semibold text-muted">Tỉnh / Thành phố <span class="text-danger">*</span></label>
+            <select class="form-select" id="newProvince">
+                <option value="" disabled selected>-- Chọn Tỉnh/Thành --</option>
+            </select>
+        </div>
+        <!-- Quận/Huyện -->
+        <div class="col-md-4">
+            <label class="form-label small fw-semibold text-muted">Quận / Huyện <span class="text-danger">*</span></label>
+            <select class="form-select" id="newDistrict" disabled>
+                <option value="" disabled selected>-- Chọn Quận/Huyện --</option>
+            </select>
+        </div>
+        <!-- Phường/Xã -->
+        <div class="col-md-4">
+            <label class="form-label small fw-semibold text-muted">Phường / Xã <span class="text-danger">*</span></label>
+            <select class="form-select" id="newWard" disabled>
+                <option value="" disabled selected>-- Chọn Phường/Xã --</option>
+            </select>
+        </div>
+        <!-- Số nhà, tên đường -->
+        <div class="col-12 mt-1">
+            <label class="form-label small fw-semibold text-muted">Số nhà, tên đường <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="newStreet"
+                   placeholder="VD: 123 Đường Lê Lợi">
+        </div>
+    </div>
+</div>
+
+                <!-- Input ẩn chứa địa chỉ cuối cùng -->
+                <input type="hidden" id="finalAddress"
+                       th:value="${defaultAddress != null ? (defaultAddress.fulladdress != null ? defaultAddress.fulladdress : defaultAddress.address) : ''}">
+
+                <div class="mt-3">
+                    <label class="form-label fw-semibold small">Tên người nhận</label>
+                    <input type="text" class="form-control" id="recipientName"
+                           th:value="${currentUser.fullname}" placeholder="Tên người nhận">
+                </div>
+                <div class="mt-2">
+                    <label class="form-label fw-semibold small">Số điện thoại</label>
+                    <input type="tel" class="form-control" id="recipientPhone"
+                           th:value="${currentUser.phone}" placeholder="Số điện thoại nhận hàng">
+                </div>
+                <div class="mt-2">
+                    <label class="form-label fw-semibold small">Ghi chú (tùy chọn)</label>
+                    <textarea class="form-control" id="orderNote" rows="2"
+                              placeholder="Ghi chú cho đơn hàng (thời gian giao, yêu cầu đặc biệt...)"></textarea>
                 </div>
             </div>
 
-            <div class="col-lg-2 col-md-6">
-                <h6 class="fw-bold mb-3">Về BeoBooks</h6>
-                <ul class="list-unstyled footer-links">
-                    <li><a href="#">Giới thiệu</a></li>
-                    <li><a href="#">Tuyển dụng</a></li>
-                    <li><a href="#">Chính sách bảo mật</a></li>
-                    <li><a href="#">Điều khoản sử dụng</a></li>
-                    <li><a href="#">Liên hệ hợp tác</a></li>
-                </ul>
-            </div>
-
-            <div class="col-lg-2 col-md-6">
-                <h6 class="fw-bold mb-3">Hỗ trợ</h6>
-                <ul class="list-unstyled footer-links">
-                    <li><a href="#">Hướng dẫn mua hàng</a></li>
-                    <li><a href="#">Phương thức thanh toán</a></li>
-                    <li><a href="#">Chính sách vận chuyển</a></li>
-                    <li><a href="#">Chính sách đổi trả</a></li>
-                    <li><a href="#">Câu hỏi thường gặp</a></li>
-                </ul>
-            </div>
-
-            <div class="col-lg-4 col-md-6">
-                <h6 class="fw-bold mb-3">Đăng ký nhận tin</h6>
-                <p class="text-muted small mb-3">Nhận thông tin sách mới và khuyến mãi đặc biệt.</p>
-                <form class="input-group mb-4">
-                    <input type="email" class="form-control" placeholder="Email của bạn..." style="border-radius: 20px 0 0 20px; border-right: none;">
-                    <button class="btn btn-success" type="button" style="border-radius: 0 20px 20px 0;">Đăng ký</button>
-                </form>
-                
-                <h6 class="fw-bold mb-3">Kết nối với chúng tôi</h6>
-                <div class="d-flex gap-2">
-                    <a href="#" class="social-icon"><i class="fa-brands fa-facebook-f"></i></a>
-                    <a href="#" class="social-icon"><i class="fa-brands fa-instagram"></i></a>
-                    <a href="#" class="social-icon"><i class="fa-brands fa-tiktok"></i></a>
-                    <a href="#" class="social-icon"><i class="fa-brands fa-youtube"></i></a>
+            <!-- 2. Phương thức thanh toán -->
+            <div class="section-card">
+                <div class="card-title">
+                    <i class="fa-solid fa-credit-card"></i>
+                    Phương thức thanh toán
                 </div>
+
+                <div class="payment-option selected" id="codOption" onclick="selectPayment('cod')">
+                    <input type="radio" name="paymentMethod" id="payCod" value="cod" checked>
+                    <div class="payment-icon cod">
+                        <i class="fa-solid fa-money-bill-wave"></i>
+                    </div>
+                    <div>
+                        <div class="fw-bold">Thanh toán khi nhận hàng (COD)</div>
+                        <div class="text-muted small">Trả tiền mặt khi nhận được sách</div>
+                    </div>
+                </div>
+
+                <div class="payment-option" id="vnpayOption" onclick="selectPayment('vnpay')">
+                    <input type="radio" name="paymentMethod" id="payVnpay" value="vnpay">
+                    <div class="payment-icon vnpay">
+                        <img src="https://sandbox.vnpayment.vn/paymentv2/images/img/logo-icon/vnpay-logo.svg"
+                             alt="VNPay" height="30"
+                             onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=\'fa-solid fa-qrcode\' style=\'color:#28a745; font-size:1.4rem\'></i>'">
+                    </div>
+                    <div>
+                        <div class="fw-bold">Thanh toán qua VNPay</div>
+                        <div class="text-muted small">Thẻ ATM, Visa, Mastercard, QR Code</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. Mã giảm giá -->
+            <div class="section-card">
+                <div class="card-title">
+                    <i class="fa-solid fa-ticket"></i>
+                    Mã giảm giá
+                </div>
+                <div class="voucher-input-group">
+                    <input type="text" class="form-control text-uppercase" id="voucherCode"
+                           placeholder="Nhập mã giảm giá..." maxlength="10"
+                           oninput="this.value = this.value.toUpperCase()">
+                    <button class="btn btn-outline-success rounded-pill px-4 fw-bold"
+                            type="button" onclick="applyVoucher()">
+                        Áp dụng
+                    </button>
+                </div>
+                <div class="voucher-result" id="voucherResult"></div>
+                <input type="hidden" id="appliedVoucherId" value="">
+                <input type="hidden" id="discountAmount" value="0">
             </div>
         </div>
 
-        <hr class="my-4 text-muted">
+        <!-- CỘT PHẢI: Tóm tắt đơn hàng -->
+        <div class="col-lg-5">
+            <div class="summary-card">
+                <div class="fw-bold mb-3" style="font-size:1rem; color:#1a1a2e;">
+                    <i class="fa-solid fa-receipt text-success me-2"></i>
+                    Đơn hàng (<span th:text="${#lists.size(cartItems)}">0</span> sản phẩm)
+                </div>
 
-        <div class="row align-items-center pb-4">
-            <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
-                <p class="mb-0 text-muted small">© 2026 <strong>BEOBOOKS</strong>. Tất cả các quyền được bảo lưu.</p>
-            </div>
-            <div class="col-md-6 text-center text-md-end">
-                <div class="d-flex gap-3 justify-content-center justify-content-md-end fs-4 text-secondary">
-                    <i class="fa-brands fa-cc-visa" title="Visa"></i>
-                    <i class="fa-brands fa-cc-mastercard" title="Mastercard"></i>
-                    <i class="fa-solid fa-wallet" title="Momo/ZaloPay"></i>
-                    <i class="fa-solid fa-truck-fast" title="COD"></i>
+                <!-- Danh sách sản phẩm -->
+                <div style="max-height: 280px; overflow-y: auto;" class="mb-3">
+                    <div th:each="item : ${cartItems}" class="order-item-preview">
+                        <div class="position-relative">
+                            <img th:src="${item.product.image != null ? item.product.image : '/images/default-book.png'}"
+                                 th:alt="${item.product.name}">
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill"
+                                  style="background:#28a745; font-size:0.7rem;"
+                                  th:text="${item.quantity}">1</span>
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="fw-bold small" th:text="${item.product.name}">Tên sách</div>
+                            <div class="text-muted" style="font-size:0.78rem;" th:text="${item.product.author}">Tác giả</div>
+                        </div>
+                        <div class="fw-bold small text-success"
+                             th:text="${#numbers.formatDecimal(item.product.price.multiply(new java.math.BigDecimal(item.quantity)), 0, 'COMMA', 0, 'POINT')} + 'đ'">
+                            0đ
+                        </div>
+                    </div>
+                </div>
+
+                <div class="summary-row">
+                    <span class="label">Tạm tính</span>
+                    <span class="value" id="coSubtotal"
+                          th:text="${#numbers.formatDecimal(subtotal, 0, 'COMMA', 0, 'POINT')} + 'đ'">0đ</span>
+                </div>
+                <div class="summary-row">
+                    <span class="label">Phí vận chuyển</span>
+                    <span class="value" id="coShipFee"
+                          th:text="${shippingFee.compareTo(T(java.math.BigDecimal).ZERO) == 0 ? 'Miễn phí 🎉' : #numbers.formatDecimal(shippingFee, 0, 'COMMA', 0, 'POINT') + 'đ'}">
+                        0đ
+                    </span>
+                </div>
+                <div class="summary-row" id="discountRow" style="display:none;">
+                    <span class="label text-success"><i class="fa-solid fa-tag me-1"></i>Giảm giá</span>
+                    <span class="value text-success" id="discountDisplay">-0đ</span>
+                </div>
+
+                <div class="summary-total">
+                    <span>Tổng thanh toán</span>
+                    <span class="total-amount" id="coTotal"
+                          th:text="${#numbers.formatDecimal(total, 0, 'COMMA', 0, 'POINT')} + 'đ'">0đ</span>
+                </div>
+
+                <button class="btn-place-order" id="placeOrderBtn" onclick="placeOrder()">
+                    <i class="fa-solid fa-check-circle me-2"></i>
+                    <span id="btnText">Đặt hàng ngay</span>
+                </button>
+
+                <div class="secure-note">
+                    <i class="fa-solid fa-shield-halved text-success"></i>
+                    Thanh toán an toàn & bảo mật
                 </div>
             </div>
         </div>
     </div>
-</footer>
+</div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Hidden forms for submission -->
+<form id="codForm" action="/user/checkout/cod" method="post" style="display:none;">
+    <input type="hidden" name="addressText" id="codAddress">
+    <input type="hidden" name="voucherId" id="codVoucher">
+    <input type="hidden" name="note" id="codNote">
+</form>
+
+<form id="vnpayForm" action="/user/checkout/vnpay" method="post" style="display:none;">
+    <input type="hidden" name="addressText" id="vnAddress">
+    <input type="hidden" name="voucherId" id="vnVoucher">
+    <input type="hidden" name="note" id="vnNote">
+</form>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    const baseSubtotal = parseFloat('[[${subtotal}]]') || 0;
+    const baseShip = parseFloat('[[${shippingFee}]]') || 0;
+    let discountAmt = 0;
+    let selectedPayment = 'cod';
+    let appliedVoucherId = '';
+
+    function formatMoney(n) { return Number(n).toLocaleString('vi-VN') + 'đ'; }
+
+    function selectAddress(el, addrText) {
+        document.querySelectorAll('.address-option').forEach(o => o.classList.remove('selected'));
+        el.classList.add('selected');
+        el.querySelector('input[type="radio"]').checked = true;
+        document.getElementById('finalAddress').value = addrText;
+        document.getElementById('newAddressForm').style.display = 'none';
+    }
+
+    function toggleNewAddress() {
+        const form = document.getElementById('newAddressForm');
+        form.style.display = form.style.display === 'none' ? 'block' : 'none';
+        if (form.style.display === 'block') {
+            document.querySelectorAll('.address-option').forEach(o => {
+                o.classList.remove('selected');
+                o.querySelector('input[type="radio"]').checked = false;
+            });
+            document.getElementById('finalAddress').value = '';
+        }
+    }
+
+    function onNewAddressInput(val) {
+        document.getElementById('finalAddress').value = val;
+    }
+
+    function selectPayment(method) {
+        selectedPayment = method;
+        document.getElementById('codOption').classList.toggle('selected', method === 'cod');
+        document.getElementById('vnpayOption').classList.toggle('selected', method === 'vnpay');
+        document.getElementById('payCod').checked = method === 'cod';
+        document.getElementById('payVnpay').checked = method === 'vnpay';
+        const btn = document.getElementById('placeOrderBtn');
+        const btnText = document.getElementById('btnText');
+        if (method === 'vnpay') {
+            btnText.textContent = 'Tiếp tục thanh toán VNPay';
+        } else {
+            btnText.textContent = 'Đặt hàng ngay';
+        }
+    }
+
+    async function applyVoucher() {
+        const code = document.getElementById('voucherCode').value.trim();
+        if (!code) return;
+
+        const res = await fetch('/user/checkout/apply-voucher', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `code=${encodeURIComponent(code)}`
+        });
+        const data = await res.json();
+        const resultEl = document.getElementById('voucherResult');
+
+        if (data.success) {
+            resultEl.className = 'voucher-result success';
+            resultEl.innerHTML = `
+                <div><i class="fa-solid fa-tag me-2"></i>${data.message}</div>
+                <button type="button" class="btn btn-sm btn-outline-danger rounded-pill" onclick="removeVoucher()">Xóa</button>
+            `;
+            appliedVoucherId = data.voucherId;
+            discountAmt = parseFloat(data.discountAmount) || 0;
+            document.getElementById('appliedVoucherId').value = appliedVoucherId;
+            document.getElementById('discountAmount').value = discountAmt;
+            updateTotal();
+        } else {
+            resultEl.className = 'voucher-result error';
+            resultEl.innerHTML = `<i class="fa-solid fa-xmark-circle me-2"></i>${data.message}`;
+            resultEl.style.display = 'block';
+            discountAmt = 0;
+            appliedVoucherId = '';
+            updateTotal();
+        }
+    }
+
+    function removeVoucher() {
+        discountAmt = 0;
+        appliedVoucherId = '';
+        document.getElementById('voucherCode').value = '';
+        document.getElementById('voucherResult').className = 'voucher-result';
+        document.getElementById('voucherResult').style.display = 'none';
+        document.getElementById('appliedVoucherId').value = '';
+        updateTotal();
+    }
+
+    function updateTotal() {
+        const total = Math.max(0, baseSubtotal + baseShip - discountAmt);
+        document.getElementById('coTotal').textContent = formatMoney(total);
+        const discountRow = document.getElementById('discountRow');
+        if (discountAmt > 0) {
+            discountRow.style.display = 'flex';
+            document.getElementById('discountDisplay').textContent = '-' + formatMoney(discountAmt);
+        } else {
+            discountRow.style.display = 'none';
+        }
+    }
+
+    function placeOrder() {
+        const address = document.getElementById('finalAddress').value.trim();
+        if (!address) {
+            alert('Vui lòng chọn hoặc nhập địa chỉ nhận hàng!');
+            return;
+        }
+
+        const note = document.getElementById('orderNote').value;
+        const voucherId = appliedVoucherId || '';
+
+        const btn = document.getElementById('placeOrderBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i>Đang xử lý...';
+
+        if (selectedPayment === 'cod') {
+            document.getElementById('codAddress').value = address;
+            document.getElementById('codVoucher').value = voucherId;
+            document.getElementById('codNote').value = note;
+            document.getElementById('codForm').submit();
+        } else {
+            document.getElementById('vnAddress').value = address;
+            document.getElementById('vnVoucher').value = voucherId;
+            document.getElementById('vnNote').value = note;
+            document.getElementById('vnpayForm').submit();
+        }
+    }
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
+<script>
+    // ===== CASCADE ĐỊA CHỈ MỚI =====
+    const newProvince = document.getElementById('newProvince');
+    const newDistrict = document.getElementById('newDistrict');
+    const newWard     = document.getElementById('newWard');
+
+    // Load tỉnh khi trang mở
+    axios.get('https://provinces.open-api.vn/api/?depth=1').then(res => {
+        res.data.forEach(p => {
+            const opt = document.createElement('option');
+            opt.value = p.code;
+            opt.text  = p.name;
+            opt.dataset.name = p.name;
+            newProvince.appendChild(opt);
+        });
+    });
+
+    newProvince.addEventListener('change', function () {
+        // Reset quận/xã
+        newDistrict.innerHTML = '<option value="" disabled selected>-- Chọn Quận/Huyện --</option>';
+        newWard.innerHTML     = '<option value="" disabled selected>-- Chọn Phường/Xã --</option>';
+        newDistrict.disabled  = true;
+        newWard.disabled      = true;
+        updateNewAddress();
+
+        axios.get(`https://provinces.open-api.vn/api/p/${this.value}?depth=2`).then(res => {
+            res.data.districts.forEach(d => {
+                const opt = document.createElement('option');
+                opt.value = d.code;
+                opt.text  = d.name;
+                opt.dataset.name = d.name;
+                newDistrict.appendChild(opt);
+            });
+            newDistrict.disabled = false;
+        });
+    });
+
+    newDistrict.addEventListener('change', function () {
+        newWard.innerHTML    = '<option value="" disabled selected>-- Chọn Phường/Xã --</option>';
+        newWard.disabled     = true;
+        updateNewAddress();
+
+        axios.get(`https://provinces.open-api.vn/api/d/${this.value}?depth=2`).then(res => {
+            res.data.wards.forEach(w => {
+                const opt = document.createElement('option');
+                opt.value = w.code;
+                opt.text  = w.name;
+                opt.dataset.name = w.name;
+                newWard.appendChild(opt);
+            });
+            newWard.disabled = false;
+        });
+    });
+
+    newWard.addEventListener('change', updateNewAddress);
+    document.getElementById('newStreet').addEventListener('input', updateNewAddress);
+
+    // Ghép chuỗi địa chỉ đầy đủ → đưa vào finalAddress
+    function updateNewAddress() {
+        const province = newProvince.options[newProvince.selectedIndex]?.dataset.name || '';
+        const district = newDistrict.options[newDistrict.selectedIndex]?.dataset.name || '';
+        const ward     = newWard.options[newWard.selectedIndex]?.dataset.name || '';
+        const street   = document.getElementById('newStreet').value.trim();
+
+        if (province && district && ward && street) {
+            document.getElementById('finalAddress').value = `${street}, ${ward}, ${district}, ${province}`;
+        } else {
+            document.getElementById('finalAddress').value = '';
+        }
+    }
+</script>
 </body>
 </html>

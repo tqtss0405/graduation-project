@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Viết Đánh Giá - BEOBOOKS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        body { font-family: 'Quicksand', sans-serif; background: #f8f9fa; }
+
+        .review-wrapper {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 16px;
+        }
+
+        .review-card {
+            background: #fff;
+            border-radius: 20px;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.10);
+            padding: 40px 36px;
+            max-width: 560px;
+            width: 100%;
+        }
+
+        .review-card .brand {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #28a745;
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+        }
+
+        .product-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            background: #f8fffe;
+            border: 1.5px solid #d4edda;
+            border-radius: 14px;
+            padding: 14px 16px;
+            margin-bottom: 28px;
+        }
+
+        .product-info img {
+            width: 64px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.12);
+        }
+
+        .product-info .product-name {
+            font-weight: 700;
+            font-size: 1rem;
+            color: #1a1a2e;
+            margin-bottom: 2px;
+        }
+
+        .product-info .product-author {
+            color: #6c757d;
+            font-size: 0.85rem;
+        }
+
+        /* Star Rating Interactive */
+        .star-selector {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .star-selector input[type="radio"] { display: none; }
+
+        .star-selector label {
+            font-size: 2.4rem;
+            color: #dee2e6;
+            cursor: pointer;
+            transition: color 0.15s, transform 0.15s;
+            line-height: 1;
+        }
+
+        .star-selector label:hover,
+        .star-selector label:hover ~ label {
+            color: #ffc107;
+        }
+
+        /* Trick: reverse order for CSS-only hover */
+        .star-selector {
+            flex-direction: row-reverse;
+            justify-content: flex-end;
+        }
+
+        .star-selector input:checked ~ label,
+        .star-selector label:hover,
+        .star-selector label:hover ~ label {
+            color: #ffc107;
+        }
+
+        .star-selector input:checked ~ label {
+            color: #ffc107;
+        }
+
+        /* Fix: star hover using JS instead */
+        .star-display {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 10px;
+        }
+
+        .star-btn {
+            font-size: 2.6rem;
+            color: #dee2e6;
+            cursor: pointer;
+            transition: color 0.12s, transform 0.12s;
+            border: none;
+            background: none;
+            padding: 0;
+            line-height: 1;
+        }
+
+        .star-btn:hover, .star-btn.active {
+            color: #ffc107;
+            transform: scale(1.15);
+        }
+
+        .star-label {
+            font-size: 0.95rem;
+            color: #6c757d;
+            min-height: 22px;
+            transition: color 0.15s;
+        }
+
+        .star-label.excellent { color: #28a745; font-weight: 700; }
+        .star-label.good { color: #17a2b8; font-weight: 600; }
+        .star-label.ok { color: #ffc107; font-weight: 600; }
+        .star-label.bad { color: #fd7e14; font-weight: 600; }
+        .star-label.terrible { color: #dc3545; font-weight: 600; }
+
+        .content-textarea {
+            border-radius: 12px;
+            border: 1.5px solid #e0e0e0;
+            font-family: 'Quicksand', sans-serif;
+            font-size: 0.97rem;
+            padding: 14px 16px;
+            resize: none;
+            transition: border-color 0.2s;
+        }
+        .content-textarea:focus {
+            border-color: #28a745;
+            box-shadow: 0 0 0 3px rgba(40,167,69,0.12);
+        }
+
+        .char-count {
+            font-size: 0.8rem;
+            color: #adb5bd;
+            text-align: right;
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            border: none;
+            border-radius: 50px;
+            padding: 12px 32px;
+            font-weight: 700;
+            font-size: 1rem;
+            color: #fff;
+            transition: transform 0.15s, box-shadow 0.15s;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(40,167,69,0.35);
+            color: #fff;
+        }
+
+        .btn-cancel {
+            border-radius: 50px;
+            padding: 12px 24px;
+            font-weight: 600;
+            border-color: #dee2e6;
+            color: #6c757d;
+        }
+
+        .divider {
+            height: 1px;
+            background: linear-gradient(to right, transparent, #e9ecef, transparent);
+            margin: 24px 0;
+        }
+
+        .rating-required-msg {
+            color: #dc3545;
+            font-size: 0.85rem;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg sticky-top">
+    <div class="container">
+        <a class="navbar-brand" href="/home">BEO<span style="color: var(--secondary-color)">BOOKS</span></a>
+        <div class="d-flex align-items-center gap-3">
+            <a href="/user/order-details" class="btn btn-outline-secondary btn-sm rounded-pill">
+                <i class="fa-solid fa-arrow-left me-1"></i> Quay lại
+            </a>
+        </div>
+    </div>
+</nav>
+
+<div class="review-wrapper">
+    <div class="review-card">
+
+        <div class="text-center mb-4">
+            <div class="brand">BEOBOOKS</div>
+            <h4 class="fw-bold mb-1" style="color:#1a1a2e;">Viết đánh giá của bạn</h4>
+            <p class="text-muted small mb-0">Chia sẻ trải nghiệm để giúp những độc giả khác 📚</p>
+        </div>
+
+        <!-- Thông tin sản phẩm -->
+        <div class="product-info" th:if="${orderDetail != null}">
+            <img th:src="${orderDetail.product.image != null ? orderDetail.product.image : '/images/default-book.png'}"
+                 th:alt="${orderDetail.product.name}">
+            <div>
+                <div class="product-name" th:text="${orderDetail.product.name}">Tên sách</div>
+                <div class="product-author">
+                    <i class="fa-solid fa-pen-nib me-1" style="color:#28a745;"></i>
+                    <span th:text="${orderDetail.product.author}">Tác giả</span>
+                </div>
+                <div class="mt-1 small text-muted">
+                    Số lượng đã mua: <strong th:text="${orderDetail.quantity}">1</strong> cuốn
+                </div>
+            </div>
+        </div>
+
+        <form th:action="@{/user/review/submit}" method="post" id="reviewForm"
+              th:if="${orderDetail != null}">
+            <input type="hidden" name="orderDetailId" th:value="${orderDetail.id}">
+            <input type="hidden" name="rating" id="ratingInput" value="0">
+
+            <!-- Chọn sao -->
+            <div class="mb-3">
+                <label class="form-label fw-bold" style="color:#1a1a2e;">
+                    <i class="fa-solid fa-star text-warning me-1"></i> Đánh giá của bạn
+                </label>
+                <div class="star-display" id="starDisplay">
+                    <button type="button" class="star-btn" data-val="1" onclick="setRating(1)">
+                        <i class="fa-solid fa-star"></i>
+                    </button>
+                    <button type="button" class="star-btn" data-val="2" onclick="setRating(2)">
+                        <i class="fa-solid fa-star"></i>
+                    </button>
+                    <button type="button" class="star-btn" data-val="3" onclick="setRating(3)">
+                        <i class="fa-solid fa-star"></i>
+                    </button>
+                    <button type="button" class="star-btn" data-val="4" onclick="setRating(4)">
+                        <i class="fa-solid fa-star"></i>
+                    </button>
+                    <button type="button" class="star-btn" data-val="5" onclick="setRating(5)">
+                        <i class="fa-solid fa-star"></i>
+                    </button>
+                </div>
+                <div class="star-label" id="starLabel">Chưa chọn số sao</div>
+                <div class="rating-required-msg" id="ratingMsg">⚠️ Vui lòng chọn số sao!</div>
+            </div>
+
+            <div class="divider"></div>
+
+            <!-- Nội dung đánh giá -->
+            <div class="mb-4">
+                <label class="form-label fw-bold" style="color:#1a1a2e;">
+                    <i class="fa-solid fa-comment-dots text-success me-1"></i> Nội dung đánh giá
+                </label>
+                <textarea class="form-control content-textarea" id="contentArea" name="content"
+                          rows="5" maxlength="1000"
+                          placeholder="Chia sẻ cảm nhận của bạn về cuốn sách này... Sách có hay không? Giao hàng thế nào? Đóng gói có cẩn thận không?"
+                          oninput="updateCharCount()" required></textarea>
+                <div class="char-count"><span id="charCount">0</span> / 1000 ký tự</div>
+            </div>
+
+            <!-- Buttons -->
+            <div class="d-flex gap-3 justify-content-end">
+                <a href="/user/order-details" class="btn btn-outline-secondary btn-cancel">
+                    Hủy
+                </a>
+                <button type="submit" class="btn btn-submit" onclick="return validateForm()">
+                    <i class="fa-solid fa-paper-plane me-2"></i>Gửi đánh giá
+                </button>
+            </div>
+        </form>
+
+        <!-- Nếu không có orderDetail -->
+        <div th:if="${orderDetail == null}" class="text-center py-4">
+            <i class="fa-solid fa-exclamation-circle fa-3x text-warning mb-3"></i>
+            <p class="text-muted">Không tìm thấy thông tin đơn hàng. Vui lòng thử lại.</p>
+            <a href="/user/order-details" class="btn btn-success rounded-pill">Quay lại lịch sử đơn hàng</a>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    const labels = {
+        1: { text: '😞 Rất tệ', cls: 'terrible' },
+        2: { text: '😐 Không hài lòng', cls: 'bad' },
+        3: { text: '🙂 Bình thường', cls: 'ok' },
+        4: { text: '😊 Hài lòng', cls: 'good' },
+        5: { text: '🤩 Tuyệt vời!', cls: 'excellent' }
+    };
+
+    let currentRating = 0;
+
+    function setRating(val) {
+        currentRating = val;
+        document.getElementById('ratingInput').value = val;
+        const stars = document.querySelectorAll('.star-btn');
+        stars.forEach((s, i) => {
+            s.classList.toggle('active', i < val);
+        });
+        const lbl = document.getElementById('starLabel');
+        lbl.textContent = labels[val].text;
+        lbl.className = 'star-label ' + labels[val].cls;
+        document.getElementById('ratingMsg').style.display = 'none';
+    }
+
+    // Hover effect
+    document.querySelectorAll('.star-btn').forEach((btn, idx) => {
+        btn.addEventListener('mouseenter', () => {
+            document.querySelectorAll('.star-btn').forEach((s, i) => {
+                s.style.color = i <= idx ? '#ffc107' : '#dee2e6';
+            });
+        });
+        btn.addEventListener('mouseleave', () => {
+            document.querySelectorAll('.star-btn').forEach((s, i) => {
+                s.style.color = i < currentRating ? '#ffc107' : '#dee2e6';
+            });
+        });
+    });
+
+    function updateCharCount() {
+        const len = document.getElementById('contentArea').value.length;
+        document.getElementById('charCount').textContent = len;
+    }
+
+    function validateForm() {
+        if (currentRating === 0) {
+            document.getElementById('ratingMsg').style.display = 'block';
+            document.getElementById('starDisplay').scrollIntoView({ behavior: 'smooth' });
+            return false;
+        }
+        return true;
+    }
+</script>
+</body>
+</html>

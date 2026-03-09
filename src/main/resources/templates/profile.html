@@ -14,7 +14,7 @@
 <body>
     <nav class="navbar navbar-expand-lg sticky-top">
         <div class="container">
-            <a class="navbar-brand" href="#">BEO<span style="color: var(--secondary-color)">BOOKS</span></a>
+            <a class="navbar-brand" href="/home">BEO<span style="color: var(--secondary-color)">BOOKS</span></a>
 
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -43,15 +43,14 @@
                             <i class="fa-solid fa-magnifying-glass"></i>
                         </button>
                     </div>
-                    <div class="position-relative cursor-pointer">
-                        <a href="/user/cart">
-                            <i class="fa-solid fa-cart-shopping fs-5 text-secondary"></i>
-                            <span
-                                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-                                style="font-size: 10px">3</span>
-                        </a>
-
-                    </div>
+                    <div class="position-relative">
+                    <a href="/user/cart">
+                        <i class="fa-solid fa-cart-shopping fs-5 text-secondary"></i>
+                       <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+      style="font-size:10px"
+      th:text="${totalQuantity}">0</span>
+                    </a>
+                </div>
                     <div class="dropdown ms-3">
                         <a href="#"
                             class="d-flex align-items-center text-decoration-none text-secondary dropdown-toggle hidden-arrow"

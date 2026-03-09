@@ -31,6 +31,11 @@ public class Review {
 
     private LocalDateTime createAt;
 
+    @Column(columnDefinition = "TEXT")
+    private String adminReply;
+
+    private LocalDateTime adminReplyAt;
+    
     @ManyToOne
     @JoinColumn(name = "order_detail_id")
     private OrderDetail orderDetail;
