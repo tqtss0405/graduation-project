@@ -36,7 +36,6 @@ public class AdminPageController {
     public String reports(Model model) {
         return "admin-reports";
     }
-
     @GetMapping("/admin/vouchers")
     public String vouchers(Model model) {
         return "admin-vouchers";

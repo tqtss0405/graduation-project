@@ -13,7 +13,7 @@ import com.poly.graduation_project.model.User;
 import com.poly.graduation_project.repository.UserRepository;
 import com.poly.graduation_project.service.SessionService;
 
-@Controller 
+@Controller
 public class AuthController {
     @Autowired
     UserRepository userRepository;
@@ -98,7 +98,7 @@ public class AuthController {
         model.addAttribute("message", "Bạn đã đăng xuất khỏi hệ thống.");
         model.addAttribute("alertClass", "alert-info");
         return "login";
-    } 
+    }
 
     // 5. Trang từ chối truy cập (403)
     @GetMapping("/unauthorized")
@@ -106,10 +106,5 @@ public class AuthController {
         model.addAttribute("message", "Bạn không có quyền truy cập trang này!");
         model.addAttribute("alertClass", "alert-warning");
         return "login";
-    }
-
-    @GetMapping("/user/change-password")
-    public String showChangePasswordForm() {
-        return "change-password"; // Trả về file change-password.html
     }
 }

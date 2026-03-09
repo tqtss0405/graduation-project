@@ -3,6 +3,8 @@ package com.poly.graduation_project.model;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -36,7 +38,9 @@ public class Voucher {
     private LocalDateTime endAt;
 
     private Boolean active;
+
     
+    @JsonIgnore
     @OneToMany(mappedBy = "voucher")
     private List<Order> orders;
 
