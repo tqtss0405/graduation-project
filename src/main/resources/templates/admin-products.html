@@ -46,16 +46,7 @@
     <main class="main-content">
 
         <!-- ===== THÔNG BÁO LỖI / THÀNH CÔNG (1 dòng duy nhất) ===== -->
-        <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
-            <i class="fa-solid fa-circle-exclamation me-2"></i>
-            <span th:text="${errorMessage}"></span>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-        <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
-            <i class="fa-solid fa-circle-check me-2"></i>
-            <span th:text="${successMessage}"></span>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
+       
 
         <!-- Admin Header -->
         <div class="admin-header">
@@ -72,7 +63,16 @@
                 <i class="fa-solid fa-chevron-down ms-2"></i>
             </div>
         </div>
-
+ <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fa-solid fa-circle-exclamation me-2"></i>
+            <span th:text="${errorMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fa-solid fa-circle-check me-2"></i>
+            <span th:text="${successMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
         <!-- Filter & Search -->
         <div class="bg-white p-3 rounded-3 shadow-sm mb-4">
             <div class="row g-3 align-items-center">
