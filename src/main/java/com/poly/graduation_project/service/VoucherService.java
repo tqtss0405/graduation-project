@@ -21,11 +21,13 @@ import lombok.extern.slf4j.Slf4j;
 public class VoucherService {
 
     private final VoucherRepository voucherRepository;
-@Transactional(readOnly = true) 
+
+    @Transactional(readOnly = true)
     public List<Voucher> getAll() {
         return voucherRepository.findAll();
     }
-@Transactional(readOnly = true) 
+
+    @Transactional(readOnly = true)
     public Voucher getById(Integer id) {
         return voucherRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy voucher với id: " + id));
@@ -58,7 +60,6 @@ public class VoucherService {
         voucherRepository.delete(getById(id));
     }
 
-    // Chạy mỗi giờ — tự động disable voucher đã hết hạn
     @Scheduled(initialDelay = 1_000, fixedRate = 3_600_000)
     public void autoDisableExpiredVouchers() {
         int count = voucherRepository.disableExpiredVouchers(LocalDateTime.now());
@@ -80,10 +81,10 @@ public class VoucherService {
     }
 
     public Map<Integer, Long> getUsedCountMap(List<Voucher> vouchers) {
-    Map<Integer, Long> map = new java.util.HashMap<>();
-    for (Voucher v : vouchers) {
-        map.put(v.getId(), voucherRepository.countUsedByVoucherId(v.getId()));
+        Map<Integer, Long> map = new java.util.HashMap<>();
+        for (Voucher v : vouchers) {
+            map.put(v.getId(), voucherRepository.countUsedByVoucherId(v.getId()));
+        }
+        return map;
     }
-    return map;
-}
 }
