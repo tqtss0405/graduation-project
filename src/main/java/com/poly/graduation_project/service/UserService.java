@@ -1,7 +1,9 @@
 package com.poly.graduation_project.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.*;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -10,84 +12,66 @@ import com.poly.graduation_project.repository.UserRepository;
 
 import java.util.List;
 
-@Service
+@Service // ✅ Đã xóa @Lazy
 public class UserService implements UserDetailsService {
-
     @Autowired
-    private UserRepository userRepository;
+    UserRepository userRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    // ===== LOGIN SPRING SECURITY =====
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-
+        // Tìm kiếm user từ DB theo email
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() ->
-                        new UsernameNotFoundException("Không tìm thấy người dùng: " + email));
+                .orElseThrow(() -> new UsernameNotFoundException("Không tìm thấy người dùng: " + email));
 
+        // LẤY TRỰC TIẾP mật khẩu từ DB
+        String passwordFromDB = user.getPassword();
+
+        // Chuyển đổi quyền hạn (Role) từ boolean sang String
         String roleName = (user.getRole() != null && user.getRole()) ? "ADMIN" : "USER";
 
+        // Lấy trạng thái hoạt động của tài khoản (nếu null thì mặc định là true)
         boolean isActive = (user.getActive() != null) ? user.getActive() : true;
 
         return org.springframework.security.core.userdetails.User
                 .withUsername(user.getEmail())
-                .password(user.getPassword())
+                .password(passwordFromDB)
                 .roles(roleName)
-                .disabled(!isActive)
+                .disabled(!isActive) // QUAN TRỌNG: Báo cho Spring Security biết tài khoản có bị khóa không
                 .build();
     }
 
-    // ===== LƯU USER =====
     public void save(User user) {
+        // Mã hóa mật khẩu từ plain text sang BCrypt
+        String encodedPassword = passwordEncoder.encode(user.getPassword());
+        user.setPassword(encodedPassword);
 
-        // Nếu là user mới thì encode password
-        if (user.getId() == null) {
-            user.setPassword(passwordEncoder.encode(user.getPassword()));
-        }
-
-        // Nếu chưa có role thì mặc định là USER
+        // Thiết lập quyền mặc định là USER (false) nếu chưa có
         if (user.getRole() == null) {
             user.setRole(false);
-        }
-
-        // Nếu chưa có trạng thái thì mặc định active
-        if (user.getActive() == null) {
-            user.setActive(true);
         }
 
         userRepository.save(user);
     }
 
-    // ===== LẤY DANH SÁCH KHÁCH HÀNG =====
-    public List<User> getAllCustomers() {
+    // Thêm các phương thức này vào trong class UserService hiện tại
+    public java.util.List<User> getAllCustomers() {
+        // Giả sử role = false là khách hàng
         return userRepository.findByRole(false);
     }
 
-    // ===== KHÓA / MỞ KHÓA USER =====
+    // Hàm xử lý Khóa / Mở khóa tài khoản
     public void toggleUserStatus(Integer id) {
-
+        // Tìm user theo ID
         User user = userRepository.findById(id).orElse(null);
-
         if (user != null) {
-
+            // Đảo ngược trạng thái hiện tại (nếu null thì mặc định chuyển thành false - bị
+            // chặn)
             boolean currentStatus = (user.getActive() != null) ? user.getActive() : true;
-
             user.setActive(!currentStatus);
-
-            userRepository.save(user);
+            userRepository.save(user); // Lưu lại vào Database
         }
     }
-
-    // ===== LẤY USER THEO ID =====
-    public User getUserById(Integer id) {
-        return userRepository.findById(id).orElse(null);
-    }
-
-    // ===== XÓA USER =====
-    public void deleteUser(Integer id) {
-        userRepository.deleteById(id);
-    }
-
 }

@@ -17,18 +17,18 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(unique = true, nullable = false, length = 100)
+     @Column(unique = true, columnDefinition = "nvarchar(100)")
     private String email;
 
     @Column(nullable = false, length = 255)
     private String password;
 
-    @Column(length = 100)
+    @Column(columnDefinition = "nvarchar(100)")
     private String fullname;
 
     @Column(length = 10)
     private String phone;
-
+    @Column(columnDefinition = "nvarchar(250)")
     private String image;
 
     private Boolean gender;
