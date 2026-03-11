@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html lang="vi">
-
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,53 +9,19 @@
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/admin-style.css">
 </head>
-
 <body>
 
     <nav class="sidebar">
         <div class="sidebar-brand">BEO<span style="color:white">BOOKS</span></div>
         <ul class="nav flex-column mt-3">
-            <li class="nav-item">
-                <a href="/admin/dashboard" class="nav-link">
-                    <i class="fa-solid fa-gauge"></i> Tổng quan
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="/admin/products" class="nav-link active">
-                    <i class="fa-solid fa-book"></i> Quản lý sách
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="/admin/orders" class="nav-link">
-                    <i class="fa-solid fa-cart-shopping"></i> Đơn hàng
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="/admin/customers" class="nav-link">
-                    <i class="fa-solid fa-users"></i> Khách hàng
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="/admin/categories" class="nav-link">
-                    <i class="fa-solid fa-layer-group"></i> Danh mục
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="/admin/vouchers" class="nav-link">
-                    <i class="fa-solid fa-ticket"></i> Mã giảm giá
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="/admin/reviews" class="nav-link">
-                    <i class="fa-solid fa-star"></i> Đánh giá
-                </a>
-            </li>
-
-            <li class="nav-item mt-5">
-                <a href="/logout" class="nav-link text-danger">
-                    <i class="fa-solid fa-right-from-bracket"></i> Thoát
-                </a>
-            </li>
+            <li class="nav-item"><a href="/admin/dashboard" class="nav-link"><i class="fa-solid fa-gauge"></i> Tổng quan</a></li>
+            <li class="nav-item"><a href="/admin/products" class="nav-link"><i class="fa-solid fa-book"></i> Quản lý sách</a></li>
+            <li class="nav-item"><a href="/admin/orders" class="nav-link active"><i class="fa-solid fa-cart-shopping"></i> Đơn hàng</a></li>
+            <li class="nav-item"><a href="/admin/customers" class="nav-link"><i class="fa-solid fa-users"></i> Khách hàng</a></li>
+            <li class="nav-item"><a href="/admin/categories" class="nav-link"><i class="fa-solid fa-layer-group"></i> Danh mục</a></li>
+            <li class="nav-item"><a href="/admin/vouchers" class="nav-link"><i class="fa-solid fa-ticket"></i> Mã giảm giá</a></li>
+            <li class="nav-item"><a href="/admin/reviews" class="nav-link"><i class="fa-solid fa-star"></i> Đánh giá</a></li>
+            <li class="nav-item mt-5"><a href="/logout" class="nav-link text-danger"><i class="fa-solid fa-right-from-bracket"></i> Thoát</a></li>
         </ul>
     </nav>
 
@@ -66,27 +31,69 @@
                 <h4 class="fw-bold m-0">Quản lý Đơn Hàng</h4>
                 <small class="text-muted">Quản lý toàn bộ đơn hàng trong hệ thống</small>
             </div>
-            <div class="admin-profile" data-bs-toggle="modal" data-bs-target="#profileModal">
-                <img src="https://ui-avatars.com/api/?name=Admin&background=28a745&color=fff" alt="Admin"
-                    class="admin-avatar">
-                <div class="admin-info">
-                    <h6>Admin Nguyễn</h6>
-                    <small><i class="fa-solid fa-circle text-success" style="font-size: 0.5rem;"></i> Đang hoạt
-                        động</small>
-                </div>
-                <i class="fa-solid fa-chevron-down ms-2"></i>
-            </div>
         </div>
+
+        <!-- Thông báo -->
+        <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show">
+            <i class="fa-solid fa-circle-check me-2"></i>
+            <span th:text="${successMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show">
+            <i class="fa-solid fa-circle-exclamation me-2"></i>
+            <span th:text="${errorMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <!-- Tab lọc trạng thái -->
         <div class="bg-white p-2 rounded-3 shadow-sm mb-4">
             <ul class="nav nav-pills nav-fill">
-                <li class="nav-item"><a class="nav-link active bg-success" href="#">Tất cả</a></li>
-                <li class="nav-item"><a class="nav-link text-secondary" href="#">Chờ xác nhận <span
-                            class="badge bg-danger rounded-pill">3</span></a></li>
-                <li class="nav-item"><a class="nav-link text-secondary" href="#">Đang giao</a></li>
-                <li class="nav-item"><a class="nav-link text-secondary" href="#">Hoàn thành</a></li>
+                <li class="nav-item">
+                    <a th:href="@{/admin/orders}"
+                       th:class="${selectedStatus == null} ? 'nav-link active bg-success' : 'nav-link text-secondary'">
+                        Tất cả <span class="badge bg-secondary rounded-pill" th:text="${countAll}">0</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a th:href="@{/admin/orders(status=0)}"
+                       th:class="${selectedStatus == 0} ? 'nav-link active bg-warning text-dark' : 'nav-link text-secondary'">
+                        Chờ xác nhận <span class="badge bg-danger rounded-pill" th:text="${countPending}">0</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a th:href="@{/admin/orders(status=1)}"
+                       th:class="${selectedStatus == 1} ? 'nav-link active bg-primary' : 'nav-link text-secondary'">
+                        Đã xác nhận <span class="badge bg-secondary rounded-pill" th:text="${countConfirmed}">0</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a th:href="@{/admin/orders(status=2)}"
+                       th:class="${selectedStatus == 2} ? 'nav-link active bg-info' : 'nav-link text-secondary'">
+                        Đang giao <span class="badge bg-secondary rounded-pill" th:text="${countShipping}">0</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a th:href="@{/admin/orders(status=3)}"
+                       th:class="${selectedStatus == 3} ? 'nav-link active bg-info' : 'nav-link text-secondary'">
+                        Đã giao <span class="badge bg-secondary rounded-pill" th:text="${countDelivered}">0</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a th:href="@{/admin/orders(status=4)}"
+                       th:class="${selectedStatus == 4} ? 'nav-link active bg-success' : 'nav-link text-secondary'">
+                        Hoàn thành <span class="badge bg-secondary rounded-pill" th:text="${countCompleted}">0</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a th:href="@{/admin/orders(status=5)}"
+                       th:class="${selectedStatus == 5} ? 'nav-link active bg-danger' : 'nav-link text-secondary'">
+                        Đã hủy <span class="badge bg-secondary rounded-pill" th:text="${countCancelled}">0</span>
+                    </a>
+                </li>
             </ul>
         </div>
 
+        <!-- Bảng đơn hàng -->
         <div class="bg-white rounded-3 shadow-sm overflow-hidden">
             <table class="table table-hover mb-0 align-middle">
                 <thead class="table-light">
@@ -95,98 +102,241 @@
                         <th>Khách hàng</th>
                         <th>Ngày đặt</th>
                         <th>Tổng tiền</th>
+                        <th>Thanh toán</th>
                         <th>Trạng thái</th>
                         <th>Thao tác</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td class="fw-bold text-primary">#ORD-9981</td>
-                        <td>Nguyễn Văn A</td>
-                        <td>08/02/2026</td>
-                        <td class="fw-bold">148.000đ</td>
-                        <td><span class="badge bg-warning text-dark">Chờ duyệt</span></td>
-                        <td><button class="btn btn-sm btn-outline-primary"><i class="fa-solid fa-eye"></i> Xem</button>
+                    <tr th:each="order : ${orders}">
+                        <td class="fw-bold text-primary" th:text="'#' + ${order.id}"></td>
+                        <td>
+                            <div class="fw-semibold" th:text="${order.user != null ? order.user.fullname : 'N/A'}"></div>
+                            <small class="text-muted" th:text="${order.user != null ? order.user.email : ''}"></small>
+                        </td>
+                        <td th:text="${#temporals.format(order.createAt, 'dd/MM/yyyy HH:mm')}"></td>
+                        <td class="fw-bold text-danger"
+                            th:text="${#numbers.formatDecimal(order.total, 0, 'COMMA', 0, 'POINT')} + 'đ'"></td>
+                        <td>
+                            <span th:if="${order.paymentMethod == 0}" class="badge bg-secondary">COD</span>
+                            <span th:if="${order.paymentMethod == 1}" class="badge bg-info">VNPay</span>
+                            <br>
+                            <span th:if="${order.paymentStatus == 0}" class="badge bg-warning text-dark mt-1">Chưa TT</span>
+                            <span th:if="${order.paymentStatus == 1}" class="badge bg-success mt-1">Đã TT</span>
+                        </td>
+                        <td>
+                            <span th:switch="${order.status}">
+                                <span th:case="0" class="badge bg-warning text-dark">Chờ xác nhận</span>
+                                <span th:case="1" class="badge bg-primary">Đã xác nhận</span>
+                                <span th:case="2" class="badge bg-info">Đang giao</span>
+                                <span th:case="3" class="badge bg-info">Đã giao</span>
+                                <span th:case="4" class="badge bg-success">Hoàn thành</span>
+                                <span th:case="5" class="badge bg-danger">Đã hủy</span>
+                            </span>
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary"
+                                th:data-id="${order.id}"
+                                th:data-customer="${order.user != null ? order.user.fullname : 'N/A'}"
+                                th:data-email="${order.user != null ? order.user.email : ''}"
+                                th:data-phone="${order.user != null ? order.user.phone : ''}"
+                                th:data-address="${order.address}"
+                                th:data-total="${order.total}"
+                                th:data-method="${order.paymentMethod}"
+                                th:data-payment-status="${order.paymentStatus}"
+                                th:data-status="${order.status}"
+                                th:data-note="${order.note}"
+                                th:data-date="${#temporals.format(order.createAt, 'dd/MM/yyyy HH:mm')}"
+                                onclick="viewOrderFromBtn(this)">
+                                <i class="fa-solid fa-eye"></i> Xem
+                            </button>
                         </td>
                     </tr>
-                    <tr>
-                        <td class="fw-bold text-primary">#ORD-9982</td>
-                        <td>Trần Thị B</td>
-                        <td>07/02/2026</td>
-                        <td class="fw-bold">250.000đ</td>
-                        <td><span class="badge bg-info">Đang giao</span></td>
-                        <td><button class="btn btn-sm btn-outline-primary"><i class="fa-solid fa-eye"></i> Xem</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="fw-bold text-primary">#ORD-9980</td>
-                        <td>Lê Văn C</td>
-                        <td>05/02/2026</td>
-                        <td class="fw-bold">85.000đ</td>
-                        <td><span class="badge bg-success">Hoàn thành</span></td>
-                        <td><button class="btn btn-sm btn-outline-primary"><i class="fa-solid fa-eye"></i> Xem</button>
+                    <tr th:if="${#lists.isEmpty(orders)}">
+                        <td colspan="7" class="text-center text-muted py-5">
+                            <i class="fa-solid fa-inbox fa-2x mb-2 d-block"></i>Không có đơn hàng nào
                         </td>
                     </tr>
                 </tbody>
             </table>
         </div>
     </main>
-    <div class="modal fade" id="profileModal" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
+
+    <!-- MODAL XEM CHI TIẾT + CẬP NHẬT TRẠNG THÁI -->
+    <div class="modal fade" id="orderModal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content border-0 shadow-lg rounded-4">
                 <div class="modal-header bg-success text-white">
                     <h5 class="modal-title fw-bold">
-                        <i class="fa-solid fa-user-circle me-2"></i>Thông tin cá nhân
+                        <i class="fa-solid fa-receipt me-2"></i>Chi tiết đơn hàng <span id="modalOrderId"></span>
                     </h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body">
-                    <form id="profileForm">
-                        <div class="text-center mb-4">
-                            <div class="position-relative d-inline-block">
-                                <img src="https://ui-avatars.com/api/?name=Admin&background=28a745&color=fff&size=150" 
-                                     class="rounded-circle" width="150" height="150" id="profileAvatarPreview" alt="Avatar">
-                                <label for="avatarUpload" class="position-absolute bottom-0 end-0 btn btn-success btn-sm rounded-circle" 
-                                       style="width: 40px; height: 40px;">
-                                    <i class="fa-solid fa-camera"></i>
-                                </label>
-                                <input type="file" id="avatarUpload" class="d-none" accept="image/*" onchange="previewAvatar(event)">
+                <div class="modal-body p-4">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="bg-light rounded-3 p-3">
+                                <h6 class="fw-bold text-success mb-3"><i class="fa-solid fa-user me-2"></i>Thông tin khách hàng</h6>
+                                <table class="table table-borderless table-sm mb-0">
+                                    <tr><th width="100">Tên:</th><td id="modalCustomer"></td></tr>
+                                    <tr><th>Email:</th><td id="modalEmail"></td></tr>
+                                    <tr><th>SĐT:</th><td id="modalPhone"></td></tr>
+                                    <tr><th>Địa chỉ:</th><td id="modalAddress"></td></tr>
+                                    <tr><th>Ghi chú:</th><td id="modalNote"></td></tr>
+                                </table>
                             </div>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">Họ và tên</label>
-                            <input type="text" class="form-control" value="Admin Nguyễn" placeholder="Nhập họ tên">
+                        <div class="col-md-6">
+                            <div class="bg-light rounded-3 p-3">
+                                <h6 class="fw-bold text-success mb-3"><i class="fa-solid fa-money-bill me-2"></i>Thông tin đơn hàng</h6>
+                                <table class="table table-borderless table-sm mb-0">
+                                    <tr><th width="120">Ngày đặt:</th><td id="modalDate"></td></tr>
+                                    <tr><th>Tổng tiền:</th><td class="fw-bold text-danger" id="modalTotal"></td></tr>
+                                    <tr>
+                                        <th>Thanh toán:</th>
+                                        <td>
+                                            <span id="modalMethod"></span>
+                                            <span id="modalPaymentStatus" class="ms-1"></span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>Trạng thái:</th>
+                                        <td><span id="modalStatus"></span></td>
+                                    </tr>
+                                </table>
+                            </div>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">Email</label>
-                            <input type="email" class="form-control" value="admin@beobooks.com" readonly>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">Số điện thoại</label>
-                            <input type="tel" class="form-control" value="0123456789" placeholder="Nhập số điện thoại">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">Giới tính</label>
-                            <select class="form-select">
-                                <option value="male">Nam</option>
-                                <option value="female">Nữ</option>
-                                <option value="other">Khác</option>
-                            </select>
-                        </div>
-                    </form>
+                    </div>
+
+                    <!-- Cập nhật trạng thái -->
+                    <div class="mt-4 p-3 border rounded-3" id="updateStatusSection">
+                        <h6 class="fw-bold mb-3"><i class="fa-solid fa-arrows-rotate me-2 text-primary"></i>Cập nhật trạng thái</h6>
+                        <form th:action="@{/admin/orders/update-status/__${0}__}" method="post" id="updateStatusForm">
+                            <input type="hidden" name="filterStatus" id="filterStatusInput">
+                            <div class="d-flex gap-2 flex-wrap align-items-center">
+                                <select name="status" id="statusSelect" class="form-select w-auto">
+                                    <option value="0">Chờ xác nhận</option>
+                                    <option value="1">Đã xác nhận</option>
+                                    <option value="2">Đang giao</option>
+                                    <option value="3">Đã giao</option>
+                                    <option value="4">Hoàn thành</option>
+                                    <option value="5">Đã hủy</option>
+                                </select>
+                                <button type="submit" id="btnSaveStatus" class="btn btn-success">
+                                    <i class="fa-solid fa-save me-1"></i>Lưu trạng thái
+                                </button>
+                            </div>
+                        </form>
+                        <!-- Ghi chú trạng thái kết thúc -->
+                        <small id="noteCompleted" class="text-muted mt-2 d-none d-block">
+                            <i class="fa-solid fa-lock me-1 text-success"></i>
+                            Đơn hàng đã hoàn thành — khách hàng đã xác nhận nhận hàng.
+                        </small>
+                        <small id="noteCancelled" class="text-muted mt-2 d-none d-block">
+                            <i class="fa-solid fa-lock me-1 text-danger"></i>
+                            Đơn hàng đã bị hủy — không thể thay đổi trạng thái.
+                        </small>
+                    </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="submit" form="profileForm" class="btn btn-success">
-                        <i class="fa-solid fa-save me-2"></i>Lưu thay đổi
-                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
                 </div>
             </div>
         </div>
     </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/js/sidebar.js"></script>
-    <script src="/js/admin-avt.js"></script>
-</body>
 
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const currentFilterStatus = urlParams.get('status') || '';
+
+        // Quy tắc: chỉ cho phép chuyển xuôi chiều
+        // Từ status hiện tại, các status được phép chọn (không kể status hiện tại)
+        const allowedNext = {
+            '0': ['1', '5'],        // Chờ xác nhận → Đã xác nhận | Hủy
+            '1': ['2', '5'],        // Đã xác nhận  → Đang giao   | Hủy
+            '2': ['3'],             // Đang giao     → Đã giao     (không hủy được)
+            '3': [],                // Đã giao       → (chờ user xác nhận, admin không làm gì)
+            '4': [],                // Hoàn thành    → không đổi được
+            '5': [],                // Đã hủy        → không đổi được
+        };
+
+        function updateStatusOptions(currentStatus) {
+            const select  = document.getElementById('statusSelect');
+            const btnSave = document.getElementById('btnSaveStatus');
+            const allowed = allowedNext[currentStatus] || [];
+            const isFinal = currentStatus === '4' || currentStatus === '5';
+
+            // Disable/enable từng option
+            Array.from(select.options).forEach(opt => {
+                const val = opt.value;
+                if (val === '4') {
+                    // Hoàn thành luôn disabled (chỉ user xác nhận)
+                    opt.disabled = true;
+                    opt.style.color = '#aaa';
+                } else if (val === currentStatus) {
+                    // Option hiện tại: cho chọn nhưng không có tác dụng
+                    opt.disabled = false;
+                    opt.style.color = '';
+                } else if (!allowed.includes(val)) {
+                    opt.disabled = true;
+                    opt.style.color = '#ccc';
+                } else {
+                    opt.disabled = false;
+                    opt.style.color = '';
+                }
+            });
+
+            // Disable toàn bộ select + nút nếu đơn đã kết thúc
+            select.disabled  = isFinal;
+            btnSave.disabled = isFinal;
+
+            // Ghi chú
+            document.getElementById('noteCompleted').classList.toggle('d-none', currentStatus !== '4');
+            document.getElementById('noteCancelled').classList.toggle('d-none', currentStatus !== '5');
+        }
+
+        function viewOrderFromBtn(btn) {
+            const d = btn.dataset;
+
+            document.getElementById('modalOrderId').textContent = '#' + d.id;
+            document.getElementById('modalCustomer').textContent = d.customer || 'N/A';
+            document.getElementById('modalEmail').textContent    = d.email || 'N/A';
+            document.getElementById('modalPhone').textContent    = d.phone || 'N/A';
+            document.getElementById('modalAddress').textContent  = d.address || 'N/A';
+            document.getElementById('modalNote').textContent     = d.note || 'Không có';
+            document.getElementById('modalDate').textContent     = d.date || '';
+            document.getElementById('modalTotal').textContent    = Number(d.total).toLocaleString('vi-VN') + 'đ';
+
+            document.getElementById('modalMethod').innerHTML =
+                d.method == '0' ? '<span class="badge bg-secondary">COD</span>'
+                                : '<span class="badge bg-info">VNPay</span>';
+
+            document.getElementById('modalPaymentStatus').innerHTML =
+                d.paymentStatus == '1' ? '<span class="badge bg-success">Đã TT</span>'
+                                       : '<span class="badge bg-warning text-dark">Chưa TT</span>';
+
+            const statusLabels = {
+                '0': '<span class="badge bg-warning text-dark">Chờ xác nhận</span>',
+                '1': '<span class="badge bg-primary">Đã xác nhận</span>',
+                '2': '<span class="badge bg-info">Đang giao</span>',
+                '3': '<span class="badge bg-info">Đã giao</span>',
+                '4': '<span class="badge bg-success">Hoàn thành</span>',
+                '5': '<span class="badge bg-danger">Đã hủy</span>'
+            };
+            document.getElementById('modalStatus').innerHTML = statusLabels[d.status] || '';
+
+            document.getElementById('updateStatusForm').action = '/admin/orders/update-status/' + d.id;
+            document.getElementById('filterStatusInput').value = currentFilterStatus;
+
+            // Set select về status hiện tại rồi cập nhật option
+            document.getElementById('statusSelect').value = d.status;
+            updateStatusOptions(d.status);
+
+            new bootstrap.Modal(document.getElementById('orderModal')).show();
+        }
+    </script>
+</body>
 </html>

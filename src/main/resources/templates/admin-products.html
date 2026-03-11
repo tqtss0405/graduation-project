@@ -141,7 +141,7 @@
                         </td>
                         <td>
                             <span class="badge" th:if="${p.category != null}"
-                                  th:style="'background-color:' + ${p.category.color}"
+                                  th:style="'background:' + ${p.category.color}"
                                   th:text="${p.category.name}">Danh mục</span>
                             <span class="badge bg-secondary" th:unless="${p.category != null}">N/A</span>
                         </td>
@@ -270,7 +270,7 @@
                                     </div>
                                     <div class="col-md-6 d-flex align-items-end">
                                         <div class="form-check form-switch p-3 bg-light rounded border w-100">
-                                            <input class="form-check-input ms-0 me-2" type="checkbox" name="active" id="prodActive" checked>
+                                            <input class="form-check-input ms-0 me-2" type="checkbox" name="active" id="prodActive" value="true">
                                             <label class="form-check-label fw-semibold" for="prodActive">Hiển thị bán trên web</label>
                                         </div>
                                     </div>

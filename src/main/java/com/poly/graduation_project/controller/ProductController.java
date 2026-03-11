@@ -110,7 +110,7 @@ public class ProductController {
             product.setStockQuantity(dto.getStockQuantity());
             product.setDescription(dto.getDescription());
             product.setCategory(categoryRepo.findById(dto.getCategoryId()).orElse(null));
-            product.setActive(dto.getActive() != null ? dto.getActive() : true);
+            product.setActive(Boolean.TRUE.equals(dto.getActive()));
 
             // Xử lý ảnh bìa chính (nếu có chọn ảnh mới thì thay thế, không thì giữ cũ)
             if (dto.getMainImage() != null && !dto.getMainImage().isEmpty()) {

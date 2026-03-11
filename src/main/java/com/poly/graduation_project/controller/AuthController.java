@@ -13,6 +13,8 @@ import com.poly.graduation_project.model.User;
 import com.poly.graduation_project.repository.UserRepository;
 import com.poly.graduation_project.service.SessionService;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 @Controller
 public class AuthController {
     @Autowired
@@ -86,11 +88,19 @@ public class AuthController {
 
     // 3. Xử lý khi đăng nhập thất bại
     @GetMapping("/login/failure")
-    public String loginFailure(Model model) {
+public String loginFailure(HttpServletRequest request, Model model) {
+    Exception exception = (Exception) request.getSession()
+            .getAttribute("SPRING_SECURITY_LAST_EXCEPTION");
+    
+    if (exception instanceof org.springframework.security.authentication.DisabledException) {
+        model.addAttribute("message", "Tài khoản của bạn đã bị khóa! Vui lòng liên hệ quản trị viên.");
+        model.addAttribute("alertClass", "alert-warning");
+    } else {
         model.addAttribute("message", "Sai tên đăng nhập hoặc mật khẩu!");
         model.addAttribute("alertClass", "alert-danger");
-        return "login";
     }
+    return "login";
+}
 
     // 4. Xử lý sau khi đăng xuất (logoutSuccessUrl)
     @GetMapping("/login/exit")

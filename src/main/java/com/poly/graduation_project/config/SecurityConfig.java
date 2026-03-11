@@ -59,12 +59,11 @@ public class SecurityConfig {
                                                 .userService(customOAuth2UserService) // Sử dụng Service vừa tạo
                                 )
                                 .successHandler((request, response, authentication) -> {
-                                        // LOGIC LƯU DATABASE & SESSION TẠI ĐÂY
                                         DefaultOidcUser oidcUser = (DefaultOidcUser) authentication.getPrincipal();
                                         String email = oidcUser.getEmail();
                                         String fullname = oidcUser.getFullName();
                                         String avatarUrl = oidcUser.getPicture();
-                                        // 1. Tìm hoặc Tạo mới User trong DB
+
                                         com.poly.graduation_project.model.User user = userRepository.findByEmail(email)
                                                         .orElseGet(() -> {
                                                                 com.poly.graduation_project.model.User newUser = new com.poly.graduation_project.model.User();
@@ -74,24 +73,27 @@ public class SecurityConfig {
                                                                 newUser.setPassword(
                                                                                 passwordEncoder.encode(randomPassword));
                                                                 newUser.setImage(avatarUrl);
-                                                                newUser.setRole(false); // User
+                                                                newUser.setRole(false);
                                                                 newUser.setActive(true);
                                                                 return userRepository.save(newUser);
                                                         });
 
-                                        // 2. Lưu vào Session
+                                        // ✅ THÊM: Kiểm tra tài khoản có bị chặn không
+                                        if (Boolean.FALSE.equals(user.getActive())) {
+                                                SecurityContextHolder.clearContext();
+                                                request.getSession().invalidate();
+                                                response.sendRedirect("/login/form?blocked=true");
+                                                return;
+                                        }
+
                                         HttpSession session = request.getSession();
                                         session.setAttribute("currentUser", user);
                                         String role = user.getRole() ? "ROLE_ADMIN" : "ROLE_USER";
                                         List<SimpleGrantedAuthority> authorities = List
                                                         .of(new SimpleGrantedAuthority(role));
-                                        Authentication newAuth = new UsernamePasswordAuthenticationToken(
-                                                        user, // Principal (Lưu object User để dùng sau này nếu cần)
-                                                        null, // Credentials (không cần vì đã login qua Google)
-                                                        authorities // Danh sách quyền
-                                        );
+                                        Authentication newAuth = new UsernamePasswordAuthenticationToken(user, null,
+                                                        authorities);
                                         SecurityContextHolder.getContext().setAuthentication(newAuth);
-                                        // 3. Điều hướng về trang chủ
                                         response.sendRedirect("/home");
                                 }));
                 // 4. Cấu hình đăng nhập thường (Form Login)

@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-
 import com.poly.graduation_project.model.CartDetail;
 import com.poly.graduation_project.model.Product;
 import com.poly.graduation_project.model.User;
@@ -25,8 +24,10 @@ import jakarta.servlet.http.HttpSession;
 @Controller
 public class CartController {
 
-    @Autowired private CartDetailRepository cartDetailRepository;
-    @Autowired private ProductRepository productRepository;
+    @Autowired
+    private CartDetailRepository cartDetailRepository;
+    @Autowired
+    private ProductRepository productRepository;
 
     // ============================================================
     // GET: Trang giỏ hàng
@@ -34,22 +35,28 @@ public class CartController {
     @GetMapping("/user/cart")
     public String cartPage(org.springframework.ui.Model model, HttpSession session) {
         User currentUser = (User) session.getAttribute("currentUser");
-
         List<CartDetail> cartItems = cartDetailRepository.findByUser(currentUser);
-        model.addAttribute("cartItems", cartItems);
-         int totalQuantity = cartItems.stream()
-            .mapToInt(CartDetail::getQuantity)
-            .sum();
-        // Tính tổng tiền hàng
+
+        // Kiểm tra có sản phẩm nào còn active không
+        boolean hasActiveItems = cartItems.stream()
+                .anyMatch(ci -> Boolean.TRUE.equals(ci.getProduct().getActive()));
+
         java.math.BigDecimal subtotal = cartItems.stream()
+                .filter(ci -> Boolean.TRUE.equals(ci.getProduct().getActive()))
                 .map(ci -> ci.getProduct().getPrice()
                         .multiply(java.math.BigDecimal.valueOf(ci.getQuantity())))
                 .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add);
 
-        java.math.BigDecimal shippingFee = subtotal.compareTo(new java.math.BigDecimal("150000")) >= 0
-                ? java.math.BigDecimal.ZERO
-                : new java.math.BigDecimal("30000");
+        java.math.BigDecimal shippingFee = (subtotal.compareTo(java.math.BigDecimal.ZERO) == 0)
+                ? java.math.BigDecimal.ZERO // ✅ Không có sp active → không tính ship
+                : subtotal.compareTo(new java.math.BigDecimal("150000")) >= 0
+                        ? java.math.BigDecimal.ZERO
+                        : new java.math.BigDecimal("30000");
 
+        int totalQuantity = cartItems.stream().mapToInt(CartDetail::getQuantity).sum();
+
+        model.addAttribute("cartItems", cartItems);
+        model.addAttribute("hasActiveItems", hasActiveItems); // ✅ Truyền sang template
         model.addAttribute("subtotal", subtotal);
         model.addAttribute("shippingFee", shippingFee);
         model.addAttribute("total", subtotal.add(shippingFee));
@@ -143,8 +150,10 @@ public class CartController {
         }
 
         int stock = cartDetail.getProduct().getStockQuantity();
-        if (quantity < 1) quantity = 1;
-        if (quantity > stock) quantity = stock;
+        if (quantity < 1)
+            quantity = 1;
+        if (quantity > stock)
+            quantity = stock;
 
         cartDetail.setQuantity(quantity);
         cartDetailRepository.save(cartDetail);
@@ -160,7 +169,8 @@ public class CartController {
                         .multiply(java.math.BigDecimal.valueOf(ci.getQuantity())))
                 .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add);
         java.math.BigDecimal shippingFee = subtotal.compareTo(new java.math.BigDecimal("150000")) >= 0
-                ? java.math.BigDecimal.ZERO : new java.math.BigDecimal("30000");
+                ? java.math.BigDecimal.ZERO
+                : new java.math.BigDecimal("30000");
 
         int totalQty = cartDetailRepository.countTotalQuantityByUser(currentUser);
 
@@ -201,7 +211,8 @@ public class CartController {
                         .multiply(java.math.BigDecimal.valueOf(ci.getQuantity())))
                 .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add);
         java.math.BigDecimal shippingFee = subtotal.compareTo(new java.math.BigDecimal("150000")) >= 0
-                ? java.math.BigDecimal.ZERO : new java.math.BigDecimal("30000");
+                ? java.math.BigDecimal.ZERO
+                : new java.math.BigDecimal("30000");
 
         int totalQty = cartDetailRepository.countTotalQuantityByUser(currentUser);
 

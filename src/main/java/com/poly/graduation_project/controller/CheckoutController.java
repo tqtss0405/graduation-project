@@ -36,7 +36,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.transaction.Transactional;
 
-@Controller 
+@Controller
 public class CheckoutController {
 
     private static final BigDecimal FREE_SHIP_THRESHOLD = new BigDecimal("150000");
@@ -57,20 +57,17 @@ public class CheckoutController {
     @GetMapping("/user/checkout")
     public String checkoutPage(Model model, HttpSession session) {
         User currentUser = (User) session.getAttribute("currentUser");
-        
 
         List<CartDetail> cartItems = cartDetailRepository.findByUser(currentUser);
         if (cartItems.isEmpty()) return "redirect:/user/cart";
-        int totalQuantity = cartItems.stream()
-        .mapToInt(CartDetail::getQuantity)
-        .sum();
-model.addAttribute("totalQuantity", totalQuantity);
-        // Tính tổng
+
+        int totalQuantity = cartItems.stream().mapToInt(CartDetail::getQuantity).sum();
+        model.addAttribute("totalQuantity", totalQuantity);
+
         BigDecimal subtotal = calcSubtotal(cartItems);
         BigDecimal shippingFee = subtotal.compareTo(FREE_SHIP_THRESHOLD) >= 0
                 ? BigDecimal.ZERO : SHIP_FEE;
 
-        // Địa chỉ đã có của user
         List<Address> addresses = addressRepository.findByUser(currentUser);
         Address defaultAddress = addressRepository
                 .findByUserAndIsDefaultTrue(currentUser).orElse(null);
@@ -87,6 +84,7 @@ model.addAttribute("totalQuantity", totalQuantity);
 
     // ============================================================
     // POST (AJAX): Apply voucher
+    // ✅ Discount tính trên tổng hóa đơn (subtotal + shippingFee)
     // ============================================================
     @PostMapping("/user/checkout/apply-voucher")
     @ResponseBody
@@ -104,6 +102,10 @@ model.addAttribute("totalQuantity", totalQuantity);
 
         List<CartDetail> cartItems = cartDetailRepository.findByUser(currentUser);
         BigDecimal subtotal = calcSubtotal(cartItems);
+        BigDecimal shippingFee = subtotal.compareTo(FREE_SHIP_THRESHOLD) >= 0
+                ? BigDecimal.ZERO : SHIP_FEE;
+        // ✅ Tổng trước giảm = subtotal + ship
+        BigDecimal totalBeforeDiscount = subtotal.add(shippingFee);
 
         Voucher voucher = voucherRepository.findByCode(code.trim().toUpperCase()).orElse(null);
         if (voucher == null) {
@@ -133,14 +135,20 @@ model.addAttribute("totalQuantity", totalQuantity);
             return ResponseEntity.ok(res);
         }
 
-        // Tính tiền giảm
-        BigDecimal discount = subtotal.multiply(BigDecimal.valueOf(voucher.getDiscount()))
+        // ✅ Giảm % trên tổng hóa đơn (bao gồm ship)
+        BigDecimal discount = totalBeforeDiscount
+                .multiply(BigDecimal.valueOf(voucher.getDiscount()))
                 .divide(BigDecimal.valueOf(100));
+
+        BigDecimal finalTotal = totalBeforeDiscount.subtract(discount);
+        if (finalTotal.compareTo(BigDecimal.ZERO) < 0) finalTotal = BigDecimal.ZERO;
 
         res.put("success", true);
         res.put("message", "Áp dụng mã \"" + voucher.getCode() + "\" thành công! Giảm " + voucher.getDiscount() + "%");
         res.put("discountPercent", voucher.getDiscount());
-        res.put("discountAmount", discount);
+        res.put("discountAmount", discount);       // số tiền giảm hiển thị trên UI
+        res.put("total", finalTotal);              // tổng cuối cùng hiển thị trên UI
+        res.put("shippingFee", shippingFee);
         res.put("voucherId", voucher.getId());
         res.put("voucherName", voucher.getName());
         return ResponseEntity.ok(res);
@@ -159,12 +167,12 @@ model.addAttribute("totalQuantity", totalQuantity);
             RedirectAttributes ra) {
 
         User currentUser = (User) session.getAttribute("currentUser");
-       
+
         List<CartDetail> cartItems = cartDetailRepository.findByUser(currentUser);
         if (cartItems.isEmpty()) return "redirect:/user/cart";
 
         try {
-            Order order = buildOrder(currentUser, cartItems, addressText, voucherId, note, 0); // 0 = COD
+            Order order = buildOrder(currentUser, cartItems, addressText, voucherId, note, 0);
             order.setPaymentStatus(0); // Chưa thanh toán (COD)
             order.setStatus(0);        // Chờ xác nhận
             Order savedOrder = orderRepository.save(order);
@@ -194,32 +202,33 @@ model.addAttribute("totalQuantity", totalQuantity);
             HttpServletRequest request) {
 
         User currentUser = (User) session.getAttribute("currentUser");
- 
 
         List<CartDetail> cartItems = cartDetailRepository.findByUser(currentUser);
         if (cartItems.isEmpty()) return "redirect:/user/cart";
 
-        // Lưu thông tin checkout vào session để dùng sau khi VNPay callback
         session.setAttribute("vnpay_addressText", addressText);
         session.setAttribute("vnpay_voucherId", voucherId);
         session.setAttribute("vnpay_note", note);
 
-        // Tính tổng tiền
         BigDecimal subtotal = calcSubtotal(cartItems);
         BigDecimal shippingFee = subtotal.compareTo(FREE_SHIP_THRESHOLD) >= 0
                 ? BigDecimal.ZERO : SHIP_FEE;
+        // ✅ Tổng trước giảm = subtotal + ship
+        BigDecimal totalBeforeDiscount = subtotal.add(shippingFee);
+
         BigDecimal discount = BigDecimal.ZERO;
         if (voucherId != null) {
             Voucher v = voucherRepository.findById(voucherId).orElse(null);
             if (v != null) {
-                discount = subtotal.multiply(BigDecimal.valueOf(v.getDiscount()))
+                // ✅ Giảm trên tổng hóa đơn
+                discount = totalBeforeDiscount
+                        .multiply(BigDecimal.valueOf(v.getDiscount()))
                         .divide(BigDecimal.valueOf(100));
             }
         }
-        BigDecimal total = subtotal.add(shippingFee).subtract(discount);
+        BigDecimal total = totalBeforeDiscount.subtract(discount);
         if (total.compareTo(BigDecimal.ZERO) < 0) total = BigDecimal.ZERO;
 
-        // Tạo mã giao dịch tạm (timestamp)
         String txnRef = String.valueOf(System.currentTimeMillis());
         session.setAttribute("vnpay_txnRef", txnRef);
 
@@ -240,7 +249,6 @@ model.addAttribute("totalQuantity", totalQuantity);
             HttpSession session,
             RedirectAttributes ra) {
 
-        // Xác minh chữ ký
         if (!vnPayUtil.verifySignature(params)) {
             ra.addFlashAttribute("paymentError", "Chữ ký không hợp lệ!");
             return "redirect:/user/checkout";
@@ -252,18 +260,16 @@ model.addAttribute("totalQuantity", totalQuantity);
             return "redirect:/user/checkout";
         }
 
-        // Thanh toán thành công → tạo đơn hàng
         User currentUser = (User) session.getAttribute("currentUser");
-
         String addressText = (String) session.getAttribute("vnpay_addressText");
-        Integer voucherId = (Integer) session.getAttribute("vnpay_voucherId");
-        String note = (String) session.getAttribute("vnpay_note");
+        Integer voucherId  = (Integer) session.getAttribute("vnpay_voucherId");
+        String note        = (String) session.getAttribute("vnpay_note");
 
         List<CartDetail> cartItems = cartDetailRepository.findByUser(currentUser);
         if (cartItems.isEmpty()) return "redirect:/home";
 
         try {
-            Order order = buildOrder(currentUser, cartItems, addressText, voucherId, note, 1); // 1 = VNPay
+            Order order = buildOrder(currentUser, cartItems, addressText, voucherId, note, 1);
             order.setPaymentStatus(1); // Đã thanh toán
             order.setStatus(1);        // Đã xác nhận (vì đã thanh toán)
             Order savedOrder = orderRepository.save(order);
@@ -272,7 +278,6 @@ model.addAttribute("totalQuantity", totalQuantity);
             clearCartAndStock(currentUser, cartItems);
             sendConfirmationEmail(currentUser, savedOrder);
 
-            // Xóa session vnpay
             session.removeAttribute("vnpay_addressText");
             session.removeAttribute("vnpay_voucherId");
             session.removeAttribute("vnpay_note");
@@ -303,6 +308,7 @@ model.addAttribute("totalQuantity", totalQuantity);
 
     // ============================================================
     // Helper: Xây dựng Order entity
+    // ✅ Discount tính trên tổng hóa đơn (subtotal + shippingFee)
     // ============================================================
     private Order buildOrder(User user, List<CartDetail> cartItems,
                               String addressText, Integer voucherId,
@@ -311,14 +317,18 @@ model.addAttribute("totalQuantity", totalQuantity);
         BigDecimal shippingFee = subtotal.compareTo(FREE_SHIP_THRESHOLD) >= 0
                 ? BigDecimal.ZERO : SHIP_FEE;
 
+        // ✅ Tổng trước giảm = subtotal + ship
+        BigDecimal totalBeforeDiscount = subtotal.add(shippingFee);
+
         BigDecimal discount = BigDecimal.ZERO;
         Voucher voucher = null;
         if (voucherId != null) {
             voucher = voucherRepository.findById(voucherId).orElse(null);
             if (voucher != null) {
-                discount = subtotal.multiply(BigDecimal.valueOf(voucher.getDiscount()))
+                // ✅ Giảm % trên tổng hóa đơn
+                discount = totalBeforeDiscount
+                        .multiply(BigDecimal.valueOf(voucher.getDiscount()))
                         .divide(BigDecimal.valueOf(100));
-                // Trừ số lượng voucher
                 if (voucher.getQuantity() != null && voucher.getQuantity() > 0) {
                     voucher.setQuantity(voucher.getQuantity() - 1);
                     voucherRepository.save(voucher);
@@ -326,7 +336,7 @@ model.addAttribute("totalQuantity", totalQuantity);
             }
         }
 
-        BigDecimal total = subtotal.add(shippingFee).subtract(discount);
+        BigDecimal total = totalBeforeDiscount.subtract(discount);
         if (total.compareTo(BigDecimal.ZERO) < 0) total = BigDecimal.ZERO;
 
         Order order = new Order();
@@ -342,7 +352,7 @@ model.addAttribute("totalQuantity", totalQuantity);
         return order;
     }
 
-    // Helper: Lưu OrderDetail + trừ kho
+    // Helper: Lưu OrderDetail
     private void saveOrderDetails(Order order, List<CartDetail> cartItems) {
         for (CartDetail ci : cartItems) {
             OrderDetail od = new OrderDetail();
@@ -353,6 +363,7 @@ model.addAttribute("totalQuantity", totalQuantity);
             orderDetailRepository.save(od);
         }
     }
+
     @Transactional
     // Helper: Trừ tồn kho và xóa giỏ hàng
     private void clearCartAndStock(User user, List<CartDetail> cartItems) {
@@ -365,7 +376,7 @@ model.addAttribute("totalQuantity", totalQuantity);
         cartDetailRepository.deleteByUser(user);
     }
 
-    // Helper: Tính subtotal
+    // Helper: Tính subtotal (chưa tính ship)
     private BigDecimal calcSubtotal(List<CartDetail> cartItems) {
         return cartItems.stream()
                 .map(ci -> ci.getProduct().getPrice()
@@ -391,7 +402,6 @@ model.addAttribute("totalQuantity", totalQuantity);
             );
             mailSender.send(msg);
         } catch (Exception e) {
-            // Không để lỗi email ảnh hưởng đến flow đặt hàng
             System.err.println("Lỗi gửi email xác nhận: " + e.getMessage());
         }
     }

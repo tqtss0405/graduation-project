@@ -442,17 +442,27 @@
                                         <div>
                                             <div class="product-name" th:text="${item.product.name}">Tên sách</div>
                                             <div class="product-author" th:text="${item.product.author}">Tác giả</div>
-                                            <div class="product-stock">Còn <span
-                                                    th:text="${item.product.stockQuantity}">0</span> cuốn</div>
+                                            <!-- ✅ THÊM: Hiển thị trạng thái sản phẩm -->
+                                            <div th:if="${!item.product.active}">
+                                                <span class="badge bg-danger mt-1">Sản phẩm đã ngừng bán</span>
+                                            </div>
+                                            <div class="product-stock" th:if="${item.product.active}">
+                                                Còn <span th:text="${item.product.stockQuantity}">0</span> cuốn
+                                            </div>
                                         </div>
                                     </div>
                                 </td>
                                 <td class="text-center">
-                                    <span class="price-text"
+                                    <!-- ✅ Nếu disabled thì gạch giá -->
+                                    <span th:if="${!item.product.active}"
+                                        class="text-muted text-decoration-line-through"
+                                        th:text="${#numbers.formatDecimal(item.product.price, 0, 'COMMA', 0, 'POINT')} + 'đ'">0đ</span>
+                                    <span th:if="${item.product.active}" class="price-text"
                                         th:text="${#numbers.formatDecimal(item.product.price, 0, 'COMMA', 0, 'POINT')} + 'đ'">0đ</span>
                                 </td>
                                 <td class="text-center">
-                                    <div class="qty-control">
+                                    <!-- ✅ Nếu disabled thì ẩn nút tăng giảm -->
+                                    <div th:if="${item.product.active}" class="qty-control">
                                         <button class="qty-btn" type="button"
                                             th:attr="onclick='updateQty(' + ${item.id} + ', -1, ' + ${item.product.stockQuantity} + ')'">−</button>
                                         <input type="text" class="qty-input" th:id="'qty-' + ${item.id}"
@@ -460,9 +470,12 @@
                                         <button class="qty-btn" type="button"
                                             th:attr="onclick='updateQty(' + ${item.id} + ', 1, ' + ${item.product.stockQuantity} + ')'">+</button>
                                     </div>
+                                    <span th:if="${!item.product.active}" class="text-muted small">—</span>
                                 </td>
                                 <td class="text-center">
-                                    <span class="line-total" th:id="'line-' + ${item.id}"
+                                    <!-- ✅ Nếu disabled thì hiển thị 0đ -->
+                                    <span th:if="${!item.product.active}" class="text-muted">0đ</span>
+                                    <span th:if="${item.product.active}" class="line-total" th:id="'line-' + ${item.id}"
                                         th:text="${#numbers.formatDecimal(item.product.price.multiply(new java.math.BigDecimal(item.quantity)), 0, 'COMMA', 0, 'POINT')} + 'đ'">0đ</span>
                                 </td>
                                 <td class="text-center">
@@ -516,9 +529,15 @@
                     </div>
 
                     <div class="mt-4">
-                        <a href="/user/checkout" class="btn-checkout">
+                        <!-- ✅ Chỉ hiện nút khi có sản phẩm active -->
+                        <a th:if="${hasActiveItems}" href="/user/checkout" class="btn-checkout">
                             <i class="fa-solid fa-lock me-2"></i>Tiến hành đặt hàng
                         </a>
+                        <!-- ✅ Hiện thông báo khi tất cả sp đã ngừng bán -->
+                        <div th:unless="${hasActiveItems}" class="alert alert-warning text-center rounded-3 fw-bold">
+                            <i class="fa-solid fa-triangle-exclamation me-2"></i>
+                            Giỏ hàng không có sản phẩm nào còn bán
+                        </div>
                     </div>
                     <div class="secure-note">
                         <i class="fa-solid fa-shield-halved text-success"></i>

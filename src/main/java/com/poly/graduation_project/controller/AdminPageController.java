@@ -27,11 +27,6 @@ public class AdminPageController {
         return "admin-customers";
     }
 
-    @GetMapping("/admin/orders")
-    public String orders(Model model) {
-        return "admin-orders";
-    }
-
     @GetMapping("/admin/reports")
     public String reports(Model model) {
         return "admin-reports";

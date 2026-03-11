@@ -12,6 +12,7 @@ import com.poly.graduation_project.model.OrderDetail;
 import com.poly.graduation_project.model.Product;
 import com.poly.graduation_project.model.Review;
 import com.poly.graduation_project.model.User;
+import com.poly.graduation_project.model.Voucher;
 import com.poly.graduation_project.repository.AddressRepository;
 import com.poly.graduation_project.repository.CartDetailRepository;
 import com.poly.graduation_project.repository.CategoryRepository;
@@ -20,6 +21,7 @@ import com.poly.graduation_project.repository.OrderRepository;
 import com.poly.graduation_project.repository.ProductRepository;
 import com.poly.graduation_project.repository.ReviewRepository;
 import com.poly.graduation_project.repository.UserRepository;
+import com.poly.graduation_project.repository.VoucherRepository;
 import com.poly.graduation_project.service.SessionService;
 
 import jakarta.servlet.http.HttpSession;
@@ -30,7 +32,8 @@ import java.util.Map;
 
 @Controller
 public class IndexController {
-
+    @Autowired
+    private VoucherRepository voucherRepository;
     @Autowired
     UserRepository userRepository;
     @Autowired
@@ -72,9 +75,9 @@ public class IndexController {
     // Trang tất cả sản phẩm
     // ================================================
     @GetMapping("/products")
-    public String products(Model model , HttpSession session) {
+    public String products(Model model, HttpSession session) {
         User currentUser = (User) session.getAttribute("currentUser");
-            List<CartDetail> cartItems = cartDetailRepository.findByUser(currentUser);
+        List<CartDetail> cartItems = cartDetailRepository.findByUser(currentUser);
         int totalQuantity = cartItems.stream()
                 .mapToInt(CartDetail::getQuantity)
                 .sum();
@@ -94,7 +97,7 @@ public class IndexController {
         Product product = productRepository.findBySlug(slug);
         if (product == null)
             return "redirect:/products";
-            List<CartDetail> cartItems = cartDetailRepository.findByUser(currentUser);
+        List<CartDetail> cartItems = cartDetailRepository.findByUser(currentUser);
         int totalQuantity = cartItems.stream()
                 .mapToInt(CartDetail::getQuantity)
                 .sum();
@@ -116,7 +119,7 @@ public class IndexController {
 
         // Kiểm tra user đã mua & chưa review orderDetail nào chưa
         // để hiển thị nút "Viết đánh giá" đúng orderDetailId
-        
+
         Integer reviewableOrderDetailId = null;
         if (currentUser != null) {
             List<Order> completedOrders = orderRepository.findCompletedOrdersByUser(currentUser);
@@ -142,7 +145,7 @@ public class IndexController {
     public String about(Model model, HttpSession session) {
         User currentUser = (User) session.getAttribute("currentUser");
         // Do something with currentUser if needed
-            List<CartDetail> cartItems = cartDetailRepository.findByUser(currentUser);
+        List<CartDetail> cartItems = cartDetailRepository.findByUser(currentUser);
         int totalQuantity = cartItems.stream()
                 .mapToInt(CartDetail::getQuantity)
                 .sum();
@@ -154,7 +157,7 @@ public class IndexController {
     public String contact(Model model, HttpSession session) {
         User currentUser = (User) session.getAttribute("currentUser");
         // Do something with currentUser if needed
-            List<CartDetail> cartItems = cartDetailRepository.findByUser(currentUser);
+        List<CartDetail> cartItems = cartDetailRepository.findByUser(currentUser);
         int totalQuantity = cartItems.stream()
                 .mapToInt(CartDetail::getQuantity)
                 .sum();
@@ -166,7 +169,7 @@ public class IndexController {
     public String favourites(Model model, HttpSession session) {
         User currentUser = (User) session.getAttribute("currentUser");
         // Do something with currentUser if needed
-            List<CartDetail> cartItems = cartDetailRepository.findByUser(currentUser);
+        List<CartDetail> cartItems = cartDetailRepository.findByUser(currentUser);
         int totalQuantity = cartItems.stream()
                 .mapToInt(CartDetail::getQuantity)
                 .sum();
@@ -179,7 +182,7 @@ public class IndexController {
         User currentUser = (User) session.getAttribute("currentUser");
 
         User user = userRepository.findById(currentUser.getId()).orElse(null);
-            List<CartDetail> cartItems = cartDetailRepository.findByUser(currentUser);
+        List<CartDetail> cartItems = cartDetailRepository.findByUser(currentUser);
         int totalQuantity = cartItems.stream()
                 .mapToInt(CartDetail::getQuantity)
                 .sum();
@@ -214,5 +217,24 @@ public class IndexController {
         model.addAttribute("orders", orders);
         model.addAttribute("reviewedMap", reviewedMap);
         return "order-details";
+    }
+
+    @GetMapping("/vouchers")
+    public String vouchersPage(Model model, HttpSession session) {
+        User currentUser = (User) session.getAttribute("currentUser");
+
+        // Lấy tất cả voucher (kể cả hết hạn để hiển thị grayout)
+        List<Voucher> vouchers = voucherRepository.findAll();
+
+        // Badge giỏ hàng
+        int totalQuantity = 0;
+        if (currentUser != null) {
+            List<CartDetail> cartItems = cartDetailRepository.findByUser(currentUser);
+            totalQuantity = cartItems.stream().mapToInt(CartDetail::getQuantity).sum();
+        }
+
+        model.addAttribute("vouchers", vouchers);
+        model.addAttribute("totalQuantity", totalQuantity);
+        return "vouchers";
     }
 }

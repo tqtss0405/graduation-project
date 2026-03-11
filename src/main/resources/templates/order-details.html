@@ -128,6 +128,69 @@
             background: #fff;
             border-radius: 16px;
         }
+
+        /* Custom Modal */
+        .custom-modal-backdrop {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.45);
+            backdrop-filter: blur(3px);
+            z-index: 9998;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        .custom-modal-backdrop.show { display: flex; }
+        .custom-modal-box {
+            background: #fff;
+            border-radius: 20px;
+            padding: 32px 28px 24px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.18);
+            text-align: center;
+            animation: modalPop 0.22s ease;
+        }
+        @keyframes modalPop {
+            from { transform: scale(0.85); opacity: 0; }
+            to   { transform: scale(1);    opacity: 1; }
+        }
+        .custom-modal-icon {
+            width: 64px; height: 64px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 16px;
+            font-size: 1.8rem;
+        }
+        .modal-icon-danger  { background: #fff0f0; color: #dc3545; }
+        .modal-icon-success { background: #f0fff4; color: #28a745; }
+        .custom-modal-title { font-weight: 700; font-size: 1.1rem; color: #1a1a2e; margin-bottom: 8px; }
+        .custom-modal-desc  { color: #6c757d; font-size: 0.9rem; margin-bottom: 24px; }
+
+        /* Toast */
+        .toast-container-custom {
+            position: fixed; top: 24px; right: 24px;
+            z-index: 9999; display: flex; flex-direction: column; gap: 10px;
+        }
+        .toast-custom {
+            display: flex; align-items: center; gap: 12px;
+            padding: 14px 18px;
+            border-radius: 14px;
+            box-shadow: 0 8px 28px rgba(0,0,0,0.14);
+            font-weight: 600; font-size: 0.9rem;
+            min-width: 280px; max-width: 380px;
+            animation: toastIn 0.3s ease;
+        }
+        @keyframes toastIn {
+            from { transform: translateX(100px); opacity: 0; }
+            to   { transform: translateX(0);     opacity: 1; }
+        }
+        .toast-success { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .toast-error   { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .toast-icon { font-size: 1.2rem; flex-shrink: 0; }
+        .toast-close {
+            margin-left: auto; cursor: pointer; opacity: 0.6;
+            background: none; border: none; font-size: 1rem; color: inherit;
+        }
     </style>
 </head>
 <body>
@@ -225,11 +288,9 @@
         </div>
     </div>
 
-    <!-- Flash messages -->
-    <div th:if="${successMessage}" class="alert-success-custom">
-        <i class="fa-solid fa-circle-check me-2"></i>
-        <span th:text="${successMessage}"></span>
-    </div>
+    <!-- Flash messages (ẩn, dùng để trigger toast JS) -->
+    <span id="flashSuccess" style="display:none" th:text="${successMessage}"></span>
+    <span id="flashError"   style="display:none" th:text="${errorMessage}"></span>
     <div th:if="${param.alreadyReviewed}" class="alert alert-warning rounded-3">
         <i class="fa-solid fa-info-circle me-2"></i>Bạn đã đánh giá sản phẩm này rồi!
     </div>
@@ -313,11 +374,34 @@
                 <i class="fa-solid fa-location-dot me-1 text-success"></i>
                 <span th:text="${order.address != null ? order.address : 'Chưa có địa chỉ'}">Địa chỉ</span>
             </div>
-            <div class="order-total">
-                Tổng cộng:
-                <span th:text="${#numbers.formatDecimal(order.total, 0, 'COMMA', 0, 'POINT')} + 'đ'">0đ</span>
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+                <!-- Nút Đã nhận hàng: chỉ hiện khi status = 3 (Đã giao) -->
+                <form th:if="${order.status == 3}"
+                      th:id="'form-confirm-' + ${order.id}"
+                      th:action="@{/user/order-details/confirm-received/{id}(id=${order.id})}"
+                      method="post" style="display:inline;">
+                    <button type="button" class="btn btn-success btn-sm rounded-pill fw-bold"
+                            th:onclick="'openModal(\'confirm\', ' + ${order.id} + ')'">
+                        <i class="fa-solid fa-circle-check me-1"></i>Đã nhận hàng
+                    </button>
+                </form>
+                <!-- Nút Hủy đơn: chỉ hiện khi status 0 hoặc 1 -->
+                <form th:if="${order.status == 0 or order.status == 1}"
+                      th:id="'form-cancel-' + ${order.id}"
+                      th:action="@{/user/order-details/cancel/{id}(id=${order.id})}"
+                      method="post" style="display:inline;">
+                    <button type="button" class="btn btn-outline-danger btn-sm rounded-pill fw-bold"
+                            th:onclick="'openModal(\'cancel\', ' + ${order.id} + ')'">
+                        <i class="fa-solid fa-xmark me-1"></i>Hủy đơn
+                    </button>
+                </form>
+                <div class="order-total ms-2">
+                    Tổng cộng:
+                    <span th:text="${#numbers.formatDecimal(order.total, 0, 'COMMA', 0, 'POINT')} + 'đ'">0đ</span>
+                </div>
             </div>
         </div>
+
     </div>
 </div>
 
@@ -328,6 +412,102 @@
     </div>
 </footer>
 
+<!-- Toast container -->
+<div class="toast-container-custom" id="toastContainer"></div>
+
+<!-- Modal xác nhận nhận hàng -->
+<div class="custom-modal-backdrop" id="modalConfirm">
+    <div class="custom-modal-box">
+        <div class="custom-modal-icon modal-icon-success">
+            <i class="fa-solid fa-circle-check"></i>
+        </div>
+        <div class="custom-modal-title">Xác nhận đã nhận hàng?</div>
+        <div class="custom-modal-desc">Bạn xác nhận đã nhận được đơn hàng này.<br>Sau khi xác nhận, đơn hàng sẽ được đánh dấu <strong>Hoàn thành</strong>.</div>
+        <div class="d-flex gap-3 justify-content-center">
+            <button class="btn btn-light rounded-pill px-4 fw-bold" onclick="closeModal('confirm')">
+                Quay lại
+            </button>
+            <button class="btn btn-success rounded-pill px-4 fw-bold" id="btnConfirmSubmit"
+                    onclick="submitModal('confirm')">
+                <i class="fa-solid fa-circle-check me-1"></i>Đã nhận hàng
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal hủy đơn -->
+<div class="custom-modal-backdrop" id="modalCancel">
+    <div class="custom-modal-box">
+        <div class="custom-modal-icon modal-icon-danger">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+        <div class="custom-modal-title">Hủy đơn hàng?</div>
+        <div class="custom-modal-desc">Bạn có chắc muốn hủy đơn hàng này không?<br>Hành động này <strong>không thể hoàn tác</strong>.</div>
+        <div class="d-flex gap-3 justify-content-center">
+            <button class="btn btn-light rounded-pill px-4 fw-bold" onclick="closeModal('cancel')">
+                Giữ lại
+            </button>
+            <button class="btn btn-danger rounded-pill px-4 fw-bold" id="btnCancelSubmit"
+                    onclick="submitModal('cancel')">
+                <i class="fa-solid fa-xmark me-1"></i>Hủy đơn
+            </button>
+        </div>
+    </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+<script>
+    let pendingOrderId = null;
+
+    function openModal(type, orderId) {
+        pendingOrderId = orderId;
+        document.getElementById(type === 'confirm' ? 'modalConfirm' : 'modalCancel')
+                .classList.add('show');
+    }
+
+    function closeModal(type) {
+        document.getElementById(type === 'confirm' ? 'modalConfirm' : 'modalCancel')
+                .classList.remove('show');
+        pendingOrderId = null;
+    }
+
+    function submitModal(type) {
+        if (!pendingOrderId) return;
+        const formId = type === 'confirm'
+            ? 'form-confirm-' + pendingOrderId
+            : 'form-cancel-'  + pendingOrderId;
+        document.getElementById(formId).submit();
+    }
+
+    // Đóng modal khi click backdrop
+    document.querySelectorAll('.custom-modal-backdrop').forEach(el => {
+        el.addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.classList.remove('show');
+                pendingOrderId = null;
+            }
+        });
+    });
+
+    // Hiện toast từ flash message (Thymeleaf render vào biến JS)
+    function showToast(message, type) {
+        const container = document.getElementById('toastContainer');
+        const toast = document.createElement('div');
+        toast.className = 'toast-custom toast-' + type;
+        toast.innerHTML = `
+            <span class="toast-icon">${type === 'success' ? '✅' : '❌'}</span>
+            <span>${message}</span>
+            <button class="toast-close" onclick="this.parentElement.remove()">✕</button>
+        `;
+        container.appendChild(toast);
+        setTimeout(() => toast.remove(), 4000);
+    }
+
+    // Trigger toast nếu có flash message
+    window.addEventListener('DOMContentLoaded', () => {
+        const successMsg = document.getElementById('flashSuccess')?.textContent?.trim();
+        const errorMsg   = document.getElementById('flashError')?.textContent?.trim();
+        if (successMsg) showToast(successMsg, 'success');
+        if (errorMsg)   showToast(errorMsg,   'error');
+    });
+</script>
