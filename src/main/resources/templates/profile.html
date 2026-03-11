@@ -115,7 +115,7 @@
 
                     <hr>
                     <div class="list-group list-group-flush text-start">
-                        <a href="/profile"
+                        <a href="/user/profile"
                             class="list-group-item list-group-item-action active bg-success border-success">
                             <i class="fa-solid fa-user me-2"></i> Hồ sơ cá nhân
                         </a>
@@ -136,6 +136,12 @@
                             tin</h5>
                     </div>
                     <div class="card-body p-4">
+                        <!-- Thông báo lưu thành công -->
+                     <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show">
+                     <i class="fa-solid fa-circle-check me-2"></i>
+                     <span th:text="${successMessage}"></span>
+                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
                         <form action="/user/profile/update" method="post" enctype="multipart/form-data">
                             <input type="file" id="avatarUpload" name="imageFile" class="d-none"
                                 onchange="this.form.submit()">
@@ -235,7 +241,7 @@
                     <form action="/profile/address/add" method="post" id="formAddress">
 
                         <input type="hidden" name="fulladdress" id="fulladdressInput">
-                        <input type="hidden" name="active" value="true">
+                        
 
                         <div class="row g-3 mb-3">
                             <div class="col-md-4">
@@ -271,8 +277,13 @@
                         </div>
 
                         <div class="form-check form-switch mb-4">
-                            <input class="form-check-input" type="checkbox" name="isDefault" id="isDefaultCheck"
-                                value="true">
+                            <input type="hidden" name="isDefault" value="false">
+
+                            <input class="form-check-input"
+                               type="checkbox"
+                               name="isDefault"
+                               id="isDefaultCheck"
+                               value="true">
                             <label class="form-check-label fw-semibold text-dark" for="isDefaultCheck">Đặt làm địa chỉ
                                 mặc định</label>
                         </div>
@@ -358,16 +369,21 @@
         });
 
         // 4. Ghép chuỗi fulladdress trước khi Submit form
-        formAddress.addEventListener("submit", function (e) {
-            // Lấy Tên hiển thị (data-name) thay vì lấy Value (ID)
-            const provName = provinceSelect.options[provinceSelect.selectedIndex].getAttribute("data-name");
-            const distName = districtSelect.options[districtSelect.selectedIndex].getAttribute("data-name");
-            const wardName = wardSelect.options[wardSelect.selectedIndex].getAttribute("data-name");
-            const street = streetAddress.value.trim();
+formAddress.addEventListener("submit", function (e) {
 
-            // Nối chuỗi: "Số 12 Lên Lợi, Phường A, Quận B, Tỉnh C"
-            fulladdressInput.value = `${street}, ${wardName}, ${distName}, ${provName}`;
-        });
+    if (!provinceSelect.value || !districtSelect.value || !wardSelect.value) {
+        alert("Vui lòng chọn đầy đủ Tỉnh / Quận / Phường");
+        e.preventDefault();
+        return;
+    }
+
+    const provName = provinceSelect.options[provinceSelect.selectedIndex].getAttribute("data-name");
+    const distName = districtSelect.options[districtSelect.selectedIndex].getAttribute("data-name");
+    const wardName = wardSelect.options[wardSelect.selectedIndex].getAttribute("data-name");
+    const street = streetAddress.value.trim();
+
+    fulladdressInput.value = `${street}, ${wardName}, ${distName}, ${provName}`;
+});
     });
 </script>
 </body>

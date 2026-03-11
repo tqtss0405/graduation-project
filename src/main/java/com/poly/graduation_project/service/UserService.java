@@ -44,17 +44,19 @@ public class UserService implements UserDetailsService {
     }
 
     public void save(User user) {
-        // Mã hóa mật khẩu từ plain text sang BCrypt
+
+    // Chỉ encode khi password chưa mã hóa
+    if (!user.getPassword().startsWith("$2a$")) {
         String encodedPassword = passwordEncoder.encode(user.getPassword());
         user.setPassword(encodedPassword);
-
-        // Thiết lập quyền mặc định là USER (false) nếu chưa có
-        if (user.getRole() == null) {
-            user.setRole(false);
-        }
-
-        userRepository.save(user);
     }
+
+    if (user.getRole() == null) {
+        user.setRole(false);
+    }
+
+    userRepository.save(user);
+}
 
     // Thêm các phương thức này vào trong class UserService hiện tại
     public java.util.List<User> getAllCustomers() {

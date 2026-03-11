@@ -1,41 +1,45 @@
 package com.poly.graduation_project.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.persistence.*;
+import lombok.*;
 
-@Entity 
+@Entity
+@Table(name = "addresses")
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
-@Table(name = "addresses")
 public class Address {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    private Integer provinceId;
-    private Integer districtId;
-    private Integer wardcode;
+    // ID tỉnh
+    private String provinceId;
 
+    // ID quận
+    private String districtId;
+
+    // ID phường
+    private String wardcode;
+
+    // Địa chỉ cụ thể (số nhà, tên đường)
     @Column(columnDefinition = "nvarchar(255)")
     private String address;
 
+    // Địa chỉ đầy đủ
     @Column(columnDefinition = "nvarchar(255)")
     private String fulladdress;
 
-    private Boolean isDefault;
-    private Boolean active;
+    // Địa chỉ mặc định
+    @Column(name = "is_default")
+    private Boolean isDefault = false;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
+    // Trạng thái còn sử dụng
+    private Boolean active = true;
+
+    // Quan hệ với bảng User
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 }

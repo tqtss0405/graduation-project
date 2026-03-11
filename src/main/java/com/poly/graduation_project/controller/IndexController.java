@@ -177,19 +177,7 @@ public class IndexController {
         return "favourites";
     }
 
-    @GetMapping("/user/profile")
-    public String profile(Model model, HttpSession session) {
-        User currentUser = (User) session.getAttribute("currentUser");
-
-        User user = userRepository.findById(currentUser.getId()).orElse(null);
-        List<CartDetail> cartItems = cartDetailRepository.findByUser(currentUser);
-        int totalQuantity = cartItems.stream()
-                .mapToInt(CartDetail::getQuantity)
-                .sum();
-        model.addAttribute("totalQuantity", totalQuantity);
-        model.addAttribute("user", user);
-        return "profile";
-    }
+    
 
     // ================================================
     // Trang lịch sử mua hàng - hiển thị nút "Đánh giá"
