@@ -52,9 +52,12 @@
                         <a href="#"
                             class="d-flex align-items-center text-decoration-none text-secondary dropdown-toggle"
                             data-bs-toggle="dropdown">
-                            <img th:if="${session.currentUser != null}" th:src="${session.currentUser.image}"
-                                class="rounded-circle" width="30" height="30" alt="Avatar"
-                                onerror="this.style.display='none'" />
+                            <img th:if="${session.currentUser != null}"
+                                 th:src="${session.currentUser.image != null ? session.currentUser.image : '/images/default-user.png'}"
+                                 class="rounded-circle"
+                                 width="30"
+                                 height="30"
+                                 alt="Avatar">
                             <i th:if="${session.currentUser == null}" class="fa-solid fa-circle-user fs-3"></i>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg p-3"
@@ -101,9 +104,10 @@
             <div class="col-lg-4">
                 <div class="card border-0 shadow-sm rounded-4 text-center p-4">
                     <div class="position-relative d-inline-block mb-3">
-                        <img th:src="${user.image != null ? user.image : '/images/default-user.png'}"
-                            class="rounded-circle border border-3 border-success"
-                            style="width: 150px; height: 150px; object-fit: cover;" alt="Avatar">
+                        <img id="avatarPreview"
+                             th:src="${user.image != null ? user.image : '/images/default-user.png'}"
+                             class="rounded-circle border border-3 border-success shadow"
+                             style="width:150px;height:150px;object-fit:cover;">
                         <label for="avatarUpload"
                             class="position-absolute bottom-0 end-0 bg-success text-white rounded-circle p-2 cursor-pointer"
                             title="Đổi ảnh">
@@ -143,10 +147,15 @@
                      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
                         <form action="/user/profile/update" method="post" enctype="multipart/form-data">
-                            <input type="file" id="avatarUpload" name="imageFile" class="d-none"
-                                onchange="this.form.submit()">
 
-                            <div class="row g-3">
+                        <!-- INPUT UPLOAD AVATAR -->
+                           <input type="file"
+                                  id="avatarUpload"
+                                  name="imageFile"
+                                  class="d-none"
+                                  accept="image/*">
+
+                           <div class="row g-3"> 
                                 <div class="col-md-6">
                                     <label class="form-label small fw-bold text-muted">Họ và tên</label>
                                     <input type="text" name="fullname" class="form-control rounded-pill"
@@ -216,7 +225,7 @@
                                         B, TP HCM</span>
                                 </div>
 
-                                <a th:href="@{|/profile/address/delete/${addr.id}|}"
+                                <a th:href="@{|/user/profile/address/delete/${addr.id}|}"
                                     class="btn btn-light btn-sm text-danger rounded-circle flex-shrink-0 mt-1"
                                     title="Xóa địa chỉ" onclick="return confirm('Bạn chắc chắn muốn xóa địa chỉ này?')">
                                     <i class="fa-solid fa-trash"></i>
@@ -238,43 +247,71 @@
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body p-4">
-                    <form action="/profile/address/add" method="post" id="formAddress">
+                    <form action="/user/profile/address/add" method="post" id="formAddress" novalidate>
 
                         <input type="hidden" name="fulladdress" id="fulladdressInput">
                         
 
                         <div class="row g-3 mb-3">
-                            <div class="col-md-4">
-                                <label class="form-label text-muted small fw-semibold">Tỉnh / Thành phố <span
-                                        class="text-danger">*</span></label>
-                                <select class="form-select" name="provinceId" id="province" required>
-                                    <option value="" selected disabled>-- Chọn Tỉnh/Thành --</option>
-                                </select>
-                            </div>
 
-                            <div class="col-md-4">
-                                <label class="form-label text-muted small fw-semibold">Quận / Huyện <span
-                                        class="text-danger">*</span></label>
-                                <select class="form-select" name="districtId" id="district" required disabled>
-                                    <option value="" selected disabled>-- Chọn Quận/Huyện --</option>
-                                </select>
-                            </div>
+    <!-- Tỉnh / Thành phố -->
+    <div class="col-md-4">
+        <label class="form-label text-muted small fw-semibold">
+            Tỉnh / Thành phố <span class="text-danger">*</span>
+        </label>
 
-                            <div class="col-md-4">
-                                <label class="form-label text-muted small fw-semibold">Phường / Xã <span
-                                        class="text-danger">*</span></label>
-                                <select class="form-select" name="wardcode" id="ward" required disabled>
-                                    <option value="" selected disabled>-- Chọn Phường/Xã --</option>
-                                </select>
-                            </div>
-                        </div>
+        <select class="form-select" name="provinceId" id="province">
+            <option value="" selected disabled>-- Chọn Tỉnh/Thành --</option>
+        </select>
 
-                        <div class="mb-4">
-                            <label class="form-label text-muted small fw-semibold">Địa chỉ cụ thể (Số nhà, Tên đường)
-                                <span class="text-danger">*</span></label>
-                            <input type="text" name="address" id="streetAddress" class="form-control"
-                                placeholder="VD: 123 Đường Lê Lợi" required>
-                        </div>
+        <div class="text-danger small mt-1" id="provinceError"></div>
+    </div>
+
+    <!-- Quận / Huyện -->
+    <div class="col-md-4">
+        <label class="form-label text-muted small fw-semibold">
+            Quận / Huyện <span class="text-danger">*</span>
+        </label>
+
+        <select class="form-select" name="districtId" id="district" disabled>
+            <option value="" selected disabled>-- Chọn Quận/Huyện --</option>
+        </select>
+
+        <div class="text-danger small mt-1" id="districtError"></div>
+    </div>
+
+    <!-- Phường / Xã -->
+    <div class="col-md-4">
+        <label class="form-label text-muted small fw-semibold">
+            Phường / Xã <span class="text-danger">*</span>
+        </label>
+
+        <select class="form-select" name="wardcode" id="ward" disabled>
+            <option value="" selected disabled>-- Chọn Phường/Xã --</option>
+        </select>
+
+        <div class="text-danger small mt-1" id="wardError"></div>
+    </div>
+
+</div>
+
+<!-- Địa chỉ cụ thể -->
+<div class="mb-4">
+    <label class="form-label text-muted small fw-semibold">
+        Địa chỉ cụ thể (Số nhà, Tên đường)
+        <span class="text-danger">*</span>
+    </label>
+
+    <input
+        type="text"
+        name="address"
+        id="streetAddress"
+        class="form-control"
+        placeholder="VD: 123 Đường Lê Lợi"
+    >
+
+    <div class="text-danger small mt-1" id="streetError"></div>
+</div>
 
                         <div class="form-check form-switch mb-4">
                             <input type="hidden" name="isDefault" value="false">
@@ -303,88 +340,171 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const provinceSelect = document.getElementById("province");
-        const districtSelect = document.getElementById("district");
-        const wardSelect = document.getElementById("ward");
-        const streetAddress = document.getElementById("streetAddress");
-        const fulladdressInput = document.getElementById("fulladdressInput");
-        const formAddress = document.getElementById("formAddress");
+document.addEventListener("DOMContentLoaded", function () {
 
-        // 1. Gọi API lấy danh sách Tỉnh/Thành
-        axios.get("https://provinces.open-api.vn/api/?depth=1")
-            .then(response => {
-                response.data.forEach(item => {
-                    let option = document.createElement("option");
-                    option.value = item.code; // Lưu ID Tỉnh
-                    option.text = item.name;  // Tên hiển thị
-                    // Lưu luôn tên vào attribute để ghép chuỗi fulladdress sau này
-                    option.setAttribute("data-name", item.name); 
-                    provinceSelect.appendChild(option);
-                });
+    const provinceSelect = document.getElementById("province");
+    const districtSelect = document.getElementById("district");
+    const wardSelect = document.getElementById("ward");
+    const streetAddress = document.getElementById("streetAddress");
+    const fulladdressInput = document.getElementById("fulladdressInput");
+    const formAddress = document.getElementById("formAddress");
+
+    /* ==============================
+       LOAD PROVINCE
+    ============================== */
+    axios.get("https://provinces.open-api.vn/api/?depth=1")
+        .then(response => {
+            response.data.forEach(item => {
+                const option = document.createElement("option");
+                option.value = item.code;
+                option.text = item.name;
+                option.setAttribute("data-name", item.name);
+                provinceSelect.appendChild(option);
             });
-
-        // 2. Khi chọn Tỉnh -> Load danh sách Quận/Huyện
-        provinceSelect.addEventListener("change", function () {
-            districtSelect.innerHTML = '<option value="" selected disabled>-- Chọn Quận/Huyện --</option>';
-            wardSelect.innerHTML = '<option value="" selected disabled>-- Chọn Phường/Xã --</option>';
-            districtSelect.disabled = true;
-            wardSelect.disabled = true;
-
-            const provinceCode = this.value;
-            if (provinceCode) {
-                axios.get(`https://provinces.open-api.vn/api/p/${provinceCode}?depth=2`)
-                    .then(response => {
-                        response.data.districts.forEach(item => {
-                            let option = document.createElement("option");
-                            option.value = item.code;
-                            option.text = item.name;
-                            option.setAttribute("data-name", item.name);
-                            districtSelect.appendChild(option);
-                        });
-                        districtSelect.disabled = false;
-                    });
-            }
         });
 
-        // 3. Khi chọn Quận -> Load danh sách Phường/Xã
-        districtSelect.addEventListener("change", function () {
-            wardSelect.innerHTML = '<option value="" selected disabled>-- Chọn Phường/Xã --</option>';
-            wardSelect.disabled = true;
+    /* ==============================
+       LOAD DISTRICT
+    ============================== */
+    provinceSelect.addEventListener("change", function () {
 
-            const districtCode = this.value;
-            if (districtCode) {
-                axios.get(`https://provinces.open-api.vn/api/d/${districtCode}?depth=2`)
-                    .then(response => {
-                        response.data.wards.forEach(item => {
-                            let option = document.createElement("option");
-                            option.value = item.code;
-                            option.text = item.name;
-                            option.setAttribute("data-name", item.name);
-                            wardSelect.appendChild(option);
-                        });
-                        wardSelect.disabled = false;
+        districtSelect.innerHTML = '<option value="" disabled selected>-- Chọn Quận/Huyện --</option>';
+        wardSelect.innerHTML = '<option value="" disabled selected>-- Chọn Phường/Xã --</option>';
+
+        districtSelect.disabled = true;
+        wardSelect.disabled = true;
+
+        const provinceCode = this.value;
+
+        if (provinceCode) {
+            axios.get(`https://provinces.open-api.vn/api/p/${provinceCode}?depth=2`)
+                .then(response => {
+
+                    response.data.districts.forEach(item => {
+
+                        const option = document.createElement("option");
+                        option.value = item.code;
+                        option.text = item.name;
+                        option.setAttribute("data-name", item.name);
+
+                        districtSelect.appendChild(option);
                     });
-            }
-        });
 
-        // 4. Ghép chuỗi fulladdress trước khi Submit form
-formAddress.addEventListener("submit", function (e) {
+                    districtSelect.disabled = false;
+                });
+        }
+    });
 
-    if (!provinceSelect.value || !districtSelect.value || !wardSelect.value) {
-        alert("Vui lòng chọn đầy đủ Tỉnh / Quận / Phường");
-        e.preventDefault();
+    /* ==============================
+       LOAD WARD
+    ============================== */
+    districtSelect.addEventListener("change", function () {
+
+        wardSelect.innerHTML = '<option value="" disabled selected>-- Chọn Phường/Xã --</option>';
+        wardSelect.disabled = true;
+
+        const districtCode = this.value;
+
+        if (districtCode) {
+            axios.get(`https://provinces.open-api.vn/api/d/${districtCode}?depth=2`)
+                .then(response => {
+
+                    response.data.wards.forEach(item => {
+
+                        const option = document.createElement("option");
+                        option.value = item.code;
+                        option.text = item.name;
+                        option.setAttribute("data-name", item.name);
+
+                        wardSelect.appendChild(option);
+                    });
+
+                    wardSelect.disabled = false;
+                });
+        }
+    });
+
+    /* ==============================
+       VALIDATE ADDRESS
+    ============================== */
+    formAddress.addEventListener("submit", function (e) {
+
+        let valid = true;
+
+        const province = provinceSelect.value;
+        const district = districtSelect.value;
+        const ward = wardSelect.value;
+        const street = streetAddress.value.trim();
+
+        document.getElementById("provinceError").innerText = "";
+        document.getElementById("districtError").innerText = "";
+        document.getElementById("wardError").innerText = "";
+        document.getElementById("streetError").innerText = "";
+
+        if (!province) {
+            document.getElementById("provinceError").innerText = "Vui lòng chọn Tỉnh / Thành phố";
+            provinceSelect.focus();
+            valid = false;
+        }
+
+        if (!district) {
+            document.getElementById("districtError").innerText = "Vui lòng chọn Quận / Huyện";
+            if (valid) districtSelect.focus();
+            valid = false;
+        }
+
+        if (!ward) {
+            document.getElementById("wardError").innerText = "Vui lòng chọn Phường / Xã";
+            if (valid) wardSelect.focus();
+            valid = false;
+        }
+
+        if (street === "") {
+            document.getElementById("streetError").innerText = "Vui lòng nhập địa chỉ cụ thể";
+            if (valid) streetAddress.focus();
+            valid = false;
+        }
+
+        if (!valid) {
+            e.preventDefault();
+            return;
+        }
+
+        const provName = provinceSelect.options[provinceSelect.selectedIndex].getAttribute("data-name");
+        const distName = districtSelect.options[districtSelect.selectedIndex].getAttribute("data-name");
+        const wardName = wardSelect.options[wardSelect.selectedIndex].getAttribute("data-name");
+
+        fulladdressInput.value =
+            `${street}, ${wardName}, ${distName}, ${provName}`;
+    });
+
+});
+
+
+/* ==============================
+   PREVIEW AVATAR
+============================== */
+document.getElementById("avatarUpload").addEventListener("change", function () {
+
+    const file = this.files[0];
+
+    if (!file) return;
+
+    if (file.size > 2 * 1024 * 1024) {
+        alert("Ảnh phải nhỏ hơn 2MB");
+        this.value = "";
         return;
     }
 
-    const provName = provinceSelect.options[provinceSelect.selectedIndex].getAttribute("data-name");
-    const distName = districtSelect.options[districtSelect.selectedIndex].getAttribute("data-name");
-    const wardName = wardSelect.options[wardSelect.selectedIndex].getAttribute("data-name");
-    const street = streetAddress.value.trim();
+    const reader = new FileReader();
 
-    fulladdressInput.value = `${street}, ${wardName}, ${distName}, ${provName}`;
+    reader.onload = function (e) {
+        document.getElementById("avatarPreview").src = e.target.result;
+    };
+
+    reader.readAsDataURL(file);
+
 });
-    });
 </script>
 </body>
 

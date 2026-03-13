@@ -62,29 +62,27 @@ public class AuthController {
     // (Mapping này khớp với .defaultSuccessUrl("/login/success") trong
     // SecurityConfig)
     @GetMapping("/login/success")
-    public String loginSuccess(Authentication authentication) {
-        // 1. Lấy email/username từ đối tượng Authentication
-        String email = authentication.getName();
+public String loginSuccess(Authentication authentication) {
 
-        // 2. Tìm đối tượng User thực sự trong Database
-        User user = userRepository.findByEmail(email).orElse(null);
+    String email = authentication.getName();
 
-        // 3. Lưu vào Session thông qua SessionService
-        if (user != null) {
-            // Xóa mật khẩu trước khi lưu vào session để bảo mật (tùy chọn)
-            user.setPassword("");
-            sessionService.setAttribute("currentUser", user);
-        }
+    // lấy user mới nhất từ database
+    User user = userRepository.findByEmail(email).orElse(null);
 
-        // 4. Điều hướng như cũ
-        boolean isAdmin = authentication.getAuthorities().stream()
-                .anyMatch(r -> r.getAuthority().equals("ROLE_ADMIN"));
-
-        if (isAdmin) {
-            return "redirect:/admin/dashboard";
-        }
-        return "redirect:/home";
+    if (user != null) {
+        user.setPassword(null); // không cần lưu password
+        sessionService.setAttribute("currentUser", user);
     }
+
+    boolean isAdmin = authentication.getAuthorities().stream()
+            .anyMatch(r -> r.getAuthority().equals("ROLE_ADMIN"));
+
+    if (isAdmin) {
+        return "redirect:/admin/dashboard";
+    }
+
+    return "redirect:/home";
+}
 
     // 3. Xử lý khi đăng nhập thất bại
     @GetMapping("/login/failure")

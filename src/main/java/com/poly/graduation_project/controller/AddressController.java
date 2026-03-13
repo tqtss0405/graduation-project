@@ -11,7 +11,7 @@ import com.poly.graduation_project.service.AddressService;
 import jakarta.servlet.http.HttpSession;
 
 @Controller
-@RequestMapping("/profile/address")
+@RequestMapping("/user/profile/address")
 public class AddressController {
 
     @Autowired

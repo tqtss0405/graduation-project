@@ -23,12 +23,12 @@ public class Address {
     // ID phường
     private String wardcode;
 
-    // Địa chỉ cụ thể (số nhà, tên đường)
-    @Column(columnDefinition = "nvarchar(255)")
+    // Địa chỉ cụ thể
+    @Column(length = 255)
     private String address;
 
     // Địa chỉ đầy đủ
-    @Column(columnDefinition = "nvarchar(255)")
+    @Column(length = 255)
     private String fulladdress;
 
     // Địa chỉ mặc định
