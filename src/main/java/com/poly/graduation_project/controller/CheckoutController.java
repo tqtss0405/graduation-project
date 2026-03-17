@@ -219,8 +219,8 @@ public class CheckoutController {
         BigDecimal discount = BigDecimal.ZERO;
         if (voucherId != null) {
             Voucher v = voucherRepository.findById(voucherId).orElse(null);
-            if (v != null) {
-                // ✅ Giảm trên tổng hóa đơn
+            // ✅ Validate trước khi tính tiền gửi lên VNPay
+            if (isVoucherValid(v)) {
                 discount = totalBeforeDiscount
                         .multiply(BigDecimal.valueOf(v.getDiscount()))
                         .divide(BigDecimal.valueOf(100));
@@ -307,8 +307,22 @@ public class CheckoutController {
     }
 
     // ============================================================
+    // Helper: Kiểm tra voucher có hợp lệ không
+    // ✅ Dùng chung ở mọi nơi — tránh lặp code
+    // ============================================================
+    private boolean isVoucherValid(Voucher voucher) {
+        if (voucher == null) return false;
+        if (!Boolean.TRUE.equals(voucher.getActive())) return false;
+        LocalDateTime now = LocalDateTime.now();
+        if (voucher.getStartedAt() != null && now.isBefore(voucher.getStartedAt())) return false;
+        if (voucher.getEndAt()     != null && now.isAfter(voucher.getEndAt()))       return false;
+        if (voucher.getQuantity()  != null && voucher.getQuantity() <= 0)            return false;
+        return true;
+    }
+
+    // ============================================================
     // Helper: Xây dựng Order entity
-    // ✅ Discount tính trên tổng hóa đơn (subtotal + shippingFee)
+    // ✅ Validate lại voucher trước khi áp dụng (chống bypass frontend)
     // ============================================================
     private Order buildOrder(User user, List<CartDetail> cartItems,
                               String addressText, Integer voucherId,
@@ -316,16 +330,15 @@ public class CheckoutController {
         BigDecimal subtotal = calcSubtotal(cartItems);
         BigDecimal shippingFee = subtotal.compareTo(FREE_SHIP_THRESHOLD) >= 0
                 ? BigDecimal.ZERO : SHIP_FEE;
-
-        // ✅ Tổng trước giảm = subtotal + ship
         BigDecimal totalBeforeDiscount = subtotal.add(shippingFee);
 
         BigDecimal discount = BigDecimal.ZERO;
         Voucher voucher = null;
         if (voucherId != null) {
-            voucher = voucherRepository.findById(voucherId).orElse(null);
-            if (voucher != null) {
-                // ✅ Giảm % trên tổng hóa đơn
+            Voucher found = voucherRepository.findById(voucherId).orElse(null);
+            // ✅ Validate đầy đủ: active, startedAt, endAt, quantity
+            if (isVoucherValid(found)) {
+                voucher = found;
                 discount = totalBeforeDiscount
                         .multiply(BigDecimal.valueOf(voucher.getDiscount()))
                         .divide(BigDecimal.valueOf(100));
@@ -334,6 +347,7 @@ public class CheckoutController {
                     voucherRepository.save(voucher);
                 }
             }
+            // Nếu voucher không hợp lệ → bỏ qua, không giảm giá
         }
 
         BigDecimal total = totalBeforeDiscount.subtract(discount);
