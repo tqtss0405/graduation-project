@@ -100,9 +100,18 @@
             <h2 class="fw-bold mb-0">Tất Cả Sản Phẩm</h2>
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb mb-0 mt-2">
-                    <li class="breadcrumb-item"><a href="/home" class="text-decoration-none text-muted">Trang
-                            chủ</a></li>
-                    <li class="breadcrumb-item active text-success" aria-current="page">Cửa hàng</li>
+                    <li class="breadcrumb-item">
+                        <a href="/home" class="text-decoration-none text-muted">Trang chủ</a>
+                    </li>
+                    <li class="breadcrumb-item"
+                        th:classappend="${currentCategoryId != null ? '' : 'active text-success'}">
+                        <a th:if="${currentCategoryId != null}" href="/products"
+                            class="text-decoration-none text-muted">Sản phẩm</a>
+                        <span th:if="${currentCategoryId == null}">Sản phẩm</span>
+                    </li>
+                    <li th:if="${currentCategoryId != null}" class="breadcrumb-item active text-success"
+                        aria-current="page" th:text="${currentCategoryName}">
+                    </li>
                 </ol>
             </nav>
         </div>
@@ -153,8 +162,7 @@
             <div class="col-lg-9">
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <span class="text-muted">
-                        Hiển thị <strong th:text="${#lists.size(products)}">0</strong> / <strong
-                            th:text="${totalItems}">0</strong> sản phẩm
+                        Hiển thị <strong th:text="${#lists.size(products)}">0</strong> sản phẩm
                     </span>
 
                     <form action="/products" method="get" class="d-flex align-items-center m-0">
@@ -214,43 +222,11 @@
                     </div>
                 </div>
 
-                <!-- Phân trang động -->
-                <nav class="mt-5 d-flex justify-content-center" th:if="${totalPages > 1}">
+                <nav class="mt-5 d-flex justify-content-center">
                     <ul class="pagination">
-
-                        <!-- Nút Trước -->
-                        <li class="page-item" th:classappend="${currentPage == 0 ? 'disabled' : ''}">
-                            <a class="page-link" th:href="@{/products(page=${currentPage - 1},
-                                                    categoryId=${currentCategoryId},
-                                                    minPrice=${currentMinPrice},
-                                                    maxPrice=${currentMaxPrice},
-                                                    sort=${currentSort})}">
-                                &laquo; Trước
-                            </a>
-                        </li>
-
-                        <!-- Số trang -->
-                        <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
-                            th:classappend="${i == currentPage ? 'active' : ''}">
-                            <a class="page-link" th:text="${i + 1}" th:href="@{/products(page=${i},
-                                                    categoryId=${currentCategoryId},
-                                                    minPrice=${currentMinPrice},
-                                                    maxPrice=${currentMaxPrice},
-                                                    sort=${currentSort})}">
-                            </a>
-                        </li>
-
-                        <!-- Nút Sau -->
-                        <li class="page-item" th:classappend="${currentPage == totalPages - 1 ? 'disabled' : ''}">
-                            <a class="page-link" th:href="@{/products(page=${currentPage + 1},
-                                                    categoryId=${currentCategoryId},
-                                                    minPrice=${currentMinPrice},
-                                                    maxPrice=${currentMaxPrice},
-                                                    sort=${currentSort})}">
-                                Sau &raquo;
-                            </a>
-                        </li>
-
+                        <li class="page-item disabled"><a class="page-link" href="#">Trước</a></li>
+                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                        <li class="page-item"><a class="page-link" href="#">Sau</a></li>
                     </ul>
                 </nav>
             </div>
@@ -274,7 +250,7 @@
                             Cần Thơ</p>
                         <p class="mb-0"><i class="fa-solid fa-envelope me-2 text-success"></i> <a
                                 href="/cdn-cgi/l/email-protection" class="__cf_email__"
-                                data-cfemail="bbd3d4cfc9d4fbd9ded4d9d4d4d0c895d8d4d6">[email&#160;protected]</a></p>
+                                data-cfemail="d5bdbaa1a7ba95b7b0bab7bababea6fbb6bab8">[email&#160;protected]</a></p>
                         <p class="mb-0"><i class="fa-solid fa-phone me-2 text-success"></i> 1900 6789</p>
                     </div>
                 </div>

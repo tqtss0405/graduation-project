@@ -45,10 +45,10 @@ public class ReviewController {
     @GetMapping("/user/review/write/{orderDetailId}")
     public String showWriteReviewForm(@PathVariable Integer orderDetailId, Model model, HttpSession session) {
         User currentUser = (User) session.getAttribute("currentUser");
-         
 
         OrderDetail orderDetail = orderDetailRepository.findById(orderDetailId).orElse(null);
-        if (orderDetail == null) return "redirect:/user/order-details";
+        if (orderDetail == null)
+            return "redirect:/user/order-details";
 
         // Kiểm tra đơn hàng có thuộc về user hiện tại không
         Order order = orderDetail.getOrder();
@@ -83,7 +83,6 @@ public class ReviewController {
             RedirectAttributes ra) {
 
         User currentUser = (User) session.getAttribute("currentUser");
-         
 
         OrderDetail orderDetail = orderDetailRepository.findById(orderDetailId).orElse(null);
         if (orderDetail == null) {

@@ -5,6 +5,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import com.poly.graduation_project.model.CartDetail;
 import com.poly.graduation_project.model.Order;
@@ -26,12 +32,14 @@ import com.poly.graduation_project.service.SessionService;
 
 import jakarta.servlet.http.HttpSession;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @Controller
 public class IndexController {
+
     @Autowired
     private VoucherRepository voucherRepository;
     @Autowired
@@ -69,17 +77,70 @@ public class IndexController {
     }
 
     // ================================================
-    // Trang tất cả sản phẩm
+    // Trang tất cả sản phẩm - có filter, sort, phân trang
     // ================================================
     @GetMapping("/products")
-    public String products(Model model, HttpSession session) {
+    public String products(
+            @RequestParam(name = "categoryId", required = false) Integer categoryId,
+            @RequestParam(name = "minPrice", required = false) BigDecimal minPrice,
+            @RequestParam(name = "maxPrice", required = false) BigDecimal maxPrice,
+            @RequestParam(name = "sort", required = false, defaultValue = "newest") String sortType,
+            @RequestParam(name = "page", required = false, defaultValue = "0") int page,
+            Model model, HttpSession session) {
+
         User currentUser = (User) session.getAttribute("currentUser");
-        List<CartDetail> cartItems = cartDetailRepository.findByUser(currentUser);
-        int totalQuantity = cartItems.stream().mapToInt(CartDetail::getQuantity).sum();
-        List<Product> products = productRepository.findByActiveTrue();
-        model.addAttribute("products", products);
+
+        int totalQuantity = 0;
+        if (currentUser != null) {
+            List<CartDetail> cartItems = cartDetailRepository.findByUser(currentUser);
+            totalQuantity = cartItems.stream().mapToInt(CartDetail::getQuantity).sum();
+        }
+
+        BigDecimal finalMinPrice = (minPrice != null) ? minPrice : BigDecimal.ZERO;
+        BigDecimal finalMaxPrice = (maxPrice != null) ? maxPrice : new BigDecimal("999999999");
+
+        // Xử lý sắp xếp
+        Sort sort;
+        if ("price-asc".equals(sortType)) {
+            sort = Sort.by("price").ascending();
+        } else if ("price-desc".equals(sortType)) {
+            sort = Sort.by("price").descending();
+        } else {
+            sort = Sort.by("id").descending();
+        }
+
+        // 9 sản phẩm mỗi trang
+        Pageable pageable = PageRequest.of(page, 9, sort);
+
+        Page<Product> productPage;
+
+        if (categoryId != null) {
+            com.poly.graduation_project.model.Category category = categoryRepository.findById(categoryId).orElse(null);
+            if (category != null) {
+                productPage = productRepository.findByCategoryAndActiveTrueAndPriceBetween(category, finalMinPrice,
+                        finalMaxPrice, pageable);
+                model.addAttribute("currentCategoryName", category.getName()); // ✅ Truyền tên danh mục
+            } else {
+                productPage = productRepository.findByActiveTrueAndPriceBetween(finalMinPrice, finalMaxPrice, pageable);
+                model.addAttribute("currentCategoryName", null);
+            }
+            model.addAttribute("currentCategoryId", categoryId);
+        } else {
+            productPage = productRepository.findByActiveTrueAndPriceBetween(finalMinPrice, finalMaxPrice, pageable);
+            model.addAttribute("currentCategoryId", null);
+            model.addAttribute("currentCategoryName", null);
+        }
+
+        model.addAttribute("products", productPage.getContent());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", productPage.getTotalPages());
+        model.addAttribute("totalItems", productPage.getTotalElements());
+        model.addAttribute("currentMinPrice", minPrice);
+        model.addAttribute("currentMaxPrice", maxPrice);
+        model.addAttribute("currentSort", sortType);
         model.addAttribute("categories", categoryRepository.findAll());
         model.addAttribute("totalQuantity", totalQuantity);
+
         return "products";
     }
 
@@ -130,6 +191,9 @@ public class IndexController {
         return "product-details";
     }
 
+    // ================================================
+    // Các trang tĩnh
+    // ================================================
     @GetMapping("/about")
     public String about(Model model, HttpSession session) {
         User currentUser = (User) session.getAttribute("currentUser");
@@ -169,7 +233,6 @@ public class IndexController {
 
         List<Order> orders = orderRepository.findByUserOrderByCreateAtDesc(currentUser);
 
-        // Map: orderDetailId -> đã review chưa
         Map<Integer, Boolean> reviewedMap = new HashMap<>();
         for (Order order : orders) {
             if (order.getOrderDetails() != null) {
@@ -179,8 +242,6 @@ public class IndexController {
             }
         }
 
-        // Map: orderId -> còn ít nhất 1 sản phẩm chưa review không
-        // Tính ở Java để tránh dùng lambda trong Thymeleaf SpEL (không được hỗ trợ)
         Map<Integer, Boolean> hasUnreviewedMap = new HashMap<>();
         for (Order order : orders) {
             if (order.getStatus() != null && order.getStatus() == 4
@@ -190,12 +251,16 @@ public class IndexController {
                 hasUnreviewedMap.put(order.getId(), hasUnreviewed);
             }
         }
+
         model.addAttribute("orders", orders);
         model.addAttribute("reviewedMap", reviewedMap);
         model.addAttribute("hasUnreviewedMap", hasUnreviewedMap);
         return "order-details";
     }
 
+    // ================================================
+    // Trang mã giảm giá
+    // ================================================
     @GetMapping("/vouchers")
     public String vouchersPage(Model model, HttpSession session) {
         User currentUser = (User) session.getAttribute("currentUser");
