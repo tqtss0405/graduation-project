@@ -27,7 +27,6 @@
                 </ul>
                 <div class="d-flex align-items-center gap-3">
 
-                    <!-- Ô tìm kiếm -->
                     <div class="input-group d-none d-lg-flex" style="width: 200px">
                         <input type="text" id="searchInput"
                             class="form-control form-control-sm border-end-0 rounded-start-pill"
@@ -38,7 +37,6 @@
                         </button>
                     </div>
 
-                    <!-- Icon giỏ hàng + badge tổng số lượng -->
                     <div class="position-relative">
                         <a href="/user/cart">
                             <i class="fa-solid fa-cart-shopping fs-5 text-secondary"></i>
@@ -48,7 +46,6 @@
                         </a>
                     </div>
 
-                    <!-- Dropdown user -->
                     <div class="dropdown ms-2">
                         <a href="#"
                             class="d-flex align-items-center text-decoration-none text-secondary dropdown-toggle"
@@ -118,36 +115,63 @@
                 <div class="filter-sidebar shadow-sm">
                     <h5 class="filter-title">Danh Mục</h5>
                     <ul class="category-list">
-                        <li><a href="#" class="active"><i class="fa-solid fa-angle-right me-2"></i>Tất cả sách</a></li>
-                        <li><a href="#"><i class="fa-solid fa-angle-right me-2"></i>Văn học nước ngoài</a></li>
-                        <li><a href="#"><i class="fa-solid fa-angle-right me-2"></i>Kinh tế - Quản trị</a></li>
-                        <li><a href="#"><i class="fa-solid fa-angle-right me-2"></i>Tâm lý - Kỹ năng</a></li>
-                        <li><a href="#"><i class="fa-solid fa-angle-right me-2"></i>Sách Thiếu nhi</a></li>
+                        <li>
+                            <a th:href="@{/products}" th:classappend="${currentCategoryId == null ? 'active' : ''}">
+                                <i class="fa-solid fa-angle-right me-2"></i>Tất cả sách
+                            </a>
+                        </li>
+
+                        <li th:each="cat : ${categories}">
+                            <a th:href="@{/products(categoryId=${cat.id})}"
+                                th:classappend="${currentCategoryId == cat.id ? 'active' : ''}">
+                                <i class="fa-solid fa-angle-right me-2"></i><span th:text="${cat.name}">Tên danh
+                                    mục</span>
+                            </a>
+                        </li>
                     </ul>
 
                     <h5 class="filter-title mt-4">Khoảng Giá</h5>
-                    <div class="d-flex align-items-center gap-2 mb-3">
-                        <input type="number" class="form-control form-control-sm" placeholder="Từ">
-                        <span>-</span>
-                        <input type="number" class="form-control form-control-sm" placeholder="Đến">
-                    </div>
-                    <button class="btn btn-success w-100 btn-sm">Áp dụng</button>
+                    <form action="/products" method="get">
+                        <input type="hidden" name="categoryId" th:if="${currentCategoryId != null}"
+                            th:value="${currentCategoryId}">
+
+                        <input type="hidden" name="sort" th:if="${currentSort != null}" th:value="${currentSort}">
+
+                        <div class="d-flex align-items-center gap-2 mb-3">
+                            <input type="number" name="minPrice" class="form-control form-control-sm" placeholder="Từ"
+                                min="0" th:value="${currentMinPrice}">
+                            <span>-</span>
+                            <input type="number" name="maxPrice" class="form-control form-control-sm" placeholder="Đến"
+                                min="0" th:value="${currentMaxPrice}">
+                        </div>
+
+                        <button type="submit" class="btn btn-success w-100 btn-sm">Áp dụng</button>
+                    </form>
                 </div>
             </div>
-
-            <!-- THAY THẾ PHẦN DANH SÁCH SẢN PHẨM TRONG products.html -->
-            <!-- Tìm <div class="col-lg-9"> và thay nội dung bên trong -->
 
             <div class="col-lg-9">
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <span class="text-muted">
-                        Hiển thị <strong th:text="${#lists.size(products)}">0</strong> sản phẩm
+                        Hiển thị <strong th:text="${#lists.size(products)}">0</strong> / <strong
+                            th:text="${totalItems}">0</strong> sản phẩm
                     </span>
-                    <select class="form-select w-auto">
-                        <option>Mới nhất</option>
-                        <option>Giá tăng dần</option>
-                        <option>Giá giảm dần</option>
-                    </select>
+
+                    <form action="/products" method="get" class="d-flex align-items-center m-0">
+                        <input type="hidden" name="categoryId" th:if="${currentCategoryId != null}"
+                            th:value="${currentCategoryId}">
+                        <input type="hidden" name="minPrice" th:if="${currentMinPrice != null}"
+                            th:value="${currentMinPrice}">
+                        <input type="hidden" name="maxPrice" th:if="${currentMaxPrice != null}"
+                            th:value="${currentMaxPrice}">
+
+                        <select name="sort" class="form-select w-auto" onchange="this.form.submit()">
+                            <option value="newest" th:selected="${currentSort == 'newest'}">Mới nhất</option>
+                            <option value="price-asc" th:selected="${currentSort == 'price-asc'}">Giá tăng dần</option>
+                            <option value="price-desc" th:selected="${currentSort == 'price-desc'}">Giá giảm dần
+                            </option>
+                        </select>
+                    </form>
                 </div>
 
                 <div class="row row-cols-1 row-cols-md-3 g-4">
@@ -175,29 +199,58 @@
 
                                     </div>
                                     <div class="mt-auto text-center">
-    <a th:href="@{'/product/' + ${p.slug}}"
-       class="btn btn-outline-success w-75">
-        Chi tiết sản phẩm
-    </a>
-</div>
+                                        <a th:href="@{'/product/' + ${p.slug}}" class="btn btn-outline-success w-75">
+                                            Chi tiết sản phẩm
+                                        </a>
+                                    </div>
                                 </div>
                             </a>
                         </div>
                     </div>
 
-                    <!-- Khi không có sản phẩm -->
                     <div class="col-12 text-center py-5" th:if="${#lists.isEmpty(products)}">
                         <i class="fa-solid fa-box-open fa-3x text-muted mb-3 d-block"></i>
                         <p class="text-muted">Không có sản phẩm nào.</p>
                     </div>
                 </div>
 
-                <!-- Phân trang (tĩnh, sau này có thể nâng cấp) -->
-                <nav class="mt-5 d-flex justify-content-center">
+                <!-- Phân trang động -->
+                <nav class="mt-5 d-flex justify-content-center" th:if="${totalPages > 1}">
                     <ul class="pagination">
-                        <li class="page-item disabled"><a class="page-link" href="#">Trước</a></li>
-                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                        <li class="page-item"><a class="page-link" href="#">Sau</a></li>
+
+                        <!-- Nút Trước -->
+                        <li class="page-item" th:classappend="${currentPage == 0 ? 'disabled' : ''}">
+                            <a class="page-link" th:href="@{/products(page=${currentPage - 1},
+                                                    categoryId=${currentCategoryId},
+                                                    minPrice=${currentMinPrice},
+                                                    maxPrice=${currentMaxPrice},
+                                                    sort=${currentSort})}">
+                                &laquo; Trước
+                            </a>
+                        </li>
+
+                        <!-- Số trang -->
+                        <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                            th:classappend="${i == currentPage ? 'active' : ''}">
+                            <a class="page-link" th:text="${i + 1}" th:href="@{/products(page=${i},
+                                                    categoryId=${currentCategoryId},
+                                                    minPrice=${currentMinPrice},
+                                                    maxPrice=${currentMaxPrice},
+                                                    sort=${currentSort})}">
+                            </a>
+                        </li>
+
+                        <!-- Nút Sau -->
+                        <li class="page-item" th:classappend="${currentPage == totalPages - 1 ? 'disabled' : ''}">
+                            <a class="page-link" th:href="@{/products(page=${currentPage + 1},
+                                                    categoryId=${currentCategoryId},
+                                                    minPrice=${currentMinPrice},
+                                                    maxPrice=${currentMaxPrice},
+                                                    sort=${currentSort})}">
+                                Sau &raquo;
+                            </a>
+                        </li>
+
                     </ul>
                 </nav>
             </div>
@@ -219,7 +272,9 @@
                     <div class="d-flex flex-column gap-2 text-muted small">
                         <p class="mb-0"><i class="fa-solid fa-location-dot me-2 text-success"></i> Đường 3/2, Ninh Kiều,
                             Cần Thơ</p>
-                        <p class="mb-0"><i class="fa-solid fa-envelope me-2 text-success"></i> hotro@beobooks.com</p>
+                        <p class="mb-0"><i class="fa-solid fa-envelope me-2 text-success"></i> <a
+                                href="/cdn-cgi/l/email-protection" class="__cf_email__"
+                                data-cfemail="bbd3d4cfc9d4fbd9ded4d9d4d4d0c895d8d4d6">[email&#160;protected]</a></p>
                         <p class="mb-0"><i class="fa-solid fa-phone me-2 text-success"></i> 1900 6789</p>
                     </div>
                 </div>
