@@ -13,61 +13,22 @@
 
 <body>
     <div id="toast-container"></div>
-    <!-- Sidebar -->
     <nav class="sidebar">
         <div class="sidebar-brand">BEO<span style="color:white">BOOKS</span></div>
         <ul class="nav flex-column mt-3">
-            <li class="nav-item">
-                <a href="/admin/dashboard" class="nav-link">
-                    <i class="fa-solid fa-gauge"></i> Tổng quan
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="/admin/products" class="nav-link">
-                    <i class="fa-solid fa-book"></i> Quản lý sách
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="/admin/orders" class="nav-link">
-                    <i class="fa-solid fa-cart-shopping"></i> Đơn hàng
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="/admin/customers" class="nav-link">
-                    <i class="fa-solid fa-users"></i> Khách hàng
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="/admin/categories" class="nav-link">
-                    <i class="fa-solid fa-layer-group"></i> Danh mục
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="/admin/vouchers" class="nav-link active">
-                    <i class="fa-solid fa-ticket"></i> Mã giảm giá
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="/admin/reviews" class="nav-link">
-                    <i class="fa-solid fa-star"></i> Đánh giá
-                </a>
-            </li>
-
-            <li class="nav-item mt-5">
-                <a href="/logout" class="nav-link text-danger">
-                    <i class="fa-solid fa-right-from-bracket"></i> Thoát
-                </a>
-            </li>
+            <li class="nav-item"><a href="/admin/dashboard" class="nav-link"><i class="fa-solid fa-gauge"></i> Tổng quan</a></li>
+            <li class="nav-item"><a href="/admin/products" class="nav-link"><i class="fa-solid fa-book"></i> Quản lý sách</a></li>
+            <li class="nav-item"><a href="/admin/orders" class="nav-link"><i class="fa-solid fa-cart-shopping"></i> Đơn hàng</a></li>
+            <li class="nav-item"><a href="/admin/customers" class="nav-link"><i class="fa-solid fa-users"></i> Khách hàng</a></li>
+            <li class="nav-item"><a href="/admin/categories" class="nav-link"><i class="fa-solid fa-layer-group"></i> Danh mục</a></li>
+            <li class="nav-item"><a href="/admin/vouchers" class="nav-link active"><i class="fa-solid fa-ticket"></i> Mã giảm giá</a></li>
+            <li class="nav-item"><a href="/admin/reviews" class="nav-link"><i class="fa-solid fa-star"></i> Đánh giá</a></li>
+            <li class="nav-item mt-5"><a href="/logout" class="nav-link text-danger"><i class="fa-solid fa-right-from-bracket"></i> Thoát</a></li>
         </ul>
     </nav>
 
-    <!-- Main Content -->
     <main class="main-content">
-
-        <!-- Admin Header -->
         <div class="admin-header">
-            <!-- Flash Messages -->
-
             <div>
                 <h4 class="fw-bold mb-0">Quản lý Mã giảm giá</h4>
                 <small class="text-muted">Tạo và quản lý các chương trình khuyến mãi</small>
@@ -77,34 +38,31 @@
                     <i class="fa-solid fa-plus me-2"></i>Tạo mã giảm giá
                 </button>
                 <div class="admin-profile" data-bs-toggle="modal" data-bs-target="#profileModal">
-                    <img src="https://ui-avatars.com/api/?name=Admin&background=28a745&color=fff" alt="Admin"
-                        class="admin-avatar">
+                    <img src="https://ui-avatars.com/api/?name=Admin&background=28a745&color=fff" alt="Admin" class="admin-avatar">
                     <div class="admin-info">
                         <h6>Admin Nguyễn</h6>
-                        <small><i class="fa-solid fa-circle text-success" style="font-size: 0.5rem;"></i> Đang hoạt
-                            động</small>
+                        <small><i class="fa-solid fa-circle text-success" style="font-size: 0.5rem;"></i> Đang hoạt động</small>
                     </div>
                     <i class="fa-solid fa-chevron-down ms-2"></i>
                 </div>
             </div>
         </div>
-        <div th:if="${successMsg}" class="alert alert-success d-flex align-items-center gap-2 mt-3 mb-3" role="alert">
+
+        <div th:if="${successMsg}" class="alert alert-success d-flex align-items-center gap-2 mt-3 mb-3">
             <i class="fa-solid fa-circle-check"></i>
             <span th:text="${successMsg}"></span>
         </div>
-        <div th:if="${errorMsg}" class="alert alert-danger d-flex align-items-center gap-2 mt-3 mb-3" role="alert">
+        <div th:if="${errorMsg}" class="alert alert-danger d-flex align-items-center gap-2 mt-3 mb-3">
             <i class="fa-solid fa-circle-exclamation"></i>
             <span th:text="${errorMsg}"></span>
         </div>
-        <!-- Stats Cards -->
+
+        <!-- Stats -->
         <div class="row g-4 mb-4">
             <div class="col-md-3">
                 <div class="stat-card">
                     <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <small class="opacity-75">Tổng mã</small>
-                            <h2 class="fw-bold mb-0" th:text="${totalVouchers}">0</h2>
-                        </div>
+                        <div><small class="opacity-75">Tổng mã</small><h2 class="fw-bold mb-0" th:text="${totalVouchers}">0</h2></div>
                         <i class="fa-solid fa-ticket fa-3x opacity-25"></i>
                     </div>
                 </div>
@@ -112,10 +70,7 @@
             <div class="col-md-3">
                 <div class="stat-card green">
                     <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <small class="opacity-75">Đang hoạt động</small>
-                            <h2 class="fw-bold mb-0" th:text="${activeVouchers}">0</h2>
-                        </div>
+                        <div><small class="opacity-75">Đang hoạt động</small><h2 class="fw-bold mb-0" th:text="${activeVouchers}">0</h2></div>
                         <i class="fa-solid fa-check-circle fa-3x opacity-25"></i>
                     </div>
                 </div>
@@ -123,10 +78,7 @@
             <div class="col-md-3">
                 <div class="stat-card orange">
                     <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <small class="opacity-75">Đã hết hạn</small>
-                            <h2 class="fw-bold mb-0" th:text="${expiredVouchers}">0</h2>
-                        </div>
+                        <div><small class="opacity-75">Đã hết hạn</small><h2 class="fw-bold mb-0" th:text="${expiredVouchers}">0</h2></div>
                         <i class="fa-solid fa-clock fa-3x opacity-25"></i>
                     </div>
                 </div>
@@ -134,10 +86,7 @@
             <div class="col-md-3">
                 <div class="stat-card blue">
                     <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <small class="opacity-75">Sắp diễn ra</small>
-                            <h2 class="fw-bold mb-0" th:text="${upcomingVouchers}">0</h2>
-                        </div>
+                        <div><small class="opacity-75">Sắp diễn ra</small><h2 class="fw-bold mb-0" th:text="${upcomingVouchers}">0</h2></div>
                         <i class="fa-solid fa-calendar fa-3x opacity-25"></i>
                     </div>
                 </div>
@@ -149,9 +98,7 @@
             <div class="row g-3">
                 <div class="col-md-4">
                     <div class="input-group">
-                        <span class="input-group-text bg-white">
-                            <i class="fa-solid fa-search"></i>
-                        </span>
+                        <span class="input-group-text bg-white"><i class="fa-solid fa-search"></i></span>
                         <input type="text" class="form-control border-start-0" placeholder="Tìm mã giảm giá...">
                     </div>
                 </div>
@@ -164,14 +111,12 @@
                     </select>
                 </div>
                 <div class="col-md-2">
-                    <button class="btn btn-outline-success w-100">
-                        <i class="fa-solid fa-filter me-2"></i>Lọc
-                    </button>
+                    <button class="btn btn-outline-success w-100"><i class="fa-solid fa-filter me-2"></i>Lọc</button>
                 </div>
             </div>
         </div>
 
-        <!-- vouchers  Table -->
+        <!-- Table -->
         <div class="bg-white rounded-3 shadow-sm overflow-hidden">
             <table class="table table-hover mb-0 align-middle">
                 <thead class="table-light">
@@ -189,12 +134,9 @@
                     </tr>
                 </thead>
                 <tbody>
-
                     <tr th:each="v : ${vouchers}">
                         <td class="fw-bold" th:text="${v.id}"></td>
-                        <td>
-                            <div class="fw-bold" th:text="${v.name}"></div>
-                        </td>
+                        <td><div class="fw-bold" th:text="${v.name}"></div></td>
                         <td>
                             <span class="coupon-code" th:text="${v.code}"></span>
                             <button class="btn btn-sm btn-light ms-2" th:data-code="${v.code}"
@@ -202,17 +144,13 @@
                                 <i class="fa-solid fa-copy"></i>
                             </button>
                         </td>
-                        <td>
-                            <span class="discount-badge" th:text="'-' + ${v.discount} + '%'"></span>
-                        </td>
+                        <td><span class="discount-badge" th:text="'-' + ${v.discount} + '%'"></span></td>
                         <td><strong th:text="${v.quantity == 0} ? '∞' : ${v.quantity}"></strong></td>
                         <td>
-                            <div th:text="${usedCountMap[v.id]} + ' / ' + (${v.quantity == 0} ? '∞' : ${v.quantity})">
-                            </div>
+                            <div th:text="${usedCountMap[v.id]} + ' / ' + (${v.quantity == 0} ? '∞' : ${v.quantity})"></div>
                             <div th:if="${v.quantity > 0}" class="progress mt-1" style="height: 5px;">
                                 <div class="progress-bar bg-success"
-                                    th:style="'width:' + (${usedCountMap[v.id]} * 100 / ${v.quantity}) + '%'">
-                                </div>
+                                    th:style="'width:' + (${usedCountMap[v.id]} * 100 / ${v.quantity}) + '%'"></div>
                             </div>
                             <small th:if="${v.quantity == 0}" class="text-muted">Không giới hạn</small>
                         </td>
@@ -220,23 +158,15 @@
                         <td th:text="${v.endAt} ? ${#temporals.format(v.endAt, 'dd/MM/yyyy')} : '-'"></td>
                         <td>
                             <span th:if="${!v.active}" class="status-expired">Đã tắt</span>
-                            <span th:if="${v.active and v.endAt != null and v.endAt.isBefore(#temporals.createNow())}"
-                                class="status-expired">Đã hết hạn</span>
-                            <span th:if="${v.active and (v.endAt == null or v.endAt.isAfter(#temporals.createNow())) 
-                         and (v.startedAt == null or v.startedAt.isAfter(#temporals.createNow()))}"
-                                class="status-upcoming">Sắp diễn ra</span>
-                            <span th:if="${v.active and (v.endAt == null or v.endAt.isAfter(#temporals.createNow())) 
-                         and (v.startedAt == null or v.startedAt.isBefore(#temporals.createNow()))}"
-                                class="status-active">Đang hoạt động</span>
+                            <span th:if="${v.active and v.endAt != null and v.endAt.isBefore(#temporals.createNow())}" class="status-expired">Đã hết hạn</span>
+                            <span th:if="${v.active and (v.endAt == null or v.endAt.isAfter(#temporals.createNow())) and (v.startedAt == null or v.startedAt.isAfter(#temporals.createNow()))}" class="status-upcoming">Sắp diễn ra</span>
+                            <span th:if="${v.active and (v.endAt == null or v.endAt.isAfter(#temporals.createNow())) and (v.startedAt == null or v.startedAt.isBefore(#temporals.createNow()))}" class="status-active">Đang hoạt động</span>
                         </td>
                         <td>
-                            <!-- Nút Sửa: load data bằng JS rồi mở modal -->
                             <button class="btn btn-sm btn-light text-primary" th:data-id="${v.id}"
                                 onclick="openEditModal(this.dataset.id)" title="Sửa">
                                 <i class="fa-solid fa-pen"></i>
                             </button>
-                            <!-- Nút Xóa: submit form DELETE -->
-                            <!-- Thay thế nút xóa cũ -->
                             <form th:action="@{/admin/vouchers/delete/{id}(id=${v.id})}" method="post"
                                 style="display:inline;" th:id="'del-form-' + ${v.id}">
                                 <button type="button" class="btn btn-sm btn-light text-danger" title="Xóa"
@@ -251,97 +181,62 @@
             </table>
         </div>
 
-        <!-- Pagination -->
         <nav class="mt-4 d-flex justify-content-between align-items-center">
-            <div class="text-muted">
-                Hiển thị <strong>1-10</strong> trong <strong>24</strong> mã
-            </div>
-            <ul class="pagination mb-0">
-                <li class="page-item disabled">
-                    <a class="page-link" href="#"><i class="fa-solid fa-chevron-left"></i></a>
-                </li>
-                <li class="page-item active">
-                    <a class="page-link bg-success border-success" href="#">1</a>
-                </li>
-                <li class="page-item">
-                    <a class="page-link text-success" href="#">2</a>
-                </li>
-                <li class="page-item">
-                    <a class="page-link text-success" href="#">3</a>
-                </li>
-                <li class="page-item">
-                    <a class="page-link" href="#"><i class="fa-solid fa-chevron-right"></i></a>
-                </li>
-            </ul>
+            <div class="text-muted">Hiển thị <strong th:text="${#lists.size(vouchers)}">0</strong> mã</div>
         </nav>
     </main>
 
-    <!-- Add Coupon Modal -->
+    <!-- Add Modal -->
     <div class="modal fade" id="addCouponModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header bg-success text-white">
-                    <h5 class="modal-title fw-bold">
-                        <i class="fa-solid fa-plus me-2"></i>Tạo Mã giảm giá Mới
-                    </h5>
+                    <h5 class="modal-title fw-bold"><i class="fa-solid fa-plus me-2"></i>Tạo Mã giảm giá Mới</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="addCouponForm" th:action="@{/admin/vouchers/save}" th:object="${voucherDTO}" method="post"
-                        class="row g-3">
-
+                    <form id="addCouponForm" th:action="@{/admin/vouchers/save}" th:object="${voucherDTO}" method="post" class="row g-3">
                         <div class="col-md-12">
                             <label class="form-label fw-semibold">Tên chương trình *</label>
-                            <input type="text" th:field="*{name}" class="form-control"
-                                placeholder="VD: Khuyến mãi Tết 2025">
-
+                            <input type="text" th:field="*{name}" class="form-control" placeholder="VD: Khuyến mãi Tết 2025">
                         </div>
-
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Mã giảm giá *</label>
                             <div class="input-group">
-                                <input type="text" th:field="*{code}" id="couponCode"
-                                    class="form-control text-uppercase" placeholder="VD: TET2025">
+                                <input type="text" th:field="*{code}" id="couponCode" class="form-control text-uppercase" placeholder="VD: TET2025">
                                 <button class="btn btn-outline-secondary" type="button" onclick="generateCode()">
                                     <i class="fa-solid fa-wand-magic-sparkles"></i> Tạo tự động
                                 </button>
                             </div>
-
                             <small class="text-muted">Chữ hoa, không dấu, không khoảng trắng, tối đa 10 ký tự</small>
                         </div>
-
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Giảm giá (%) *</label>
                             <div class="input-group">
-                                <input type="number" th:field="*{discount}" class="form-control" min="1" max="100"
-                                    placeholder="Nhập % giảm">
+                                <input type="number" th:field="*{discount}" class="form-control" min="1" max="100" placeholder="Nhập % giảm">
                                 <span class="input-group-text">%</span>
                             </div>
-
                         </div>
-
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Số lượng mã *</label>
-                            <input type="number" th:field="*{quantity}" class="form-control" min="0"
-                                placeholder="0 = Không giới hạn">
-
+                            <input type="number" th:field="*{quantity}" class="form-control" min="0" placeholder="0 = Không giới hạn">
                         </div>
-
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Ngày bắt đầu *</label>
                             <input type="datetime-local" name="startedAt" id="startedAt" class="form-control">
-
                         </div>
-
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Ngày hết hạn *</label>
                             <input type="datetime-local" name="endAt" id="endAt" class="form-control">
-
                         </div>
-
                         <div class="col-12">
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" th:field="*{active}" id="activeStatus">
+                                <!--
+                                    ✅ FIX CHECKBOX: Không dùng hidden field vì Spring MVC lấy value đầu tiên
+                                    Thay vào đó dùng th:field với value="true", khi uncheck thì active=null
+                                    Controller sẽ xử lý null thành false qua Boolean.TRUE.equals()
+                                -->
+                                <input class="form-check-input" type="checkbox" th:field="*{active}" id="activeStatus" value="true">
                                 <label class="form-check-label" for="activeStatus">Kích hoạt ngay sau khi tạo</label>
                             </div>
                         </div>
@@ -357,43 +252,36 @@
         </div>
     </div>
 
-    <!-- Edit Coupon Modal (tương tự Add) -->
+    <!-- Edit Modal -->
     <div class="modal fade" id="editCouponModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title fw-bold">
-                        <i class="fa-solid fa-pen me-2"></i>Cập nhật Mã giảm giá
-                    </h5>
+                    <h5 class="modal-title fw-bold"><i class="fa-solid fa-pen me-2"></i>Cập nhật Mã giảm giá</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <form id="editCouponForm" method="post" class="row g-3">
-                        <!-- action được set động bằng JS -->
                         <input type="hidden" id="editId">
-
                         <div class="col-md-12">
                             <label class="form-label fw-semibold">Tên chương trình *</label>
                             <input type="text" id="editName" name="name" class="form-control" required>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Mã giảm giá *</label>
-                            <input type="text" id="editCode" name="code" class="form-control text-uppercase"
-                                maxlength="10" required>
+                            <input type="text" id="editCode" name="code" class="form-control text-uppercase" maxlength="10" required>
                             <small class="text-muted">Tối đa 10 ký tự, chữ hoa và số</small>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Giảm giá (%) *</label>
                             <div class="input-group">
-                                <input type="number" id="editDiscount" name="discount" class="form-control" min="1"
-                                    max="100" required>
+                                <input type="number" id="editDiscount" name="discount" class="form-control" min="1" max="100" required>
                                 <span class="input-group-text">%</span>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Số lượng *</label>
-                            <input type="number" id="editQuantity" name="quantity" class="form-control" min="0"
-                                required>
+                            <input type="number" id="editQuantity" name="quantity" class="form-control" min="0" required>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Ngày bắt đầu *</label>
@@ -405,7 +293,13 @@
                         </div>
                         <div class="col-12">
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="editActive" name="active">
+                                <!--
+                                    ✅ FIX: Dùng hidden input "activeHidden" để gửi false khi uncheck
+                                    JS sẽ set value của hidden này trước khi submit
+                                -->
+                                <input type="hidden" name="active" id="editActiveHidden" value="false">
+                                <input class="form-check-input" type="checkbox" id="editActive" value="true"
+                                       onchange="document.getElementById('editActiveHidden').value = this.checked ? 'true' : 'false'">
                                 <label class="form-check-label" for="editActive">Đang kích hoạt</label>
                             </div>
                         </div>
@@ -420,13 +314,12 @@
             </div>
         </div>
     </div>
+
     <div class="modal fade" id="profileModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header bg-success text-white">
-                    <h5 class="modal-title fw-bold">
-                        <i class="fa-solid fa-user-circle me-2"></i>Thông tin cá nhân
-                    </h5>
+                    <h5 class="modal-title fw-bold"><i class="fa-solid fa-user-circle me-2"></i>Thông tin cá nhân</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
@@ -434,20 +327,16 @@
                         <div class="text-center mb-4">
                             <div class="position-relative d-inline-block">
                                 <img src="https://ui-avatars.com/api/?name=Admin&background=28a745&color=fff&size=150"
-                                    class="rounded-circle" width="150" height="150" id="profileAvatarPreview"
-                                    alt="Avatar">
-                                <label for="avatarUpload"
-                                    class="position-absolute bottom-0 end-0 btn btn-success btn-sm rounded-circle"
-                                    style="width: 40px; height: 40px;">
+                                    class="rounded-circle" width="150" height="150" id="profileAvatarPreview" alt="Avatar">
+                                <label for="avatarUpload" class="position-absolute bottom-0 end-0 btn btn-success btn-sm rounded-circle" style="width:40px;height:40px;">
                                     <i class="fa-solid fa-camera"></i>
                                 </label>
-                                <input type="file" id="avatarUpload" class="d-none" accept="image/*"
-                                    onchange="previewAvatar(event)">
+                                <input type="file" id="avatarUpload" class="d-none" accept="image/*" onchange="previewAvatar(event)">
                             </div>
                         </div>
                         <div class="mb-3">
                             <label class="form-label fw-semibold">Họ và tên</label>
-                            <input type="text" class="form-control" value="Admin Nguyễn" placeholder="Nhập họ tên">
+                            <input type="text" class="form-control" value="Admin Nguyễn">
                         </div>
                         <div class="mb-3">
                             <label class="form-label fw-semibold">Email</label>
@@ -455,50 +344,39 @@
                         </div>
                         <div class="mb-3">
                             <label class="form-label fw-semibold">Số điện thoại</label>
-                            <input type="tel" class="form-control" value="0123456789" placeholder="Nhập số điện thoại">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">Giới tính</label>
-                            <select class="form-select">
-                                <option value="male">Nam</option>
-                                <option value="female">Nữ</option>
-                                <option value="other">Khác</option>
-                            </select>
+                            <input type="tel" class="form-control" value="0123456789">
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="submit" form="profileForm" class="btn btn-success">
-                        <i class="fa-solid fa-save me-2"></i>Lưu thay đổi
-                    </button>
+                    <button type="submit" form="profileForm" class="btn btn-success"><i class="fa-solid fa-save me-2"></i>Lưu thay đổi</button>
                 </div>
             </div>
         </div>
     </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/js/admin-avt.js"></script>
     <script src="/js/sidebar.js"></script>
     <script>
-        /* ── TOAST ENGINE ──────────────────────────────────────── */
-        const TOAST_ICONS = { success: 'fa-circle-check', error: 'fa-circle-xmark', info: 'fa-circle-info', warning: 'fa-triangle-exclamation' };
-        const TOAST_TITLES = { success: 'Thành công', error: 'Lỗi', info: 'Thông báo', warning: 'Cảnh báo' };
+        /* ── TOAST ── */
+        const TOAST_ICONS  = { success:'fa-circle-check', error:'fa-circle-xmark', info:'fa-circle-info', warning:'fa-triangle-exclamation' };
+        const TOAST_TITLES = { success:'Thành công', error:'Lỗi', info:'Thông báo', warning:'Cảnh báo' };
 
-        function showToast(type = 'info', title = '', message = '', duration = 4000) {
+        function showToast(type='info', title='', message='', duration=4000) {
             const container = document.getElementById('toast-container');
             const id = 'toast-' + Date.now();
             const el = document.createElement('div');
-            el.className = `toast-item ${type}`;
-            el.id = id;
+            el.className = `toast-item ${type}`; el.id = id;
             el.innerHTML = `
-    <div class="toast-icon"><i class="fa-solid ${TOAST_ICONS[type]}"></i></div>
-    <div class="toast-body">
-      <div class="toast-title">${title || TOAST_TITLES[type]}</div>
-      ${message ? `<div class="toast-msg">${message}</div>` : ''}
-    </div>
-    <button class="toast-close" onclick="closeToast('${id}')"><i class="fa-solid fa-xmark"></i></button>
-    <div class="toast-progress" style="animation-duration:${duration}ms"></div>
-  `;
+                <div class="toast-icon"><i class="fa-solid ${TOAST_ICONS[type]}"></i></div>
+                <div class="toast-body">
+                    <div class="toast-title">${title || TOAST_TITLES[type]}</div>
+                    ${message ? `<div class="toast-msg">${message}</div>` : ''}
+                </div>
+                <button class="toast-close" onclick="closeToast('${id}')"><i class="fa-solid fa-xmark"></i></button>
+                <div class="toast-progress" style="animation-duration:${duration}ms"></div>`;
             container.appendChild(el);
             setTimeout(() => closeToast(id), duration);
         }
@@ -510,30 +388,29 @@
             setTimeout(() => el.remove(), 320);
         }
 
-        /* ── CONFIRM DIALOG (thay confirm()) ───────────────────── */
+        /* ── CONFIRM ── */
         function showConfirm(message, onConfirm) {
             const overlay = document.createElement('div');
-            overlay.style.cssText = 'position:fixed;inset:0;background:rgba(15,23,42,0.45);backdrop-filter:blur(4px);z-index:10000;display:flex;align-items:center;justify-content:center;animation:fadeIn 0.2s ease both;';
+            overlay.style.cssText = 'position:fixed;inset:0;background:rgba(15,23,42,0.45);backdrop-filter:blur(4px);z-index:10000;display:flex;align-items:center;justify-content:center;';
             overlay.innerHTML = `
-    <div style="background:#fff;border-radius:18px;padding:32px 28px;max-width:360px;width:90%;
-      box-shadow:0 24px 64px rgba(0,0,0,0.18);animation:scaleIn 0.25s cubic-bezier(.22,1,.36,1) both;text-align:center;">
-      <div style="width:56px;height:56px;border-radius:50%;background:#fee2e2;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
-        <i class="fa-solid fa-trash" style="color:#ef4444;font-size:22px;"></i>
-      </div>
-      <div style="font-weight:700;font-size:1rem;color:#1e293b;margin-bottom:8px;">Xác nhận xóa</div>
-      <div style="font-size:0.85rem;color:#64748b;margin-bottom:24px;line-height:1.5;">${message}</div>
-      <div style="display:flex;gap:10px;">
-        <button id="dlg-cancel" style="flex:1;padding:11px 0;border-radius:10px;border:1.5px solid #e2e8f0;background:#f8fafc;color:#475569;font-weight:600;cursor:pointer;">Hủy</button>
-        <button id="dlg-ok"     style="flex:1;padding:11px 0;border-radius:10px;border:none;background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;font-weight:700;cursor:pointer;box-shadow:0 4px 14px rgba(239,68,68,0.35);">Xóa</button>
-      </div>
-    </div>`;
+                <div style="background:#fff;border-radius:18px;padding:32px 28px;max-width:360px;width:90%;box-shadow:0 24px 64px rgba(0,0,0,0.18);text-align:center;">
+                    <div style="width:56px;height:56px;border-radius:50%;background:#fee2e2;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+                        <i class="fa-solid fa-trash" style="color:#ef4444;font-size:22px;"></i>
+                    </div>
+                    <div style="font-weight:700;font-size:1rem;color:#1e293b;margin-bottom:8px;">Xác nhận xóa</div>
+                    <div style="font-size:0.85rem;color:#64748b;margin-bottom:24px;line-height:1.5;">${message}</div>
+                    <div style="display:flex;gap:10px;">
+                        <button id="dlg-cancel" style="flex:1;padding:11px 0;border-radius:10px;border:1.5px solid #e2e8f0;background:#f8fafc;color:#475569;font-weight:600;cursor:pointer;">Hủy</button>
+                        <button id="dlg-ok" style="flex:1;padding:11px 0;border-radius:10px;border:none;background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;font-weight:700;cursor:pointer;">Xóa</button>
+                    </div>
+                </div>`;
             document.body.appendChild(overlay);
             overlay.querySelector('#dlg-cancel').onclick = () => overlay.remove();
             overlay.querySelector('#dlg-ok').onclick = () => { overlay.remove(); onConfirm(); };
             overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
         }
 
-        /* ── VOUCHER FUNCTIONS ─────────────────────────────────── */
+        /* ── VOUCHER ── */
         function copyCoupon(code) {
             navigator.clipboard.writeText(code).then(() => {
                 showToast('info', 'Đã sao chép!', `Mã <strong>${code}</strong> đã được copy vào clipboard.`, 2500);
@@ -551,25 +428,28 @@
             fetch('/admin/vouchers/edit/' + id)
                 .then(res => res.json())
                 .then(data => {
-                    document.getElementById('editId').value = data.id;
-                    document.getElementById('editName').value = data.name;
-                    document.getElementById('editCode').value = data.code;
+                    document.getElementById('editId').value       = data.id;
+                    document.getElementById('editName').value     = data.name;
+                    document.getElementById('editCode').value     = data.code;
                     document.getElementById('editDiscount').value = data.discount;
                     document.getElementById('editQuantity').value = data.quantity;
                     document.getElementById('editStartedAt').value = data.startedAt ? data.startedAt.substring(0, 16) : '';
-                    document.getElementById('editEndAt').value = data.endAt ? data.endAt.substring(0, 16) : '';
-                    document.getElementById('editActive').checked = data.active;
+                    document.getElementById('editEndAt').value    = data.endAt ? data.endAt.substring(0, 16) : '';
+
+                    // ✅ FIX: Set cả checkbox lẫn hidden field cùng lúc
+                    const isActive = data.active === true;
+                    document.getElementById('editActive').checked       = isActive;
+                    document.getElementById('editActiveHidden').value   = isActive ? 'true' : 'false';
+
                     document.getElementById('editCouponForm').action = '/admin/vouchers/update/' + id;
                     new bootstrap.Modal(document.getElementById('editCouponModal')).show();
                 })
                 .catch(() => showToast('error', 'Lỗi', 'Không thể tải thông tin voucher.'));
         }
 
-        document.getElementById('couponCode')?.addEventListener('input', function (e) {
+        document.getElementById('couponCode')?.addEventListener('input', function(e) {
             e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
         });
     </script>
-
 </body>
-
 </html>
