@@ -32,6 +32,7 @@ public class ChangePasswordController {
     }
 
     // 2. Xử lý khi bấm nút "Xác Nhận Thay Đổi"
+    // 2. Xử lý khi bấm nút "Xác Nhận Thay Đổi"
     @PostMapping("/change-password")
     public String processChangePassword(
             @RequestParam("currentPass") String currentPass,
@@ -40,14 +41,25 @@ public class ChangePasswordController {
             Model model) {
 
         // Lấy thông tin user đang đăng nhập từ Session
-        User user = (User) session.getAttribute("currentUser");
+        User sessionUser = (User) session.getAttribute("currentUser");
 
-        if (user == null) {
+        if (sessionUser == null) {
             return "redirect:/login/form"; // Nếu rớt mạng/mất session thì bắt đăng nhập lại
         }
 
-        // Kiểm tra 1: Mật khẩu cũ có đúng không?
-        if (!passwordEncoder.matches(currentPass, user.getPassword())) {
+        // ========================================================
+        // 🌟 BƯỚC QUAN TRỌNG NHẤT: TRUY VẤN LẠI TỪ DATABASE!
+        // ========================================================
+        // Dùng ID trong session để tìm lại user trong DB (đảm bảo lấy được chuỗi mật
+        // khẩu đã mã hóa)
+        User dbUser = userRepository.findById(sessionUser.getId()).orElse(null);
+
+        if (dbUser == null) {
+            return "redirect:/login/form";
+        }
+
+        // Kiểm tra 1: Mật khẩu cũ có đúng không? (Lấy mật khẩu từ dbUser)
+        if (!passwordEncoder.matches(currentPass, dbUser.getPassword())) {
             model.addAttribute("message", "Mật khẩu hiện tại không chính xác!");
             return "change-password";
         }
@@ -59,11 +71,11 @@ public class ChangePasswordController {
         }
 
         // Lưu mật khẩu mới vào Database
-        user.setPassword(passwordEncoder.encode(newPass));
-        userRepository.save(user);
+        dbUser.setPassword(passwordEncoder.encode(newPass));
+        userRepository.save(dbUser);
 
-        // Cập nhật lại user mới vào session
-        session.setAttribute("currentUser", user);
+        // Cập nhật lại user mới vào session (để xài cho các trang khác)
+        session.setAttribute("currentUser", dbUser);
 
         model.addAttribute("message", "Đổi mật khẩu thành công!");
         return "change-password";
