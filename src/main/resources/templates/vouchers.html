@@ -9,11 +9,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/style.css">
     <script src="/js/search.js"></script>
-     <script src="/js/sidebar.js"></script>
+    <script src="/js/sidebar.js"></script>
     <style>
         body { font-family: 'Quicksand', sans-serif; background: #f8f9fa; }
 
-        /* ===== VOUCHER CARD ===== */
         .voucher-card {
             background: #fff;
             border-radius: 16px;
@@ -29,7 +28,6 @@
             box-shadow: 0 8px 28px rgba(40,167,69,0.13);
         }
 
-        /* Dải màu bên trái */
         .voucher-stripe {
             width: 10px;
             background: linear-gradient(180deg, #28a745, #20c997);
@@ -38,7 +36,6 @@
         .voucher-stripe.expired { background: linear-gradient(180deg, #adb5bd, #ced4da); }
         .voucher-stripe.low     { background: linear-gradient(180deg, #fd7e14, #ffc107); }
 
-        /* Vòng tròn cắt 2 bên */
         .voucher-cut {
             position: relative;
             display: flex;
@@ -58,7 +55,6 @@
         .voucher-cut::before { left: 108px; }
         .voucher-cut::after  { right: -10px; }
 
-        /* Phần trái: % giảm */
         .voucher-left {
             width: 120px;
             flex-shrink: 0;
@@ -92,7 +88,6 @@
         .voucher-off.expired { color: #adb5bd; }
         .voucher-off.low     { color: #fd7e14; }
 
-        /* Phần phải: thông tin */
         .voucher-right {
             flex: 1;
             padding: 16px 20px 16px 24px;
@@ -149,12 +144,11 @@
         }
         .voucher-meta i { width: 14px; }
 
-        .badge-qty-ok      { background: #d4edda; color: #155724; font-size: 0.72rem; padding: 3px 8px; border-radius: 50px; font-weight: 700; }
-        .badge-qty-low     { background: #fff3cd; color: #856404; font-size: 0.72rem; padding: 3px 8px; border-radius: 50px; font-weight: 700; }
-        .badge-qty-out     { background: #f8d7da; color: #721c24; font-size: 0.72rem; padding: 3px 8px; border-radius: 50px; font-weight: 700; }
-        .badge-expired     { background: #e9ecef; color: #6c757d; font-size: 0.72rem; padding: 3px 8px; border-radius: 50px; font-weight: 700; }
+        .badge-qty-ok  { background: #d4edda; color: #155724; font-size: 0.72rem; padding: 3px 8px; border-radius: 50px; font-weight: 700; }
+        .badge-qty-low { background: #fff3cd; color: #856404; font-size: 0.72rem; padding: 3px 8px; border-radius: 50px; font-weight: 700; }
+        .badge-qty-out { background: #f8d7da; color: #721c24; font-size: 0.72rem; padding: 3px 8px; border-radius: 50px; font-weight: 700; }
+        .badge-expired { background: #e9ecef; color: #6c757d; font-size: 0.72rem; padding: 3px 8px; border-radius: 50px; font-weight: 700; }
 
-        /* Toast */
         .toast-container-custom {
             position: fixed; top: 24px; right: 24px;
             z-index: 9999; display: flex; flex-direction: column; gap: 10px;
@@ -178,22 +172,13 @@
             background: none; border: none; font-size: 1rem; color: inherit;
         }
 
-        .empty-state {
-            text-align: center; padding: 60px 20px;
-            background: #fff; border-radius: 16px;
-        }
-
-        /* Filter tabs */
-        .filter-tabs .btn {
-            border-radius: 50px;
-            font-weight: 600;
-            font-size: 0.85rem;
-        }
+        .empty-state { text-align: center; padding: 60px 20px; background: #fff; border-radius: 16px; }
+        .filter-tabs .btn { border-radius: 50px; font-weight: 600; font-size: 0.85rem; }
     </style>
 </head>
 <body>
 
- <nav class="navbar navbar-expand-lg sticky-top">
+    <nav class="navbar navbar-expand-lg sticky-top">
         <div class="container">
             <a class="navbar-brand" href="/home">BEO<span style="color: var(--secondary-color)">BOOKS</span></a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -248,199 +233,195 @@
         </div>
     </nav>
 
-<div class="container py-5" style="max-width: 900px;">
+    <div class="container py-5" style="max-width: 900px;">
 
-    <!-- Header -->
-    <div class="d-flex align-items-center gap-3 mb-4">
-        <i class="fa-solid fa-ticket fa-2x text-success"></i>
-        <div>
-            <h4 class="fw-bold mb-0">Mã giảm giá</h4>
-            <small class="text-muted">Sao chép mã và dùng khi thanh toán để được giảm giá</small>
+        <div class="d-flex align-items-center gap-3 mb-4">
+            <i class="fa-solid fa-ticket fa-2x text-success"></i>
+            <div>
+                <h4 class="fw-bold mb-0">Mã giảm giá</h4>
+                <small class="text-muted">Sao chép mã và dùng khi thanh toán để được giảm giá</small>
+            </div>
         </div>
-    </div>
 
-    <!-- Filter tabs -->
-    <div class="filter-tabs d-flex gap-2 mb-4 flex-wrap">
-        <button class="btn btn-success btn-sm" onclick="filterVouchers('all', this)">
-            Tất cả <span class="badge bg-white text-success ms-1" id="countAll">0</span>
-        </button>
-        <button class="btn btn-outline-secondary btn-sm" onclick="filterVouchers('active', this)">
-            Còn hiệu lực <span class="badge bg-secondary ms-1" id="countActive">0</span>
-        </button>
-        <button class="btn btn-outline-secondary btn-sm" onclick="filterVouchers('expired', this)">
-            Hết hạn <span class="badge bg-secondary ms-1" id="countExpired">0</span>
-        </button>
-    </div>
+        <!-- Filter tabs -->
+        <div class="filter-tabs d-flex gap-2 mb-4 flex-wrap">
+            <button class="btn btn-success btn-sm" onclick="filterVouchers('all', this)">
+                Tất cả <span class="badge bg-white text-success ms-1" id="countAll">0</span>
+            </button>
+            <button class="btn btn-outline-secondary btn-sm" onclick="filterVouchers('active', this)">
+                Còn hiệu lực <span class="badge bg-secondary ms-1" id="countActive">0</span>
+            </button>
+            <button class="btn btn-outline-secondary btn-sm" onclick="filterVouchers('expired', this)">
+                Hết hạn <span class="badge bg-secondary ms-1" id="countExpired">0</span>
+            </button>
+        </div>
 
-    <!-- Danh sách voucher -->
-    <div th:if="${vouchers == null or #lists.isEmpty(vouchers)}" class="empty-state">
-        <i class="fa-solid fa-ticket fa-4x text-muted mb-4"></i>
-        <h5 class="fw-bold text-muted">Chưa có mã giảm giá nào</h5>
-        <p class="text-muted">Hãy quay lại sau nhé!</p>
-    </div>
+        <!-- Empty state -->
+        <div th:if="${vouchers == null or #lists.isEmpty(vouchers)}" class="empty-state">
+            <i class="fa-solid fa-ticket fa-4x text-muted mb-4"></i>
+            <h5 class="fw-bold text-muted">Chưa có mã giảm giá nào</h5>
+            <p class="text-muted">Hãy quay lại sau nhé!</p>
+        </div>
 
-    <div id="voucherList" class="d-flex flex-column gap-3">
-        <div th:each="v : ${vouchers}"
-             th:data-state="${v.active and (v.endAt == null or v.endAt.isAfter(#temporals.createNow())) and (v.quantity == null or v.quantity > 0) ? 'active' : 'expired'}"
-             class="voucher-item">
+        <div id="voucherList" class="d-flex flex-column gap-3">
+            <div th:each="v : ${vouchers}"
+                 th:data-state="${v.active and (v.endAt == null or v.endAt.isAfter(#temporals.createNow())) and (v.quantity == null or v.quantity > 0) ? 'active' : 'expired'}"
+                 class="voucher-item">
 
-            <div class="voucher-card">
-                <!-- Stripe màu -->
-                <div th:class="${v.active and (v.endAt == null or v.endAt.isAfter(#temporals.createNow())) and (v.quantity != null and v.quantity > 0 and v.quantity <= 5) ? 'voucher-stripe low' :
-                                 (!v.active or (v.endAt != null and v.endAt.isBefore(#temporals.createNow())) or (v.quantity != null and v.quantity <= 0)) ? 'voucher-stripe expired' :
-                                 'voucher-stripe'}"></div>
+                <div class="voucher-card">
+                    <!-- Stripe -->
+                    <div th:class="${v.active and (v.endAt == null or v.endAt.isAfter(#temporals.createNow())) and (v.quantity != null and v.quantity > 0 and v.quantity <= 5) ? 'voucher-stripe low' :
+                                     (!v.active or (v.endAt != null and v.endAt.isBefore(#temporals.createNow())) or (v.quantity != null and v.quantity <= 0)) ? 'voucher-stripe expired' :
+                                     'voucher-stripe'}"></div>
 
-                <div class="voucher-cut">
-                    <!-- Phần trái: % -->
-                    <div th:class="${!v.active or (v.endAt != null and v.endAt.isBefore(#temporals.createNow())) or (v.quantity != null and v.quantity <= 0) ? 'voucher-left expired' :
-                                     (v.quantity != null and v.quantity <= 5) ? 'voucher-left low' : 'voucher-left'}">
-                        <div th:class="${!v.active or (v.endAt != null and v.endAt.isBefore(#temporals.createNow())) or (v.quantity != null and v.quantity <= 0) ? 'voucher-percent expired' :
-                                         (v.quantity != null and v.quantity <= 5) ? 'voucher-percent low' : 'voucher-percent'}"
-                             th:text="${v.discount} + '%'">10%</div>
-                        <div th:class="${!v.active or (v.endAt != null and v.endAt.isBefore(#temporals.createNow())) or (v.quantity != null and v.quantity <= 0) ? 'voucher-off expired' :
-                                         (v.quantity != null and v.quantity <= 5) ? 'voucher-off low' : 'voucher-off'}">GIẢM</div>
-                    </div>
-
-                    <!-- Phần phải: thông tin -->
-                    <div class="voucher-right">
-                        <div class="voucher-name" th:text="${v.name}">Tên voucher</div>
-
-                        <!-- Code + nút copy -->
-                        <div class="voucher-code-row">
-                            <span th:class="${!v.active or (v.endAt != null and v.endAt.isBefore(#temporals.createNow())) or (v.quantity != null and v.quantity <= 0) ? 'voucher-code expired' :
-                                              (v.quantity != null and v.quantity <= 5) ? 'voucher-code low' : 'voucher-code'}"
-                                  th:text="${v.code}" th:id="'code-' + ${v.id}">CODE</span>
-                            <button class="btn-copy"
-                                    th:id="'btn-' + ${v.id}"
-                                    th:disabled="${!v.active or (v.endAt != null and v.endAt.isBefore(#temporals.createNow())) or (v.quantity != null and v.quantity <= 0)}"
-                                    th:onclick="'copyCode(\'' + ${v.code} + '\', ' + ${v.id} + ')'">
-                                <i class="fa-regular fa-copy me-1"></i>Sao chép
-                            </button>
+                    <div class="voucher-cut">
+                        <!-- Phần trái: % -->
+                        <div th:class="${!v.active or (v.endAt != null and v.endAt.isBefore(#temporals.createNow())) or (v.quantity != null and v.quantity <= 0) ? 'voucher-left expired' :
+                                         (v.quantity != null and v.quantity <= 5) ? 'voucher-left low' : 'voucher-left'}">
+                            <div th:class="${!v.active or (v.endAt != null and v.endAt.isBefore(#temporals.createNow())) or (v.quantity != null and v.quantity <= 0) ? 'voucher-percent expired' :
+                                             (v.quantity != null and v.quantity <= 5) ? 'voucher-percent low' : 'voucher-percent'}"
+                                 th:text="${v.discount} + '%'">10%</div>
+                            <div th:class="${!v.active or (v.endAt != null and v.endAt.isBefore(#temporals.createNow())) or (v.quantity != null and v.quantity <= 0) ? 'voucher-off expired' :
+                                             (v.quantity != null and v.quantity <= 5) ? 'voucher-off low' : 'voucher-off'}">GIẢM</div>
                         </div>
 
-                        <!-- Meta info -->
-                        <div class="voucher-meta">
-                            <span>
-                                <i class="fa-solid fa-clock"></i>
-                                <span th:if="${v.endAt != null}"
-                                      th:text="'HSD: ' + ${#temporals.format(v.endAt, 'dd/MM/yyyy')}">HSD</span>
-                                <span th:if="${v.endAt == null}">Không giới hạn thời gian</span>
-                            </span>
-                            <span>
-                                <i class="fa-solid fa-layer-group"></i>
-                                <span th:if="${v.quantity != null}" th:text="'Còn ' + ${v.quantity} + ' lượt'">Còn lượt</span>
-                                <span th:if="${v.quantity == null}">Không giới hạn</span>
-                            </span>
-                        </div>
+                        <!-- Phần phải: thông tin -->
+                        <div class="voucher-right">
+                            <div class="voucher-name" th:text="${v.name}">Tên voucher</div>
 
-                        <!-- Badge trạng thái -->
-                        <div>
-                            <span th:if="${v.quantity != null and v.quantity <= 0}" class="badge-qty-out">Hết lượt</span>
-                            <span th:if="${v.endAt != null and v.endAt.isBefore(#temporals.createNow())}" class="badge-expired">Hết hạn</span>
-                            <span th:if="${!v.active}" class="badge-expired">Không hoạt động</span>
-                            <span th:if="${v.active and (v.endAt == null or v.endAt.isAfter(#temporals.createNow())) and (v.quantity != null and v.quantity > 0 and v.quantity <= 5)}"
-                                  class="badge-qty-low">
-                                <i class="fa-solid fa-fire me-1"></i>Sắp hết
-                            </span>
-                            <span th:if="${v.active and (v.endAt == null or v.endAt.isAfter(#temporals.createNow())) and (v.quantity == null or v.quantity > 5)}"
-                                  class="badge-qty-ok">
-                                <i class="fa-solid fa-check me-1"></i>Có thể dùng
-                            </span>
+                            <!-- Code + nút copy: dùng data-code và data-vid thay vì th:onclick -->
+                            <div class="voucher-code-row">
+                                <span th:class="${!v.active or (v.endAt != null and v.endAt.isBefore(#temporals.createNow())) or (v.quantity != null and v.quantity <= 0) ? 'voucher-code expired' :
+                                                  (v.quantity != null and v.quantity <= 5) ? 'voucher-code low' : 'voucher-code'}"
+                                      th:text="${v.code}"
+                                      th:id="'code-' + ${v.id}">CODE</span>
+
+                                <!-- ✅ FIX: dùng data-code + data-vid thay vì th:onclick với String -->
+                                <button class="btn-copy"
+                                        th:id="'btn-' + ${v.id}"
+                                        th:data-code="${v.code}"
+                                        th:data-vid="${v.id}"
+                                        th:disabled="${!v.active or (v.endAt != null and v.endAt.isBefore(#temporals.createNow())) or (v.quantity != null and v.quantity <= 0)}"
+                                        onclick="copyCode(this)">
+                                    <i class="fa-regular fa-copy me-1"></i>Sao chép
+                                </button>
+                            </div>
+
+                            <!-- Meta -->
+                            <div class="voucher-meta">
+                                <span>
+                                    <i class="fa-solid fa-clock"></i>
+                                    <span th:if="${v.endAt != null}"
+                                          th:text="'HSD: ' + ${#temporals.format(v.endAt, 'dd/MM/yyyy')}">HSD</span>
+                                    <span th:if="${v.endAt == null}">Không giới hạn thời gian</span>
+                                </span>
+                                <span>
+                                    <i class="fa-solid fa-layer-group"></i>
+                                    <span th:if="${v.quantity != null}" th:text="'Còn ' + ${v.quantity} + ' lượt'">Còn lượt</span>
+                                    <span th:if="${v.quantity == null}">Không giới hạn</span>
+                                </span>
+                            </div>
+
+                            <!-- Badge trạng thái -->
+                            <div>
+                                <span th:if="${v.quantity != null and v.quantity <= 0}" class="badge-qty-out">Hết lượt</span>
+                                <span th:if="${v.endAt != null and v.endAt.isBefore(#temporals.createNow())}" class="badge-expired">Hết hạn</span>
+                                <span th:if="${!v.active}" class="badge-expired">Không hoạt động</span>
+                                <span th:if="${v.active and (v.endAt == null or v.endAt.isAfter(#temporals.createNow())) and (v.quantity != null and v.quantity > 0 and v.quantity <= 5)}"
+                                      class="badge-qty-low">
+                                    <i class="fa-solid fa-fire me-1"></i>Sắp hết
+                                </span>
+                                <span th:if="${v.active and (v.endAt == null or v.endAt.isAfter(#temporals.createNow())) and (v.quantity == null or v.quantity > 5)}"
+                                      class="badge-qty-ok">
+                                    <i class="fa-solid fa-check me-1"></i>Có thể dùng
+                                </span>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- Hướng dẫn -->
+        <div class="mt-5 p-4 bg-white rounded-3 shadow-sm border-start border-4 border-success">
+            <h6 class="fw-bold text-success mb-3"><i class="fa-solid fa-circle-info me-2"></i>Cách sử dụng mã giảm giá</h6>
+            <ol class="text-muted small mb-0" style="line-height: 2;">
+                <li>Sao chép mã giảm giá bạn muốn dùng</li>
+                <li>Thêm sản phẩm vào giỏ hàng và tiến hành thanh toán</li>
+                <li>Dán mã vào ô <strong>"Nhập mã giảm giá"</strong> trên trang checkout</li>
+                <li>Nhấn <strong>"Áp dụng"</strong> để được giảm giá ngay!</li>
+            </ol>
+        </div>
     </div>
 
-    <!-- Hướng dẫn -->
-    <div class="mt-5 p-4 bg-white rounded-3 shadow-sm border-start border-4 border-success">
-        <h6 class="fw-bold text-success mb-3"><i class="fa-solid fa-circle-info me-2"></i>Cách sử dụng mã giảm giá</h6>
-        <ol class="text-muted small mb-0" style="line-height: 2;">
-            <li>Sao chép mã giảm giá bạn muốn dùng</li>
-            <li>Thêm sản phẩm vào giỏ hàng và tiến hành thanh toán</li>
-            <li>Dán mã vào ô <strong>"Nhập mã giảm giá"</strong> trên trang checkout</li>
-            <li>Nhấn <strong>"Áp dụng"</strong> để được giảm giá ngay!</li>
-        </ol>
-    </div>
-</div>
+    <div class="toast-container-custom" id="toastContainer"></div>
 
-<!-- Toast container -->
-<div class="toast-container-custom" id="toastContainer"></div>
+    <footer class="bg-white border-top py-4 mt-4">
+        <div class="container text-center">
+            <p class="mb-0 text-muted small">© 2026 <strong>BEOBOOKS</strong>. Tất cả các quyền được bảo lưu.</p>
+        </div>
+    </footer>
 
-<footer class="bg-white border-top py-4 mt-4">
-    <div class="container text-center">
-        <p class="mb-0 text-muted small">© 2026 <strong>BEOBOOKS</strong>. Tất cả các quyền được bảo lưu.</p>
-    </div>
-</footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // ✅ FIX: nhận btn element, đọc data-code và data-vid từ dataset
+        function copyCode(btn) {
+            const code = btn.dataset.code;
+            const id   = btn.dataset.vid;
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-    // ===== COPY CODE =====
-    function copyCode(code, id) {
-        navigator.clipboard.writeText(code).then(() => {
-            const btn = document.getElementById('btn-' + id);
-            btn.classList.add('copied');
-            btn.innerHTML = '<i class="fa-solid fa-check me-1"></i>Đã sao chép';
-            showToast('Đã sao chép mã <strong>' + code + '</strong> vào clipboard!');
-            setTimeout(() => {
-                btn.classList.remove('copied');
-                btn.innerHTML = '<i class="fa-regular fa-copy me-1"></i>Sao chép';
-            }, 2500);
-        }).catch(() => {
-            // Fallback cho browser cũ
-            const el = document.createElement('textarea');
-            el.value = code;
-            document.body.appendChild(el);
-            el.select();
-            document.execCommand('copy');
-            document.body.removeChild(el);
-            showToast('Đã sao chép mã <strong>' + code + '</strong>!');
+            navigator.clipboard.writeText(code).then(() => {
+                btn.classList.add('copied');
+                btn.innerHTML = '<i class="fa-solid fa-check me-1"></i>Đã sao chép';
+                showToast('Đã sao chép mã <strong>' + code + '</strong> vào clipboard!');
+                setTimeout(() => {
+                    btn.classList.remove('copied');
+                    btn.innerHTML = '<i class="fa-regular fa-copy me-1"></i>Sao chép';
+                }, 2500);
+            }).catch(() => {
+                const el = document.createElement('textarea');
+                el.value = code;
+                document.body.appendChild(el);
+                el.select();
+                document.execCommand('copy');
+                document.body.removeChild(el);
+                showToast('Đã sao chép mã <strong>' + code + '</strong>!');
+            });
+        }
+
+        function filterVouchers(state, btnEl) {
+            document.querySelectorAll('.filter-tabs .btn').forEach(b => {
+                b.classList.remove('btn-success');
+                b.classList.add('btn-outline-secondary');
+            });
+            btnEl.classList.remove('btn-outline-secondary');
+            btnEl.classList.add('btn-success');
+
+            document.querySelectorAll('.voucher-item').forEach(item => {
+                item.style.display = (state === 'all' || item.dataset.state === state) ? '' : 'none';
+            });
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const items = document.querySelectorAll('.voucher-item');
+            let all = 0, active = 0, expired = 0;
+            items.forEach(item => {
+                all++;
+                if (item.dataset.state === 'active') active++; else expired++;
+            });
+            document.getElementById('countAll').textContent     = all;
+            document.getElementById('countActive').textContent  = active;
+            document.getElementById('countExpired').textContent = expired;
         });
-    }
 
-    // ===== FILTER =====
-    function filterVouchers(state, btnEl) {
-        document.querySelectorAll('.filter-tabs .btn').forEach(b => {
-            b.classList.remove('btn-success', 'btn-warning', 'btn-secondary');
-            b.classList.add('btn-outline-secondary');
-        });
-        btnEl.classList.remove('btn-outline-secondary');
-        btnEl.classList.add('btn-success');
-
-        document.querySelectorAll('.voucher-item').forEach(item => {
-            if (state === 'all' || item.dataset.state === state) {
-                item.style.display = '';
-            } else {
-                item.style.display = 'none';
-            }
-        });
-    }
-
-    // ===== COUNT BADGES =====
-    window.addEventListener('DOMContentLoaded', () => {
-        const items   = document.querySelectorAll('.voucher-item');
-        let all = 0, active = 0, expired = 0;
-        items.forEach(item => {
-            all++;
-            if (item.dataset.state === 'active') active++;
-            else expired++;
-        });
-        document.getElementById('countAll').textContent    = all;
-        document.getElementById('countActive').textContent = active;
-        document.getElementById('countExpired').textContent = expired;
-    });
-
-    // ===== TOAST =====
-    function showToast(message) {
-        const container = document.getElementById('toastContainer');
-        const toast = document.createElement('div');
-        toast.className = 'toast-custom toast-success';
-        toast.innerHTML = `<span>🎉</span><span>${message}</span>
-            <button class="toast-close" onclick="this.parentElement.remove()">✕</button>`;
-        container.appendChild(toast);
-        setTimeout(() => toast.remove(), 3000);
-    }
-</script>
+        function showToast(message) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'toast-custom toast-success';
+            toast.innerHTML = `<span>🎉</span><span>${message}</span>
+                <button class="toast-close" onclick="this.parentElement.remove()">✕</button>`;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+    </script>
 </body>
 </html>
