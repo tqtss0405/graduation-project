@@ -49,34 +49,76 @@ public class UserOrderController {
     }
 
     // ================================================
-    // POST: User hủy đơn (chỉ hủy được khi status = 0)
+    // POST: User hủy đơn (chỉ hủy được khi status 0 hoặc 1)
     // ================================================
     @PostMapping("/cancel/{id}")
-public String cancelOrder(
-        @PathVariable Integer id,
-        HttpSession session,
-        RedirectAttributes ra) {
+    public String cancelOrder(
+            @PathVariable Integer id,
+            HttpSession session,
+            RedirectAttributes ra) {
 
-    User currentUser = (User) session.getAttribute("currentUser");
+        User currentUser = (User) session.getAttribute("currentUser");
 
-    Order order = orderRepository.findById(id).orElse(null);
+        Order order = orderRepository.findById(id).orElse(null);
 
-    if (order == null || !order.getUser().getId().equals(currentUser.getId())) {
-        ra.addFlashAttribute("errorMessage", "Không tìm thấy đơn hàng!");
+        if (order == null || !order.getUser().getId().equals(currentUser.getId())) {
+            ra.addFlashAttribute("errorMessage", "Không tìm thấy đơn hàng!");
+            return "redirect:/user/order-details";
+        }
+
+        if (order.getStatus() >= 2) {
+            ra.addFlashAttribute("errorMessage", "Không thể hủy đơn hàng khi hàng đã được giao đi!");
+            return "redirect:/user/order-details";
+        }
+
+        order.setStatus(5);
+        orderRepository.save(order);
+
+        ra.addFlashAttribute("successMessage", "Đã hủy đơn hàng #" + id + " thành công!");
         return "redirect:/user/order-details";
     }
 
-    // ✅ Cho hủy khi chưa giao (status 0 hoặc 1)
-    // ❌ Không cho hủy khi đang giao, đã giao, hoàn thành, đã hủy
-    if (order.getStatus() >= 2) {
-        ra.addFlashAttribute("errorMessage", "Không thể hủy đơn hàng khi hàng đã được giao đi!");
+    // ================================================
+    // POST: User yêu cầu hoàn tiền / trả hàng (status 3 → 6)
+    // ================================================
+    @PostMapping("/request-refund/{id}")
+    public String requestRefund(
+            @PathVariable Integer id,
+            @RequestParam(value = "reason", required = false) String reason,
+            HttpSession session,
+            RedirectAttributes ra) {
+
+        User currentUser = (User) session.getAttribute("currentUser");
+
+        Order order = orderRepository.findById(id).orElse(null);
+
+        if (order == null || !order.getUser().getId().equals(currentUser.getId())) {
+            ra.addFlashAttribute("errorMessage", "Không tìm thấy đơn hàng!");
+            return "redirect:/user/order-details";
+        }
+
+        if (order.getStatus() != 3) {
+            ra.addFlashAttribute("errorMessage", "Chỉ có thể yêu cầu khi đơn hàng đang ở trạng thái 'Đã giao'!");
+            return "redirect:/user/order-details";
+        }
+
+        // Ghi lý do vào ghi chú đơn hàng (append vào note hiện tại nếu có)
+        String refundType = (order.getPaymentMethod() != null && order.getPaymentMethod() == 1)
+                ? "Yêu cầu hoàn tiền" : "Yêu cầu trả hàng";
+        String reasonText = (reason != null && !reason.trim().isEmpty()) ? reason.trim() : "Không rõ";
+        String noteAppend  = "[" + refundType + "] Lý do: " + reasonText;
+        String currentNote = (order.getNote() != null && !order.getNote().isBlank())
+                ? order.getNote() + " | " + noteAppend
+                : noteAppend;
+
+        order.setNote(currentNote);
+        order.setStatus(6);
+        orderRepository.save(order);
+
+        String successMsg = order.getPaymentMethod() == 1
+                ? "Đã gửi yêu cầu hoàn tiền cho đơn #" + id + ". Chúng tôi sẽ liên hệ lại trong 24 giờ!"
+                : "Đã gửi yêu cầu trả hàng cho đơn #" + id + ". Chúng tôi sẽ liên hệ lại trong 24 giờ!";
+        ra.addFlashAttribute("successMessage", successMsg);
         return "redirect:/user/order-details";
     }
-
-    order.setStatus(5);
-    orderRepository.save(order);
-
-    ra.addFlashAttribute("successMessage", "Đã hủy đơn hàng #" + id + " thành công!");
-    return "redirect:/user/order-details";
-}
 }

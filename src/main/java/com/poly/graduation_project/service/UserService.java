@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import com.poly.graduation_project.model.User;
 import com.poly.graduation_project.repository.UserRepository;
 
-import java.util.List;
 
 @Service // ✅ Đã xóa @Lazy
 public class UserService implements UserDetailsService {

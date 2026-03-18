@@ -1,0 +1,57 @@
+<!--
+    ============================================================
+    SNIPPET: Thêm vào order-details.html
+    Thay thế / bổ sung phần hiển thị trạng thái và nút hành động
+    cho mỗi đơn hàng trong lịch sử mua hàng của khách
+    ============================================================
+-->
+
+<!-- Badge trạng thái (th:switch) — thêm case 6 -->
+<span th:switch="${order.status}">
+    <span th:case="0"  class="badge bg-warning text-dark">Chờ xác nhận</span>
+    <span th:case="1"  class="badge bg-primary">Đã xác nhận</span>
+    <span th:case="2"  class="badge bg-info">Đang giao hàng</span>
+    <span th:case="3"  class="badge bg-info">Đã giao — chờ xác nhận</span>
+    <span th:case="4"  class="badge bg-success">Hoàn thành</span>
+    <span th:case="5"  class="badge bg-danger">Đã hủy</span>
+    <span th:case="6"  class="badge bg-danger">
+        <i class="fa-solid fa-rotate-left me-1"></i>Đang yêu cầu hoàn tiền
+    </span>
+</span>
+
+
+<!-- Nhóm nút hành động cho khách — đặt cạnh mỗi đơn hàng -->
+<div class="d-flex gap-2 flex-wrap mt-2">
+
+    <!-- Nút HỦY ĐƠN: chỉ khi status 0 hoặc 1 -->
+    <form th:if="${order.status == 0 or order.status == 1}"
+          th:action="@{/user/order-details/cancel/{id}(id=${order.id})}" method="post"
+          onsubmit="return confirm('Bạn có chắc muốn hủy đơn hàng này?')">
+        <button type="submit" class="btn btn-sm btn-outline-danger">
+            <i class="fa-solid fa-xmark me-1"></i>Hủy đơn
+        </button>
+    </form>
+
+    <!-- Nút XÁC NHẬN ĐÃ NHẬN HÀNG: chỉ khi status 3 -->
+    <form th:if="${order.status == 3}"
+          th:action="@{/user/order-details/confirm-received/{id}(id=${order.id})}" method="post">
+        <button type="submit" class="btn btn-sm btn-success">
+            <i class="fa-solid fa-check me-1"></i>Đã nhận hàng
+        </button>
+    </form>
+
+    <!-- Nút YÊU CẦU HOÀN TIỀN: chỉ khi status 3 (đã giao nhưng có vấn đề) -->
+    <form th:if="${order.status == 3}"
+          th:action="@{/user/order-details/request-refund/{id}(id=${order.id})}" method="post"
+          onsubmit="return confirm('Bạn có chắc muốn yêu cầu hoàn tiền? Chúng tôi sẽ xem xét và liên hệ lại sớm nhất.')">
+        <button type="submit" class="btn btn-sm btn-outline-warning">
+            <i class="fa-solid fa-rotate-left me-1"></i>Yêu cầu hoàn tiền
+        </button>
+    </form>
+
+    <!-- Thông báo khi đang chờ xử lý hoàn tiền: status 6 -->
+    <span th:if="${order.status == 6}" class="text-danger small fst-italic align-self-center">
+        <i class="fa-solid fa-clock me-1"></i>Yêu cầu hoàn tiền đang được xử lý...
+    </span>
+
+</div>
