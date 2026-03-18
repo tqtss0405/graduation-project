@@ -1,4 +1,5 @@
 package com.poly.graduation_project.controller;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -19,17 +20,22 @@ import com.poly.graduation_project.dto.ProductDTO;
 import com.poly.graduation_project.helper.SlugUtils;
 import com.poly.graduation_project.model.Image;
 import com.poly.graduation_project.model.Product;
+import com.poly.graduation_project.repository.CartDetailRepository;
 import com.poly.graduation_project.repository.CategoryRepository;
 import com.poly.graduation_project.repository.ImageRepository;
+import com.poly.graduation_project.repository.OrderDetailRepository;
 import com.poly.graduation_project.repository.ProductRepository;
+
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.validation.Valid;
 
 @MultipartConfig
 @Controller
 public class ProductController {
+
     @Value("${app.upload.dir}")
     private String uploadDir;
+
     @Autowired
     private ImageRepository productImageRepo;
 
@@ -38,6 +44,12 @@ public class ProductController {
 
     @Autowired
     private CategoryRepository categoryRepo;
+
+    @Autowired
+    private CartDetailRepository cartDetailRepo;
+
+    @Autowired
+    private OrderDetailRepository orderDetailRepo;
 
     // ====================================================
     // GET: Trang quản lý sản phẩm
@@ -51,20 +63,14 @@ public class ProductController {
 
     // ====================================================
     // POST: Lưu sản phẩm (Thêm mới hoặc Cập nhật)
-    // Quy tắc bắt lỗi:
-    // 1. Ưu tiên bắt lỗi @NotBlank trước (tên, tác giả, nhà XB)
-    // 2. Sau đó bắt các lỗi @NotNull / @Min (giá, số lượng, danh mục)
-    // 3. Cuối cùng bắt lỗi chưa chọn ảnh (chỉ khi thêm mới)
-    // → Mỗi lần chỉ hiển thị đúng 1 dòng lỗi duy nhất
     // ====================================================
     @PostMapping("/admin/products/save")
     public String save(@Valid @ModelAttribute ProductDTO dto,
             BindingResult result,
             RedirectAttributes ra) {
         try {
-            // --- Bước 1: Bắt lỗi @NotBlank trước (tên, tác giả, nhà xuất bản) ---
+            // Bắt lỗi @NotBlank trước
             if (result.hasErrors()) {
-                // Ưu tiên lỗi blank trước các lỗi khác
                 String blankError = result.getFieldErrors().stream()
                         .filter(e -> e.getCode() != null && e.getCode().equals("NotBlank"))
                         .map(FieldError::getDefaultMessage)
@@ -76,13 +82,12 @@ public class ProductController {
                     return "redirect:/admin/products";
                 }
 
-                // Nếu không có lỗi blank → lấy lỗi đầu tiên còn lại (NotNull, Min...)
                 String firstError = result.getFieldErrors().get(0).getDefaultMessage();
                 ra.addFlashAttribute("errorMessage", firstError);
                 return "redirect:/admin/products";
             }
 
-            // --- Bước 2: Bắt lỗi chưa chọn ảnh bìa (chỉ khi THÊM MỚI) ---
+            // Bắt lỗi chưa chọn ảnh bìa (chỉ khi THÊM MỚI)
             boolean isNew = (dto.getId() == null);
             if (isNew) {
                 if (dto.getMainImage() == null || dto.getMainImage().isEmpty()) {
@@ -91,14 +96,11 @@ public class ProductController {
                 }
             }
 
-            // --- Bước 3: Xử lý lưu Product entity ---
             Product product;
             if (!isNew) {
-                // Cập nhật: tìm sản phẩm cũ theo ID
                 product = productRepo.findById(dto.getId())
                         .orElseThrow(() -> new RuntimeException("Không tìm thấy sản phẩm ID: " + dto.getId()));
             } else {
-                // Thêm mới: tạo slug duy nhất
                 product = new Product();
                 product.setSlug(SlugUtils.makeSlug(dto.getName()) + "-" + System.currentTimeMillis());
             }
@@ -112,11 +114,9 @@ public class ProductController {
             product.setCategory(categoryRepo.findById(dto.getCategoryId()).orElse(null));
             product.setActive(Boolean.TRUE.equals(dto.getActive()));
 
-            // Xử lý ảnh bìa chính (nếu có chọn ảnh mới thì thay thế, không thì giữ cũ)
             if (dto.getMainImage() != null && !dto.getMainImage().isEmpty()) {
                 String originalName = dto.getMainImage().getOriginalFilename();
                 String extension = "";
-
                 if (originalName != null && originalName.contains(".")) {
                     extension = originalName.substring(originalName.lastIndexOf("."));
                 }
@@ -127,13 +127,11 @@ public class ProductController {
 
             Product savedProduct = productRepo.save(product);
 
-            // Xử lý lưu ảnh gallery (nếu có chọn ảnh mới)
             if (dto.getDetailImages() != null) {
                 for (MultipartFile file : dto.getDetailImages()) {
                     if (file != null && !file.isEmpty()) {
                         String originalName = file.getOriginalFilename();
                         String extension = "";
-
                         if (originalName != null && originalName.contains(".")) {
                             extension = originalName.substring(originalName.lastIndexOf("."));
                         }
@@ -158,24 +156,45 @@ public class ProductController {
     }
 
     // ====================================================
-    // POST: Xóa sản phẩm theo ID
+    // POST: Xóa sản phẩm
+    // Chỉ cho xóa vĩnh viễn khi KHÔNG có đơn hàng và KHÔNG có trong giỏ hàng.
+    // Nếu có → trả về lỗi (frontend đã xử lý chuyển sang modal ẩn/hết hàng).
     // ====================================================
     @PostMapping("/admin/products/delete")
-    public String delete(@RequestParam("id") Integer id,
-            RedirectAttributes ra) {
+    public String delete(@RequestParam("id") Integer id, RedirectAttributes ra) {
         try {
             Product product = productRepo.findById(id)
                     .orElseThrow(() -> new RuntimeException("Không tìm thấy sản phẩm ID: " + id));
 
             String productName = product.getName();
 
-            // Xóa các ảnh gallery liên quan trước (tránh lỗi FK)
+            // Kiểm tra đã có trong đơn hàng chưa
+            boolean hasOrders = product.getOrderDetails() != null
+                    && !product.getOrderDetails().isEmpty();
+
+            // Kiểm tra đang trong giỏ hàng của khách chưa
+            boolean inCart = product.getCartDetails() != null
+                    && !product.getCartDetails().isEmpty();
+
+            if (hasOrders || inCart) {
+                // Không cho xóa — frontend không nên gọi endpoint này trong trường hợp này,
+                // nhưng vẫn guard ở backend để an toàn
+                ra.addFlashAttribute("errorMessage",
+                        "Không thể xóa \"" + productName + "\" vì sản phẩm "
+                                + (hasOrders ? "đã có trong đơn hàng" : "")
+                                + (hasOrders && inCart ? " và " : "")
+                                + (inCart ? "đang có trong giỏ hàng" : "")
+                                + ". Vui lòng ẩn hoặc đặt hết hàng thay thế.");
+                return "redirect:/admin/products";
+            }
+
+            // Xóa ảnh gallery liên quan trước (tránh lỗi FK)
             productImageRepo.deleteAll(product.getImages());
 
             // Xóa sản phẩm
             productRepo.deleteById(id);
-
             ra.addFlashAttribute("successMessage", "Đã xóa sản phẩm \"" + productName + "\" thành công!");
+
         } catch (Exception e) {
             ra.addFlashAttribute("errorMessage", "Không thể xóa sản phẩm: " + e.getMessage());
         }
@@ -183,17 +202,48 @@ public class ProductController {
     }
 
     // ====================================================
-    // Hàm phụ: Lưu file ảnh vào thư mục /img/ trên server
+    // POST: Ẩn hoặc đặt hết hàng (dùng khi không thể xóa)
+    // action = "outofstock" → stockQuantity = 0
+    // action = "hide" → active = false
     // ====================================================
-  private void saveToImgFolder(MultipartFile file, String fileName) throws IOException {
+    @PostMapping("/admin/products/hide")
+    public String hideOrOutOfStock(
+            @RequestParam("id") Integer id,
+            @RequestParam("action") String action,
+            RedirectAttributes ra) {
+        try {
+            Product product = productRepo.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Không tìm thấy sản phẩm ID: " + id));
 
-    Path uploadPath = Paths.get(uploadDir);
+            String productName = product.getName();
 
-    // Tự động tạo folder nếu chưa tồn tại
-    Files.createDirectories(uploadPath);
+            if ("outofstock".equals(action)) {
+                product.setStockQuantity(0);
+                productRepo.save(product);
+                ra.addFlashAttribute("successMessage",
+                        "Đã đặt sản phẩm \"" + productName + "\" về trạng thái hết hàng.");
+            } else if ("hide".equals(action)) {
+                product.setActive(false);
+                productRepo.save(product);
+                ra.addFlashAttribute("successMessage",
+                        "Đã ẩn sản phẩm \"" + productName + "\" khỏi cửa hàng.");
+            } else {
+                ra.addFlashAttribute("errorMessage", "Hành động không hợp lệ!");
+            }
 
-    Path filePath = uploadPath.resolve(fileName);
+        } catch (Exception e) {
+            ra.addFlashAttribute("errorMessage", "Lỗi hệ thống: " + e.getMessage());
+        }
+        return "redirect:/admin/products";
+    }
 
-    file.transferTo(filePath.toFile());
-}
+    // ====================================================
+    // Hàm phụ: Lưu file ảnh vào thư mục /img/
+    // ====================================================
+    private void saveToImgFolder(MultipartFile file, String fileName) throws IOException {
+        Path uploadPath = Paths.get(uploadDir);
+        Files.createDirectories(uploadPath);
+        Path filePath = uploadPath.resolve(fileName);
+        file.transferTo(filePath.toFile());
+    }
 }

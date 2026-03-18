@@ -42,6 +42,37 @@
         .status-tab.refund-tab { color: #dc3545; border-color: #f5c6cb; background: #fff5f5; }
         .status-tab.refund-tab:hover { background: #fce8e8; }
 
+        /* ===== PAGINATION ===== */
+        .orders-footer {
+            background: #fff;
+            border-radius: 14px;
+            padding: 13px 18px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            margin-top: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+            font-size: 0.83rem;
+            color: #6c757d;
+        }
+        .pagination-wrapper { display: flex; align-items: center; gap: 4px; }
+        .page-btn {
+            min-width: 34px; height: 34px; padding: 0 8px;
+            border-radius: 8px;
+            border: 1.5px solid #e9ecef;
+            background: #fff; color: #495057;
+            font-size: 0.85rem; font-weight: 600;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.15s;
+            text-decoration: none;
+        }
+        .page-btn:hover:not(.disabled) { border-color: #28a745; color: #28a745; background: #f6fdf8; }
+        .page-btn.active { background: #28a745; border-color: #28a745; color: #fff; }
+        .page-btn.disabled { opacity: 0.4; pointer-events: none; }
+
         /* Badge trong tab */
         .status-tab .tab-badge {
             display: inline-block;
@@ -362,70 +393,10 @@
             </table>
         </div>
 
-        <!-- ===== PHÂN TRANG ===== -->
-        <div th:if="${totalPages > 1}"
-             class="d-flex justify-content-between align-items-center mt-3 px-1">
-
-            <small class="text-muted">
-                Tổng cộng <strong th:text="${totalItems}">0</strong> đơn hàng
-                &nbsp;·&nbsp; Trang <strong th:text="${currentPage}">1</strong>/<strong th:text="${totalPages}">1</strong>
-            </small>
-
-            <div class="d-flex align-items-center gap-1">
-
-                <!-- Nút < -->
-                <a th:if="${currentPage > 1}"
-                   th:href="@{/admin/orders(status=${selectedStatus},keyword=${keyword},fromDate=${fromDate},toDate=${toDate},page=${currentPage - 1})}"
-                   class="btn btn-sm btn-outline-secondary rounded-pill px-2 py-1"
-                   style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;">
-                    <i class="fa-solid fa-chevron-left" style="font-size:.75rem"></i>
-                </a>
-                <span th:unless="${currentPage > 1}"
-                      class="btn btn-sm btn-outline-secondary rounded-pill px-2 py-1 disabled"
-                      style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;">
-                    <i class="fa-solid fa-chevron-left" style="font-size:.75rem"></i>
-                </span>
-
-                <!-- Số trang -->
-                <th:block th:each="i : ${#numbers.sequence(1, totalPages)}">
-
-                    <!-- Dấu ... trước -->
-                    <span th:if="${i == currentPage - 3 and i > 1}"
-                          class="text-muted px-1" style="line-height:32px">…</span>
-
-                    <!-- Nút trang: hiện trang đầu, cuối, và gần currentPage -->
-                    <a th:if="${i == 1 or i == totalPages or (i >= currentPage - 2 and i <= currentPage + 2)}"
-                       th:href="@{/admin/orders(status=${selectedStatus},keyword=${keyword},fromDate=${fromDate},toDate=${toDate},page=${i})}"
-                       th:text="${i}"
-                       th:style="${i == currentPage}
-                           ? 'width:32px;height:32px;display:flex;align-items:center;justify-content:center;background:#198754;color:#fff;border-color:#198754;'
-                           : 'width:32px;height:32px;display:flex;align-items:center;justify-content:center;'"
-                       th:class="${i == currentPage}
-                           ? 'btn btn-sm btn-success rounded-pill px-0'
-                           : 'btn btn-sm btn-outline-secondary rounded-pill px-0'">
-                        1
-                    </a>
-
-                    <!-- Dấu ... sau -->
-                    <span th:if="${i == currentPage + 3 and i < totalPages}"
-                          class="text-muted px-1" style="line-height:32px">…</span>
-
-                </th:block>
-
-                <!-- Nút > -->
-                <a th:if="${currentPage < totalPages}"
-                   th:href="@{/admin/orders(status=${selectedStatus},keyword=${keyword},fromDate=${fromDate},toDate=${toDate},page=${currentPage + 1})}"
-                   class="btn btn-sm btn-outline-secondary rounded-pill px-2 py-1"
-                   style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;">
-                    <i class="fa-solid fa-chevron-right" style="font-size:.75rem"></i>
-                </a>
-                <span th:unless="${currentPage < totalPages}"
-                      class="btn btn-sm btn-outline-secondary rounded-pill px-2 py-1 disabled"
-                      style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;">
-                    <i class="fa-solid fa-chevron-right" style="font-size:.75rem"></i>
-                </span>
-
-            </div>
+        <!-- ===== FOOTER PHÂN TRANG ===== -->
+        <div class="orders-footer" id="ordersFooter">
+            <span id="footerInfo"></span>
+            <div class="pagination-wrapper" id="paginationWrapper"></div>
         </div>
 
     </main>
@@ -594,6 +565,79 @@
 
             new bootstrap.Modal(document.getElementById('orderModal')).show();
         }
+    </script>
+    <!-- ===== PAGINATION JS (giống trang reviews) ===== -->
+    <script>
+        // Dữ liệu từ Thymeleaf
+        const TOTAL_ITEMS   = /*[[${totalItems}]]*/ 0;
+        const CURRENT_PAGE  = /*[[${currentPage}]]*/ 1;
+        const TOTAL_PAGES   = /*[[${totalPages}]]*/ 1;
+        const BASE_STATUS   = /*[[${selectedStatus}]]*/ null;
+        const BASE_KEYWORD  = /*[[${keyword}]]*/ '';
+        const BASE_FROM     = /*[[${fromDate}]]*/ '';
+        const BASE_TO       = /*[[${toDate}]]*/ '';
+
+        function buildUrl(page) {
+            const params = new URLSearchParams();
+            if (BASE_STATUS !== null && BASE_STATUS !== 'null') params.set('status', BASE_STATUS);
+            if (BASE_KEYWORD) params.set('keyword', BASE_KEYWORD);
+            if (BASE_FROM)    params.set('fromDate', BASE_FROM);
+            if (BASE_TO)      params.set('toDate', BASE_TO);
+            params.set('page', page);
+            return '/admin/orders?' + params.toString();
+        }
+
+        function makeBtn(label, disabled, active, href) {
+            const btn = document.createElement('a');
+            btn.className = 'page-btn' + (active ? ' active' : '') + (disabled ? ' disabled' : '');
+            btn.innerHTML = label;
+            btn.href = disabled ? '#' : href;
+            return btn;
+        }
+
+        function getPageNumbers(current, total) {
+            if (total <= 7) return Array.from({length: total}, (_, i) => i + 1);
+            if (current <= 4) return [1, 2, 3, 4, 5, '...', total];
+            if (current >= total - 3) return [1, '...', total-4, total-3, total-2, total-1, total];
+            return [1, '...', current-1, current, current+1, '...', total];
+        }
+
+        function renderPagination() {
+            const footer  = document.getElementById('ordersFooter');
+            const wrapper = document.getElementById('paginationWrapper');
+            const info    = document.getElementById('footerInfo');
+            if (!footer || !wrapper || !info) return;
+
+            // Footer info
+            info.innerHTML = `Tổng cộng <strong>${TOTAL_ITEMS}</strong> đơn hàng &nbsp;·&nbsp; Trang <strong>${CURRENT_PAGE}</strong>/${TOTAL_PAGES}`;
+
+            if (TOTAL_PAGES <= 1) {
+                wrapper.style.display = 'none';
+                return;
+            }
+
+            wrapper.innerHTML = '';
+
+            // Nút <
+            wrapper.appendChild(makeBtn('‹', CURRENT_PAGE === 1, false, buildUrl(CURRENT_PAGE - 1)));
+
+            // Số trang
+            getPageNumbers(CURRENT_PAGE, TOTAL_PAGES).forEach(p => {
+                if (p === '...') {
+                    const dots = document.createElement('span');
+                    dots.textContent = '…';
+                    dots.style.cssText = 'padding:0 4px;color:#adb5bd;align-self:center;';
+                    wrapper.appendChild(dots);
+                } else {
+                    wrapper.appendChild(makeBtn(p, false, p === CURRENT_PAGE, buildUrl(p)));
+                }
+            });
+
+            // Nút >
+            wrapper.appendChild(makeBtn('›', CURRENT_PAGE === TOTAL_PAGES, false, buildUrl(CURRENT_PAGE + 1)));
+        }
+
+        document.addEventListener('DOMContentLoaded', renderPagination);
     </script>
 </body>
 </html>

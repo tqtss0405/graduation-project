@@ -1,18 +1,122 @@
 <!DOCTYPE html>
-<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cửa Hàng - BEOBOOKS</title>
-
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css">
-</head>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        /* ===== SIDEBAR ===== */
+        .filter-sidebar {
+            background: #fff;
+            border-radius: 16px;
+            padding: 22px 20px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+            position: sticky;
+            top: 80px;
+        }
+        .filter-title {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: #1a1a2e;
+            margin-bottom: 14px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e9ecef;
+        }
 
+        /* Danh mục */
+        .category-list { list-style: none; padding: 0; margin: 0; }
+        .category-list li a {
+            display: flex; align-items: center;
+            padding: 8px 10px; border-radius: 10px;
+            color: #495057; text-decoration: none;
+            font-size: 0.9rem; font-weight: 500;
+            transition: all 0.15s;
+        }
+        .category-list li a:hover { background: #f0fdf4; color: #28a745; }
+        .category-list li a.active { background: #28a745; color: #fff; font-weight: 700; }
+
+        /* Phân trang danh mục */
+        .cat-pagination { display: flex; align-items: center; justify-content: center; gap: 4px; margin-top: 10px; }
+        .cat-page-btn {
+            width: 30px; height: 30px; border-radius: 8px;
+            border: 1.5px solid #e9ecef; background: #fff;
+            color: #495057; font-size: 0.8rem; font-weight: 600;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            transition: all 0.15s; text-decoration: none;
+        }
+        .cat-page-btn:hover { border-color: #28a745; color: #28a745; background: #f0fdf4; }
+        .cat-page-btn.active { background: #28a745; border-color: #28a745; color: #fff; }
+        .cat-page-btn.disabled { opacity: 0.4; pointer-events: none; }
+
+        /* Lọc giá - radio preset */
+        .price-option {
+            display: flex; align-items: center; gap: 8px;
+            padding: 7px 10px; border-radius: 10px;
+            cursor: pointer; font-size: 0.88rem; font-weight: 500;
+            color: #495057; transition: background 0.15s;
+        }
+        .price-option:hover { background: #f0fdf4; }
+        .price-option input[type="radio"] { accent-color: #28a745; width: 16px; height: 16px; flex-shrink: 0; }
+        .price-option.selected { background: #e8f8f1; color: #1a7a4a; font-weight: 700; }
+
+        /* Tùy chỉnh giá */
+        .custom-price-row { display: flex; align-items: center; gap: 6px; margin-top: 8px; }
+        .custom-price-row input {
+            flex: 1; min-width: 0; border-radius: 8px; border: 1.5px solid #e9ecef;
+            padding: 6px 8px; font-size: 0.85rem; outline: none;
+            font-family: 'Quicksand', sans-serif; width: 0;
+        }
+        .custom-price-row input:focus { border-color: #28a745; }
+
+        /* ===== SEARCH BAR ===== */
+        .search-bar-top {
+            background: #fff; border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            padding: 12px 16px; margin-bottom: 18px;
+            display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+        }
+        .search-bar-top .search-group { position: relative; flex: 1; min-width: 200px; }
+        .search-bar-top .search-group .fa-magnifying-glass {
+            position: absolute; left: 13px; top: 50%; transform: translateY(-50%);
+            color: #adb5bd; font-size: 0.88rem;
+        }
+        .search-bar-top .search-group input {
+            padding-left: 36px; border-radius: 10px; border: 1.5px solid #e9ecef;
+            height: 40px; width: 100%; outline: none;
+            font-family: 'Quicksand', sans-serif; font-size: 0.9rem;
+            transition: border-color 0.2s;
+        }
+        .search-bar-top .search-group input:focus { border-color: #28a745; box-shadow: 0 0 0 3px rgba(40,167,69,0.1); }
+
+        /* Active filter tags */
+        .filter-tag {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: #e8f8f1; color: #1a7a4a; border-radius: 20px;
+            padding: 4px 12px; font-size: 0.8rem; font-weight: 600;
+        }
+        .filter-tag a { color: #1a7a4a; text-decoration: none; margin-left: 2px; }
+
+        /* ===== PRODUCT PAGINATION ===== */
+        .prod-pagination { display: flex; align-items: center; justify-content: center; gap: 4px; margin-top: 32px; }
+        .prod-page-btn {
+            min-width: 36px; height: 36px; padding: 0 10px; border-radius: 8px;
+            border: 1.5px solid #e9ecef; background: #fff;
+            color: #495057; font-size: 0.88rem; font-weight: 600;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            transition: all 0.15s; text-decoration: none;
+        }
+        .prod-page-btn:hover { border-color: #28a745; color: #28a745; background: #f0fdf4; }
+        .prod-page-btn.active { background: #28a745; border-color: #28a745; color: #fff; }
+        .prod-page-btn.disabled { opacity: 0.4; pointer-events: none; }
+    </style>
+</head>
 <body>
+
+    <!-- NAVBAR -->
     <nav class="navbar navbar-expand-lg sticky-top">
         <div class="container">
             <a class="navbar-brand" href="/home">BEO<span style="color: var(--secondary-color)">BOOKS</span></a>
@@ -22,271 +126,341 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav mx-auto">
                     <li class="nav-item"><a class="nav-link" href="/home">Trang chủ</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/products">Sản Phẩm</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/products">Sản phẩm</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/vouchers">Mã giảm giá</a></li>
                     <li class="nav-item"><a class="nav-link" href="/contact">Liên hệ</a></li>
                 </ul>
                 <div class="d-flex align-items-center gap-3">
-
-                    <div class="input-group d-none d-lg-flex" style="width: 200px">
-                        <input type="text" id="searchInput"
+                    <div class="input-group d-none d-lg-flex" style="width:200px;">
+                        <input type="text" id="searchInputNav"
                             class="form-control form-control-sm border-end-0 rounded-start-pill"
-                            placeholder="Tìm sách..." onkeydown="if(event.key==='Enter') doSearch()" />
-                        <button class="btn btn-outline-secondary border-start-0 rounded-end-pill" type="button"
-                            onclick="doSearch()">
+                            placeholder="Tìm sách..."
+                            th:value="${keyword}"
+                            onkeydown="if(event.key==='Enter') navSearch()"/>
+                        <button class="btn btn-outline-secondary border-start-0 rounded-end-pill" type="button" onclick="navSearch()">
                             <i class="fa-solid fa-magnifying-glass"></i>
                         </button>
                     </div>
-
                     <div class="position-relative">
                         <a href="/user/cart">
                             <i class="fa-solid fa-cart-shopping fs-5 text-secondary"></i>
-                            <span
-                                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
                                 style="font-size:10px" th:text="${totalQuantity}">0</span>
                         </a>
                     </div>
-
                     <div class="dropdown ms-2">
-                        <a href="#"
-                            class="d-flex align-items-center text-decoration-none text-secondary dropdown-toggle"
-                            data-bs-toggle="dropdown">
-                            <img th:if="${session.currentUser != null}" th:src="${session.currentUser.image}"
-                                class="rounded-circle" width="30" height="30" alt="Avatar"
-                                onerror="this.style.display='none'" />
+                        <a href="#" class="d-flex align-items-center text-decoration-none text-secondary dropdown-toggle" data-bs-toggle="dropdown">
+                            <img th:if="${session.currentUser != null}" th:src="${session.currentUser.image}" class="rounded-circle" width="30" height="30" alt="Avatar" onerror="this.style.display='none'" />
                             <i th:if="${session.currentUser == null}" class="fa-solid fa-circle-user fs-3"></i>
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg p-3"
-                            style="min-width:220px; border-radius:15px;">
+                        <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg p-3" style="min-width:220px;border-radius:15px;">
                             <li th:if="${session.currentUser != null}">
-                                <div class="text-center mb-2">
-                                    <h6 class="fw-bold text-success mb-0" th:text="${session.currentUser.fullname}">User
-                                    </h6>
-                                </div>
-                                <hr class="dropdown-divider" />
+                                <div class="text-center mb-2"><h6 class="fw-bold text-success mb-0" th:text="${session.currentUser.fullname}">User</h6></div>
+                                <hr class="dropdown-divider"/>
                             </li>
-                            <li><a class="dropdown-item rounded py-2" href="/user/profile">
-                                    <i class="fa-solid fa-user me-2 text-muted"></i>Thông tin cá nhân</a></li>
-                            <li>
-                                <a class="dropdown-item py-2 rounded" href="/user/change-password">
-                                    <i class="fa-solid fa-key me-2 text-muted"></i> Đổi mật khẩu
-                                </a>
-                            </li>
-                            <li><a class="dropdown-item rounded py-2" href="/user/order-details">
-                                    <i class="fa-solid fa-box-open me-2 text-muted"></i>Lịch sử mua hàng</a></li>
-                            <li th:if="${session.currentUser != null and session.currentUser.role == true}">
-                                <a class="dropdown-item rounded py-2" href="/admin/dashboard">
-                                    <i class="fa-solid fa-user-shield me-2 text-muted"></i>Trang Quản Trị</a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item py-2 rounded" href="/user/favourites">
-                                    <i class="fa-solid fa-heart me-2 text-danger"></i> Sách yêu thích
-                                </a>
-                            </li>
-                            <li>
-                                <hr class="dropdown-divider" />
-                            </li>
-                            <li><a class="dropdown-item rounded py-2 text-danger" href="/logout">
-                                    <i class="fa-solid fa-right-from-bracket me-2"></i>Đăng xuất</a></li>
+                            <li><a class="dropdown-item rounded py-2" href="/user/profile"><i class="fa-solid fa-user me-2 text-muted"></i>Thông tin cá nhân</a></li>
+                            <li><a class="dropdown-item py-2 rounded" href="/user/change-password"><i class="fa-solid fa-key me-2 text-muted"></i>Đổi mật khẩu</a></li>
+                            <li><a class="dropdown-item rounded py-2" href="/user/order-details"><i class="fa-solid fa-box-open me-2 text-muted"></i>Lịch sử mua hàng</a></li>
+                            <li th:if="${session.currentUser != null and session.currentUser.role == true}"><a class="dropdown-item rounded py-2" href="/admin/dashboard"><i class="fa-solid fa-user-shield me-2 text-muted"></i>Trang Quản Trị</a></li>
+                            <li><a class="dropdown-item py-2 rounded" href="/user/favourites"><i class="fa-solid fa-heart me-2 text-danger"></i>Sách yêu thích</a></li>
+                            <li><hr class="dropdown-divider"/></li>
+                            <li><a class="dropdown-item rounded py-2 text-danger" href="/logout"><i class="fa-solid fa-right-from-bracket me-2"></i>Đăng xuất</a></li>
                         </ul>
                     </div>
-
                 </div>
             </div>
         </div>
     </nav>
 
-    <div class="bg-white py-4 mb-4 border-bottom">
+    <!-- BREADCRUMB -->
+    <div class="bg-white py-3 mb-4 border-bottom">
         <div class="container">
-            <h2 class="fw-bold mb-0">Tất Cả Sản Phẩm</h2>
             <nav aria-label="breadcrumb">
-                <ol class="breadcrumb mb-0 mt-2">
-                    <li class="breadcrumb-item">
-                        <a href="/home" class="text-decoration-none text-muted">Trang chủ</a>
-                    </li>
-                    <li class="breadcrumb-item"
-                        th:classappend="${currentCategoryId != null ? '' : 'active text-success'}">
-                        <a th:if="${currentCategoryId != null}" href="/products"
-                            class="text-decoration-none text-muted">Sản phẩm</a>
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="/home" class="text-decoration-none text-muted">Trang chủ</a></li>
+                    <li class="breadcrumb-item" th:classappend="${currentCategoryId == null ? 'active text-success' : ''}">
+                        <a th:if="${currentCategoryId != null}" href="/products" class="text-decoration-none text-muted">Sản phẩm</a>
                         <span th:if="${currentCategoryId == null}">Sản phẩm</span>
                     </li>
-                    <li th:if="${currentCategoryId != null}" class="breadcrumb-item active text-success"
-                        aria-current="page" th:text="${currentCategoryName}">
-                    </li>
+                    <li th:if="${currentCategoryId != null}" class="breadcrumb-item active text-success" aria-current="page"
+                        th:text="${currentCategoryName}">Danh mục</li>
                 </ol>
             </nav>
         </div>
     </div>
 
     <div class="container mb-5">
-        <div class="row">
+        <div class="row g-4">
 
-            <div class="col-lg-3 mb-4">
-                <div class="filter-sidebar shadow-sm">
-                    <h5 class="filter-title">Danh Mục</h5>
+            <!-- ===== SIDEBAR ===== -->
+            <div class="col-lg-3">
+                <div class="filter-sidebar">
+
+                    <!-- Danh mục -->
+                    <h5 class="filter-title"><i class="fa-solid fa-layer-group me-2 text-success"></i>Danh Mục</h5>
                     <ul class="category-list">
                         <li>
-                            <a th:href="@{/products}" th:classappend="${currentCategoryId == null ? 'active' : ''}">
+                            <a th:href="@{/products(keyword=${keyword},sort=${currentSort})}"
+                               th:classappend="${currentCategoryId == null ? 'active' : ''}">
                                 <i class="fa-solid fa-angle-right me-2"></i>Tất cả sách
                             </a>
                         </li>
-
                         <li th:each="cat : ${categories}">
-                            <a th:href="@{/products(categoryId=${cat.id})}"
-                                th:classappend="${currentCategoryId == cat.id ? 'active' : ''}">
-                                <i class="fa-solid fa-angle-right me-2"></i><span th:text="${cat.name}">Tên danh
-                                    mục</span>
+                            <a th:href="@{/products(categoryId=${cat.id},keyword=${keyword},sort=${currentSort})}"
+                               th:classappend="${currentCategoryId == cat.id ? 'active' : ''}">
+                                <i class="fa-solid fa-angle-right me-2"></i>
+                                <span th:text="${cat.name}">Tên danh mục</span>
                             </a>
                         </li>
                     </ul>
 
-                    <h5 class="filter-title mt-4">Khoảng Giá</h5>
-                    <form action="/products" method="get">
-                        <input type="hidden" name="categoryId" th:if="${currentCategoryId != null}"
-                            th:value="${currentCategoryId}">
+                    <!-- Phân trang danh mục -->
+                    <div class="cat-pagination" th:if="${totalCatPages > 1}">
+                        <a th:href="@{/products(catPage=${catPage - 1},categoryId=${currentCategoryId},keyword=${keyword},sort=${currentSort})}"
+                           th:classappend="${catPage <= 1 ? 'disabled' : ''}"
+                           class="cat-page-btn">‹</a>
+                        <th:block th:each="i : ${#numbers.sequence(1, totalCatPages)}">
+                            <a th:href="@{/products(catPage=${i},categoryId=${currentCategoryId},keyword=${keyword},sort=${currentSort})}"
+                               th:text="${i}"
+                               th:classappend="${i == catPage ? 'active' : ''}"
+                               class="cat-page-btn"></a>
+                        </th:block>
+                        <a th:href="@{/products(catPage=${catPage + 1},categoryId=${currentCategoryId},keyword=${keyword},sort=${currentSort})}"
+                           th:classappend="${catPage >= totalCatPages ? 'disabled' : ''}"
+                           class="cat-page-btn">›</a>
+                    </div>
 
-                        <input type="hidden" name="sort" th:if="${currentSort != null}" th:value="${currentSort}">
+                    <!-- Khoảng giá -->
+                    <h5 class="filter-title mt-4"><i class="fa-solid fa-tag me-2 text-success"></i>Khoảng Giá</h5>
+                    <form th:action="@{/products}" method="get" id="priceForm">
+                        <input type="hidden" name="keyword"    th:value="${keyword}">
+                        <input type="hidden" name="categoryId" th:if="${currentCategoryId != null}" th:value="${currentCategoryId}">
+                        <input type="hidden" name="sort"       th:value="${currentSort}">
+                        <input type="hidden" name="priceRange" id="priceRangeInput" th:value="${currentPriceRange}">
+                        <input type="hidden" name="minPrice"   id="customMinInput"  th:value="${currentMinPrice}">
+                        <input type="hidden" name="maxPrice"   id="customMaxInput"  th:value="${currentMaxPrice}">
 
-                        <div class="d-flex align-items-center gap-2 mb-3">
-                            <input type="number" name="minPrice" class="form-control form-control-sm" placeholder="Từ"
-                                min="0" th:value="${currentMinPrice}">
-                            <span>-</span>
-                            <input type="number" name="maxPrice" class="form-control form-control-sm" placeholder="Đến"
-                                min="0" th:value="${currentMaxPrice}">
+                        <!-- Preset options - viết tĩnh để tránh lỗi SpEL inline list -->
+                        <div class="price-option" th:classappend="${currentPriceRange == ''} ? 'selected' : ''" onclick="selectPreset(this)">
+                            <input type="radio" name="_pricePreset" value="" th:checked="${currentPriceRange == '' or currentPriceRange == null}">
+                            <span>Tất cả mức giá</span>
+                        </div>
+                        <div class="price-option" th:classappend="${currentPriceRange == '0-100000'} ? 'selected' : ''" onclick="selectPreset(this)">
+                            <input type="radio" name="_pricePreset" value="0-100000" th:checked="${currentPriceRange == '0-100000'}">
+                            <span>Dưới 100.000đ</span>
+                        </div>
+                        <div class="price-option" th:classappend="${currentPriceRange == '100000-200000'} ? 'selected' : ''" onclick="selectPreset(this)">
+                            <input type="radio" name="_pricePreset" value="100000-200000" th:checked="${currentPriceRange == '100000-200000'}">
+                            <span>100.000 – 200.000đ</span>
+                        </div>
+                        <div class="price-option" th:classappend="${currentPriceRange == '200000-500000'} ? 'selected' : ''" onclick="selectPreset(this)">
+                            <input type="radio" name="_pricePreset" value="200000-500000" th:checked="${currentPriceRange == '200000-500000'}">
+                            <span>200.000 – 500.000đ</span>
+                        </div>
+                        <div class="price-option" th:classappend="${currentPriceRange == '500000+'} ? 'selected' : ''" onclick="selectPreset(this)">
+                            <input type="radio" name="_pricePreset" value="500000+" th:checked="${currentPriceRange == '500000+'}">
+                            <span>Trên 500.000đ</span>
                         </div>
 
-                        <button type="submit" class="btn btn-success w-100 btn-sm">Áp dụng</button>
+                        <!-- Tùy chỉnh giá -->
+                        <div class="mt-3">
+                            <div class="text-muted small fw-semibold mb-2">Hoặc nhập tùy chỉnh:</div>
+                            <div class="custom-price-row">
+                                <input type="number" id="customMin" placeholder="Từ" min="0"
+                                       th:value="${currentPriceRange == '' or currentPriceRange == null ? currentMinPrice : ''}">
+                                <span class="text-muted">—</span>
+                                <input type="number" id="customMax" placeholder="Đến" min="0"
+                                       th:value="${currentPriceRange == '' or currentPriceRange == null ? currentMaxPrice : ''}">
+                            </div>
+                            <button type="button" class="btn btn-success btn-sm w-100 mt-2 rounded-pill"
+                                    onclick="applyCustomPrice()">
+                                <i class="fa-solid fa-check me-1"></i>Áp dụng
+                            </button>
+                        </div>
+
+                        <!-- Xóa lọc giá -->
+                        <a th:if="${currentPriceRange != null and currentPriceRange != '' or currentMinPrice != null}"
+                           th:href="@{/products(keyword=${keyword},categoryId=${currentCategoryId},sort=${currentSort})}"
+                           class="btn btn-outline-secondary btn-sm w-100 mt-2 rounded-pill">
+                            <i class="fa-solid fa-xmark me-1"></i>Bỏ lọc giá
+                        </a>
                     </form>
                 </div>
             </div>
 
+            <!-- ===== NỘI DUNG CHÍNH ===== -->
             <div class="col-lg-9">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <span class="text-muted">
-                        Hiển thị <strong th:text="${#lists.size(products)}">0</strong> sản phẩm
-                    </span>
 
-                    <form action="/products" method="get" class="d-flex align-items-center m-0">
-                        <input type="hidden" name="categoryId" th:if="${currentCategoryId != null}"
-                            th:value="${currentCategoryId}">
-                        <input type="hidden" name="minPrice" th:if="${currentMinPrice != null}"
-                            th:value="${currentMinPrice}">
-                        <input type="hidden" name="maxPrice" th:if="${currentMaxPrice != null}"
-                            th:value="${currentMaxPrice}">
-
-                        <select name="sort" class="form-select w-auto" onchange="this.form.submit()">
-                            <option value="newest" th:selected="${currentSort == 'newest'}">Mới nhất</option>
-                            <option value="price-asc" th:selected="${currentSort == 'price-asc'}">Giá tăng dần</option>
-                            <option value="price-desc" th:selected="${currentSort == 'price-desc'}">Giá giảm dần
-                            </option>
+                <!-- Search bar -->
+                <div class="search-bar-top">
+                    <div class="search-group">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" id="searchInput" placeholder="Tìm theo tên sách, tác giả..."
+                               th:value="${keyword}"
+                               onkeydown="if(event.key==='Enter') doSearch()">
+                    </div>
+                    <!-- Sort -->
+                    <form id="sortForm" th:action="@{/products}" method="get" class="d-flex align-items-center m-0">
+                        <input type="hidden" name="keyword"    th:value="${keyword}">
+                        <input type="hidden" name="categoryId" th:if="${currentCategoryId != null}" th:value="${currentCategoryId}">
+                        <input type="hidden" name="priceRange" th:value="${currentPriceRange}">
+                        <input type="hidden" name="minPrice"   th:if="${currentMinPrice != null}" th:value="${currentMinPrice}">
+                        <input type="hidden" name="maxPrice"   th:if="${currentMaxPrice != null}" th:value="${currentMaxPrice}">
+                        <select name="sort" class="form-select form-select-sm" style="width:auto;border-radius:10px;" onchange="document.getElementById('sortForm').submit()">
+                            <option value="newest"     th:selected="${currentSort == 'newest'}">Mới nhất</option>
+                            <option value="price-asc"  th:selected="${currentSort == 'price-asc'}">Giá tăng dần</option>
+                            <option value="price-desc" th:selected="${currentSort == 'price-desc'}">Giá giảm dần</option>
                         </select>
                     </form>
+                    <span class="text-muted small ms-auto">
+                        <strong th:text="${totalProducts}">0</strong> sản phẩm
+                    </span>
                 </div>
 
+                <!-- Active filter tags -->
+                <div class="d-flex flex-wrap gap-2 mb-3"
+                     th:if="${(keyword != null and keyword != '') or currentCategoryId != null or (currentPriceRange != null and currentPriceRange != '') or currentMinPrice != null}">
+                    <span th:if="${keyword != null and keyword != ''}" class="filter-tag">
+                        <i class="fa-solid fa-magnifying-glass"></i> "<span th:text="${keyword}"></span>"
+                        <a th:href="@{/products(categoryId=${currentCategoryId},priceRange=${currentPriceRange},sort=${currentSort})}">✕</a>
+                    </span>
+                    <span th:if="${currentCategoryId != null}" class="filter-tag">
+                        <i class="fa-solid fa-layer-group"></i> <span th:text="${currentCategoryName}"></span>
+                        <a th:href="@{/products(keyword=${keyword},priceRange=${currentPriceRange},sort=${currentSort})}">✕</a>
+                    </span>
+                    <span th:if="${currentPriceRange != null and currentPriceRange != ''}" class="filter-tag">
+                        <i class="fa-solid fa-tag"></i>
+                        <span th:switch="${currentPriceRange}">
+                            <span th:case="'0-100000'">Dưới 100.000đ</span>
+                            <span th:case="'100000-200000'">100k - 200k</span>
+                            <span th:case="'200000-500000'">200k - 500k</span>
+                            <span th:case="'500000+'">Trên 500.000đ</span>
+                        </span>
+                        <a th:href="@{/products(keyword=${keyword},categoryId=${currentCategoryId},sort=${currentSort})}">✕</a>
+                    </span>
+                    <span th:if="${currentPriceRange == '' and currentMinPrice != null}" class="filter-tag">
+                        <i class="fa-solid fa-tag"></i>
+                        Tùy chỉnh
+                        <a th:href="@{/products(keyword=${keyword},categoryId=${currentCategoryId},sort=${currentSort})}">✕</a>
+                    </span>
+                </div>
+
+                <!-- Lưới sản phẩm -->
                 <div class="row row-cols-1 row-cols-md-3 g-4">
                     <div class="col" th:each="p : ${products}">
                         <div class="card book-card h-100">
                             <a th:href="@{'/product/' + ${p.slug}}" class="text-decoration-none">
                                 <div class="book-img-container">
-                                    <img th:src="${p.image != null ? p.image : '/images/default-book.png'}"
-                                        class="book-img" th:alt="${p.name}">
+                                    <img th:src="${p.image != null ? p.image : '/images/default-book.png'}" class="book-img" th:alt="${p.name}">
                                 </div>
                                 <div class="card-body d-flex flex-column">
                                     <span class="badge mb-1" th:if="${p.category != null}"
-                                        th:style="'background-color:' + ${p.category.color}"
-                                        th:text="${p.category.name}">Danh mục</span>
+                                          th:style="'background-color:' + ${p.category.color}"
+                                          th:text="${p.category.name}">Danh mục</span>
                                     <h6 class="fw-bold mb-1 text-dark" th:text="${p.name}">Tên sách</h6>
                                     <p class="text-muted small mb-2" th:text="${p.author}">Tác giả</p>
-                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <div class="d-flex justify-content-between align-items-center mb-3 mt-auto">
                                         <span class="text-danger fw-bold"
-                                            th:text="${#numbers.formatDecimal(p.price, 0, 'COMMA', 0, 'POINT')} + 'đ'">
-                                            0đ
-                                        </span>
-                                        <button class="btn btn-outline-success btn-sm rounded-circle">
+                                            th:text="${#numbers.formatDecimal(p.price, 0, 'POINT', 0, 'COMMA')} + 'đ'">0đ</span>
+                                        <button class="btn btn-outline-success btn-sm rounded-circle"
+                                                th:onclick="|event.preventDefault(); addToCartList(${p.id})|"
+                                                title="Thêm vào giỏ">
                                             <i class="fa-solid fa-cart-plus"></i>
                                         </button>
-
                                     </div>
-                                    <div class="mt-auto text-center">
-                                        <a th:href="@{'/product/' + ${p.slug}}" class="btn btn-outline-success w-75">
-                                            Chi tiết sản phẩm
-                                        </a>
-                                    </div>
+                                    <a th:href="@{'/product/' + ${p.slug}}" class="btn btn-outline-success w-100 btn-sm rounded-pill">
+                                        Chi tiết sản phẩm
+                                    </a>
                                 </div>
                             </a>
                         </div>
                     </div>
 
+                    <!-- Empty -->
                     <div class="col-12 text-center py-5" th:if="${#lists.isEmpty(products)}">
                         <i class="fa-solid fa-box-open fa-3x text-muted mb-3 d-block"></i>
-                        <p class="text-muted">Không có sản phẩm nào.</p>
+                        <p class="text-muted fw-semibold">Không tìm thấy sản phẩm phù hợp.</p>
+                        <a href="/products" class="btn btn-outline-success rounded-pill px-4">Xem tất cả</a>
                     </div>
                 </div>
 
-                <nav class="mt-5 d-flex justify-content-center">
-                    <ul class="pagination">
-                        <li class="page-item disabled"><a class="page-link" href="#">Trước</a></li>
-                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                        <li class="page-item"><a class="page-link" href="#">Sau</a></li>
-                    </ul>
-                </nav>
+                <!-- Phân trang sản phẩm -->
+                <div class="prod-pagination" th:if="${totalPages > 1}">
+                    <!-- Prev -->
+                    <a th:href="@{/products(page=${currentPage - 1},keyword=${keyword},categoryId=${currentCategoryId},priceRange=${currentPriceRange},minPrice=${currentMinPrice},maxPrice=${currentMaxPrice},sort=${currentSort})}"
+                       th:classappend="${currentPage <= 1 ? 'disabled' : ''}"
+                       class="prod-page-btn">‹</a>
+
+                    <!-- Pages with ellipsis -->
+                    <th:block th:with="start=${currentPage > 3 ? currentPage - 2 : 1}, end=${currentPage < totalPages - 2 ? currentPage + 2 : totalPages}">
+                        <!-- First page + ellipsis -->
+                        <th:block th:if="${start > 1}">
+                            <a th:href="@{/products(page=1,keyword=${keyword},categoryId=${currentCategoryId},priceRange=${currentPriceRange},minPrice=${currentMinPrice},maxPrice=${currentMaxPrice},sort=${currentSort})}"
+                               class="prod-page-btn">1</a>
+                            <span th:if="${start > 2}" class="text-muted" style="align-self:center;padding:0 4px;">…</span>
+                        </th:block>
+
+                        <th:block th:each="i : ${#numbers.sequence(start, end)}">
+                            <a th:href="@{/products(page=${i},keyword=${keyword},categoryId=${currentCategoryId},priceRange=${currentPriceRange},minPrice=${currentMinPrice},maxPrice=${currentMaxPrice},sort=${currentSort})}"
+                               th:text="${i}"
+                               th:classappend="${i == currentPage ? 'active' : ''}"
+                               class="prod-page-btn"></a>
+                        </th:block>
+
+                        <!-- Last page + ellipsis -->
+                        <th:block th:if="${end < totalPages}">
+                            <span th:if="${end < totalPages - 1}" class="text-muted" style="align-self:center;padding:0 4px;">…</span>
+                            <a th:href="@{/products(page=${totalPages},keyword=${keyword},categoryId=${currentCategoryId},priceRange=${currentPriceRange},minPrice=${currentMinPrice},maxPrice=${currentMaxPrice},sort=${currentSort})}"
+                               th:text="${totalPages}"
+                               class="prod-page-btn"></a>
+                        </th:block>
+                    </th:block>
+
+                    <!-- Next -->
+                    <a th:href="@{/products(page=${currentPage + 1},keyword=${keyword},categoryId=${currentCategoryId},priceRange=${currentPriceRange},minPrice=${currentMinPrice},maxPrice=${currentMaxPrice},sort=${currentSort})}"
+                       th:classappend="${currentPage >= totalPages ? 'disabled' : ''}"
+                       class="prod-page-btn">›</a>
+                </div>
+
+                <!-- Info tổng -->
+                <div class="text-center text-muted small mt-3" th:if="${totalProducts > 0}">
+                    Hiển thị
+                    <strong th:text="${(currentPage - 1) * 9 + 1}">1</strong> –
+                    <strong th:text="${currentPage * 9 > totalProducts ? totalProducts : currentPage * 9}">9</strong>
+                    trong <strong th:text="${totalProducts}">0</strong> sản phẩm
+                </div>
             </div>
         </div>
     </div>
 
+    <!-- FOOTER -->
     <footer class="bg-white border-top pt-5">
         <div class="container">
             <div class="row g-4">
                 <div class="col-lg-4 col-md-6">
-                    <a href="index.html" class="text-decoration-none">
-                        <h3 class="fw-bold mb-3" style="color: var(--primary-color);">BEO<span
-                                style="color: var(--secondary-color);">BOOKS</span></h3>
-                    </a>
-                    <p class="text-muted small mb-4">
-                        BeoBooks là nơi lan tỏa văn hóa đọc, cung cấp những đầu sách chất lượng với trải nghiệm mua sắm
-                        tuyệt vời nhất cho độc giả.
-                    </p>
+                    <h3 class="fw-bold mb-3" style="color:var(--primary-color)">BEO<span style="color:var(--secondary-color)">BOOKS</span></h3>
+                    <p class="text-muted small mb-4">BeoBooks là nơi lan tỏa văn hóa đọc, cung cấp những đầu sách chất lượng với trải nghiệm mua sắm tuyệt vời nhất.</p>
                     <div class="d-flex flex-column gap-2 text-muted small">
-                        <p class="mb-0"><i class="fa-solid fa-location-dot me-2 text-success"></i> Đường 3/2, Ninh Kiều,
-                            Cần Thơ</p>
-                        <p class="mb-0"><i class="fa-solid fa-envelope me-2 text-success"></i> <a
-                                href="/cdn-cgi/l/email-protection" class="__cf_email__"
-                                data-cfemail="d5bdbaa1a7ba95b7b0bab7bababea6fbb6bab8">[email&#160;protected]</a></p>
-                        <p class="mb-0"><i class="fa-solid fa-phone me-2 text-success"></i> 1900 6789</p>
+                        <p class="mb-0"><i class="fa-solid fa-location-dot me-2 text-success"></i>Đường 3/2, Ninh Kiều, Cần Thơ</p>
+                        <p class="mb-0"><i class="fa-solid fa-envelope me-2 text-success"></i>hotro@beobooks.com</p>
+                        <p class="mb-0"><i class="fa-solid fa-phone me-2 text-success"></i>1900 6789</p>
                     </div>
                 </div>
-
                 <div class="col-lg-2 col-md-6">
                     <h6 class="fw-bold mb-3">Về BeoBooks</h6>
                     <ul class="list-unstyled footer-links">
-                        <li><a href="#">Giới thiệu</a></li>
-                        <li><a href="#">Tuyển dụng</a></li>
-                        <li><a href="#">Chính sách bảo mật</a></li>
-                        <li><a href="#">Điều khoản sử dụng</a></li>
-                        <li><a href="#">Liên hệ hợp tác</a></li>
+                        <li><a href="#">Giới thiệu</a></li><li><a href="#">Tuyển dụng</a></li>
+                        <li><a href="#">Chính sách bảo mật</a></li><li><a href="#">Điều khoản sử dụng</a></li>
                     </ul>
                 </div>
-
                 <div class="col-lg-2 col-md-6">
                     <h6 class="fw-bold mb-3">Hỗ trợ</h6>
                     <ul class="list-unstyled footer-links">
-                        <li><a href="#">Hướng dẫn mua hàng</a></li>
-                        <li><a href="#">Phương thức thanh toán</a></li>
-                        <li><a href="#">Chính sách vận chuyển</a></li>
-                        <li><a href="#">Chính sách đổi trả</a></li>
-                        <li><a href="#">Câu hỏi thường gặp</a></li>
+                        <li><a href="#">Hướng dẫn mua hàng</a></li><li><a href="#">Chính sách vận chuyển</a></li>
+                        <li><a href="#">Chính sách đổi trả</a></li><li><a href="#">Câu hỏi thường gặp</a></li>
                     </ul>
                 </div>
-
                 <div class="col-lg-4 col-md-6">
-                    <h6 class="fw-bold mb-3">Đăng ký nhận tin</h6>
-                    <p class="text-muted small mb-3">Nhận thông tin sách mới và khuyến mãi đặc biệt.</p>
-                    <form class="input-group mb-4">
-                        <input type="email" class="form-control" placeholder="Email của bạn..."
-                            style="border-radius: 20px 0 0 20px; border-right: none;">
-                        <button class="btn btn-success" type="button" style="border-radius: 0 20px 20px 0;">Đăng
-                            ký</button>
-                    </form>
-
                     <h6 class="fw-bold mb-3">Kết nối với chúng tôi</h6>
                     <div class="d-flex gap-2">
                         <a href="#" class="social-icon"><i class="fa-brands fa-facebook-f"></i></a>
@@ -296,20 +470,17 @@
                     </div>
                 </div>
             </div>
-
             <hr class="my-4 text-muted">
-
             <div class="row align-items-center pb-4">
                 <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
-                    <p class="mb-0 text-muted small">© 2026 <strong>BEOBOOKS</strong>. Tất cả các quyền được bảo lưu.
-                    </p>
+                    <p class="mb-0 text-muted small">© 2026 <strong>BEOBOOKS</strong>. Tất cả các quyền được bảo lưu.</p>
                 </div>
                 <div class="col-md-6 text-center text-md-end">
                     <div class="d-flex gap-3 justify-content-center justify-content-md-end fs-4 text-secondary">
-                        <i class="fa-brands fa-cc-visa" title="Visa"></i>
-                        <i class="fa-brands fa-cc-mastercard" title="Mastercard"></i>
-                        <i class="fa-solid fa-wallet" title="Momo/ZaloPay"></i>
-                        <i class="fa-solid fa-truck-fast" title="COD"></i>
+                        <i class="fa-brands fa-cc-visa"></i>
+                        <i class="fa-brands fa-cc-mastercard"></i>
+                        <i class="fa-solid fa-wallet"></i>
+                        <i class="fa-solid fa-truck-fast"></i>
                     </div>
                 </div>
             </div>
@@ -317,6 +488,82 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
+    <script>
+        // Search
+        function doSearch() {
+            const kw = document.getElementById('searchInput').value.trim();
+            const url = new URL('/products', window.location.origin);
+            if (kw) url.searchParams.set('keyword', kw);
+            const catId = new URLSearchParams(window.location.search).get('categoryId');
+            if (catId) url.searchParams.set('categoryId', catId);
+            const sort  = new URLSearchParams(window.location.search).get('sort') || 'newest';
+            url.searchParams.set('sort', sort);
+            window.location.href = url.toString();
+        }
+        function navSearch() {
+            const kw = document.getElementById('searchInputNav').value.trim();
+            window.location.href = '/products' + (kw ? '?keyword=' + encodeURIComponent(kw) : '');
+        }
 
+        // Preset giá
+        function selectPreset(el) {
+            document.querySelectorAll('.price-option').forEach(o => o.classList.remove('selected'));
+            el.classList.add('selected');
+            const val = el.querySelector('input[type="radio"]').value;
+            document.getElementById('priceRangeInput').value = val;
+            document.getElementById('customMinInput').value  = '';
+            document.getElementById('customMaxInput').value  = '';
+            document.getElementById('priceForm').submit();
+        }
+
+        // Giá tùy chỉnh
+        function applyCustomPrice() {
+            const min = document.getElementById('customMin').value;
+            const max = document.getElementById('customMax').value;
+            if (!min && !max) return;
+            document.getElementById('priceRangeInput').value = '';
+            document.getElementById('customMinInput').value  = min;
+            document.getElementById('customMaxInput').value  = max;
+            document.getElementById('priceForm').submit();
+        }
+
+        // Thêm vào giỏ từ trang danh sách
+        async function addToCartList(productId) {
+            const res  = await fetch('/user/cart/add', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `productId=${productId}&quantity=1`
+            });
+            const data = await res.json();
+            if (data.redirect) { window.location.href = data.redirect; return; }
+            showToast(data.success, data.message, data.cartCount);
+        }
+
+        function showToast(success, message, cartCount) {
+            document.getElementById('cartToast')?.remove();
+            const toast = document.createElement('div');
+            toast.id = 'cartToast';
+            toast.style.cssText = `position:fixed;top:80px;right:20px;z-index:9999;background:#fff;border-radius:14px;
+                padding:14px 18px;box-shadow:0 4px 24px rgba(0,0,0,0.13);
+                border-left:4px solid ${success ? '#28a745' : '#dc3545'};
+                display:flex;align-items:center;gap:10px;font-family:'Quicksand',sans-serif;
+                font-weight:600;font-size:0.92rem;max-width:320px;animation:slideInToast 0.3s ease;`;
+            toast.innerHTML = `
+                <i class="fa-solid fa-${success ? 'check-circle' : 'xmark-circle'}" style="color:${success ? '#28a745' : '#dc3545'};font-size:1.2rem;flex-shrink:0;"></i>
+                <span>${message}</span>
+                ${cartCount != null ? `<a href="/user/cart" style="margin-left:auto;background:#28a745;color:#fff;border-radius:50px;padding:4px 12px;font-size:0.78rem;text-decoration:none;white-space:nowrap;">Xem giỏ (${cartCount})</a>` : ''}
+            `;
+            if (!document.getElementById('toastStyle')) {
+                const s = document.createElement('style'); s.id = 'toastStyle';
+                s.textContent = '@keyframes slideInToast{from{transform:translateX(120%);opacity:0}to{transform:translateX(0);opacity:1}}';
+                document.head.appendChild(s);
+            }
+            document.body.appendChild(toast);
+            if (cartCount != null) {
+                document.querySelectorAll('.badge.bg-danger').forEach(el => { if (el.closest('a[href="/user/cart"]')) el.textContent = cartCount; });
+            }
+            setTimeout(() => toast.remove(), 3500);
+        }
+    </script>
+</body>
 </html>

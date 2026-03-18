@@ -8,187 +8,154 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/style.css">
+    <script src="/js/search.js"></script>
     <style>
         body { font-family: 'Quicksand', sans-serif; background: #f8f9fa; }
 
         .order-card {
-            background: #fff;
-            border-radius: 16px;
+            background: #fff; border-radius: 16px;
             box-shadow: 0 2px 16px rgba(0,0,0,0.07);
-            margin-bottom: 20px;
-            overflow: hidden;
+            margin-bottom: 20px; overflow: hidden;
             border: 1px solid #f0f0f0;
         }
-
         .order-header {
             background: linear-gradient(135deg, #f8fffe, #e8f5e9);
-            padding: 14px 20px;
-            border-bottom: 1px solid #e9ecef;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 10px;
+            padding: 14px 20px; border-bottom: 1px solid #e9ecef;
+            display: flex; align-items: center; justify-content: space-between;
+            flex-wrap: wrap; gap: 10px;
         }
-
-        .order-status {
-            font-size: 0.82rem;
-            padding: 4px 12px;
-            border-radius: 50px;
-            font-weight: 600;
-        }
-
+        .order-status { font-size: 0.82rem; padding: 4px 12px; border-radius: 50px; font-weight: 600; }
         .status-0 { background: #fff3cd; color: #856404; }
         .status-1 { background: #cce5ff; color: #004085; }
         .status-2 { background: #d4edda; color: #155724; }
         .status-3 { background: #d1ecf1; color: #0c5460; }
         .status-4 { background: #28a745; color: #fff; }
         .status-5 { background: #f8d7da; color: #721c24; }
-        /* Yêu cầu hoàn tiền */
         .status-6 { background: #fff3cd; color: #856404; border: 1.5px dashed #ffc107; }
 
         .order-item {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            padding: 14px 20px;
-            border-bottom: 1px solid #f8f9fa;
+            display: flex; align-items: center; gap: 14px;
+            padding: 14px 20px; border-bottom: 1px solid #f8f9fa;
         }
-
         .order-item:last-child { border-bottom: none; }
-
-        .order-item img {
-            width: 60px;
-            height: 75px;
-            object-fit: cover;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.10);
-            flex-shrink: 0;
-        }
-
+        .order-item img { width: 60px; height: 75px; object-fit: cover; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.10); flex-shrink: 0; }
         .item-info { flex: 1; }
         .item-name { font-weight: 700; color: #1a1a2e; font-size: 0.95rem; }
         .item-meta { color: #6c757d; font-size: 0.82rem; }
         .item-price { font-weight: 700; color: #28a745; white-space: nowrap; }
 
-        .btn-review {
-            background: linear-gradient(135deg, #28a745, #20c997);
-            color: #fff;
-            border: none;
-            border-radius: 50px;
-            padding: 5px 16px;
-            font-size: 0.82rem;
-            font-weight: 600;
-            text-decoration: none;
-            white-space: nowrap;
-            transition: transform 0.12s;
-            display: inline-block;
-        }
-
-        .btn-review:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(40,167,69,0.3);
-            color: #fff;
-        }
-
         .badge-reviewed {
-            background: #e8f5e9;
-            color: #28a745;
-            border-radius: 50px;
-            padding: 4px 12px;
-            font-size: 0.78rem;
-            font-weight: 600;
-            border: 1px solid #c3e6cb;
+            background: #e8f5e9; color: #28a745; border-radius: 50px;
+            padding: 4px 12px; font-size: 0.78rem; font-weight: 600; border: 1px solid #c3e6cb;
         }
-
         .order-footer {
-            background: #fafafa;
-            padding: 12px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 8px;
+            background: #fafafa; padding: 12px 20px;
+            display: flex; justify-content: space-between; align-items: center;
+            flex-wrap: wrap; gap: 8px;
         }
-
         .order-total { font-weight: 700; font-size: 1rem; color: #1a1a2e; }
         .order-total span { color: #28a745; font-size: 1.1rem; }
+        .empty-state { text-align: center; padding: 60px 20px; background: #fff; border-radius: 16px; }
 
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            background: #fff;
-            border-radius: 16px;
+        /* ===== REVIEW MODAL ===== */
+        .review-backdrop {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px); z-index: 9999;
+            display: none; align-items: center; justify-content: center;
+            padding: 20px;
         }
+        .review-backdrop.show { display: flex; }
 
-        /* Custom Modal */
-        .custom-modal-backdrop {
-            position: fixed; inset: 0;
-            background: rgba(0,0,0,0.45);
-            backdrop-filter: blur(3px);
-            z-index: 9998;
-            display: none;
-            align-items: center;
-            justify-content: center;
+        .review-modal {
+            background: #fff; border-radius: 20px;
+            width: 100%; max-width: 600px; max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 24px 64px rgba(0,0,0,0.2);
+            animation: popIn 0.22s cubic-bezier(.22,1,.36,1);
         }
+        @keyframes popIn { from { transform: scale(0.88); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+        .review-modal-header {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: #fff; padding: 20px 24px; border-radius: 20px 20px 0 0;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .review-modal-header h5 { margin: 0; font-weight: 700; font-size: 1rem; }
+        .review-close-btn { background: rgba(255,255,255,0.2); border: none; color: #fff; border-radius: 50%; width: 32px; height: 32px; cursor: pointer; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; transition: background 0.15s; }
+        .review-close-btn:hover { background: rgba(255,255,255,0.35); }
+
+        .review-product-block {
+            padding: 18px 24px; border-bottom: 1px solid #f0f0f0;
+        }
+        .review-product-block:last-of-type { border-bottom: none; }
+
+        .review-product-info { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+        .review-product-info img { width: 50px; height: 62px; object-fit: cover; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); flex-shrink: 0; }
+        .review-product-name { font-weight: 700; font-size: 0.93rem; color: #1a1a2e; }
+        .review-product-author { font-size: 0.8rem; color: #6c757d; }
+
+        /* Star rating UI */
+        .star-row { display: flex; gap: 4px; margin-bottom: 12px; }
+        .star-btn {
+            background: none; border: none; cursor: pointer; padding: 0;
+            font-size: 1.5rem; color: #dee2e6; transition: color 0.1s, transform 0.1s;
+            line-height: 1;
+        }
+        .star-btn:hover, .star-btn.active { color: #ffc107; transform: scale(1.15); }
+
+        .review-textarea {
+            width: 100%; border-radius: 10px; border: 1.5px solid #e9ecef;
+            padding: 10px 14px; font-family: 'Quicksand', sans-serif;
+            font-size: 0.9rem; resize: none; transition: border-color 0.2s; outline: none;
+        }
+        .review-textarea:focus { border-color: #28a745; box-shadow: 0 0 0 3px rgba(40,167,69,0.1); }
+        .review-textarea.error { border-color: #dc3545; }
+
+        .char-count { font-size: 0.75rem; color: #adb5bd; text-align: right; margin-top: 4px; }
+
+        .review-modal-footer { padding: 16px 24px; background: #f8f9fa; border-radius: 0 0 20px 20px; display: flex; gap: 12px; justify-content: flex-end; border-top: 1px solid #e9ecef; }
+
+        .btn-submit-review {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: #fff; border: none; border-radius: 50px;
+            padding: 10px 28px; font-weight: 700; font-size: 0.9rem;
+            cursor: pointer; transition: all 0.15s;
+        }
+        .btn-submit-review:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(40,167,69,0.35); }
+        .btn-submit-review:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+        /* Nút đánh giá đơn hàng */
+        .btn-review-order {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: #fff; border: none; border-radius: 50px;
+            padding: 6px 18px; font-size: 0.82rem; font-weight: 600;
+            cursor: pointer; transition: all 0.12s; white-space: nowrap;
+        }
+        .btn-review-order:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(40,167,69,0.3); }
+
+        /* Custom modal (confirm/cancel/refund) */
+        .custom-modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.45); backdrop-filter: blur(3px); z-index: 9998; display: none; align-items: center; justify-content: center; }
         .custom-modal-backdrop.show { display: flex; }
-        .custom-modal-box {
-            background: #fff;
-            border-radius: 20px;
-            padding: 32px 28px 24px;
-            max-width: 400px;
-            width: 90%;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.18);
-            text-align: center;
-            animation: modalPop 0.22s ease;
-        }
-        @keyframes modalPop {
-            from { transform: scale(0.85); opacity: 0; }
-            to   { transform: scale(1);    opacity: 1; }
-        }
-        .custom-modal-icon {
-            width: 64px; height: 64px;
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            margin: 0 auto 16px;
-            font-size: 1.8rem;
-        }
-        .modal-icon-danger   { background: #fff0f0; color: #dc3545; }
-        .modal-icon-success  { background: #f0fff4; color: #28a745; }
-        .modal-icon-warning  { background: #fffbea; color: #e6a817; }
+        .custom-modal-box { background: #fff; border-radius: 20px; padding: 32px 28px 24px; max-width: 400px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.18); text-align: center; animation: popIn 0.22s ease; }
+        .custom-modal-icon { width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; font-size: 1.8rem; }
+        .modal-icon-danger  { background: #fff0f0; color: #dc3545; }
+        .modal-icon-success { background: #f0fff4; color: #28a745; }
+        .modal-icon-warning { background: #fffbea; color: #e6a817; }
         .custom-modal-title { font-weight: 700; font-size: 1.1rem; color: #1a1a2e; margin-bottom: 8px; }
         .custom-modal-desc  { color: #6c757d; font-size: 0.9rem; margin-bottom: 24px; }
 
         /* Toast */
-        .toast-container-custom {
-            position: fixed; top: 24px; right: 24px;
-            z-index: 9999; display: flex; flex-direction: column; gap: 10px;
-        }
-        .toast-custom {
-            display: flex; align-items: center; gap: 12px;
-            padding: 14px 18px;
-            border-radius: 14px;
-            box-shadow: 0 8px 28px rgba(0,0,0,0.14);
-            font-weight: 600; font-size: 0.9rem;
-            min-width: 280px; max-width: 380px;
-            animation: toastIn 0.3s ease;
-        }
-        @keyframes toastIn {
-            from { transform: translateX(100px); opacity: 0; }
-            to   { transform: translateX(0);     opacity: 1; }
-        }
+        .toast-container-custom { position: fixed; top: 24px; right: 24px; z-index: 10000; display: flex; flex-direction: column; gap: 10px; }
+        .toast-custom { display: flex; align-items: center; gap: 12px; padding: 14px 18px; border-radius: 14px; box-shadow: 0 8px 28px rgba(0,0,0,0.14); font-weight: 600; font-size: 0.9rem; min-width: 280px; max-width: 380px; animation: toastIn 0.3s ease; }
+        @keyframes toastIn { from { transform: translateX(100px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         .toast-success { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
         .toast-error   { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
-        .toast-icon { font-size: 1.2rem; flex-shrink: 0; }
-        .toast-close {
-            margin-left: auto; cursor: pointer; opacity: 0.6;
-            background: none; border: none; font-size: 1rem; color: inherit;
-        }
+        .toast-close { margin-left: auto; cursor: pointer; opacity: 0.6; background: none; border: none; font-size: 1rem; color: inherit; }
     </style>
 </head>
 <body>
 
- <nav class="navbar navbar-expand-lg sticky-top">
+    <nav class="navbar navbar-expand-lg sticky-top">
         <div class="container">
             <a class="navbar-brand" href="/home">BEO<span style="color: var(--secondary-color)">BOOKS</span></a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -197,16 +164,18 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav mx-auto">
                     <li class="nav-item"><a class="nav-link" href="/home">Trang chủ</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/products">Sản Phẩm</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/products">Sản phẩm</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/vouchers">Mã giảm giá</a></li>
                     <li class="nav-item"><a class="nav-link" href="/contact">Liên hệ</a></li>
                 </ul>
                 <div class="d-flex align-items-center gap-3">
-                    <div class="input-group d-none d-lg-flex" style="width: 200px">
-                        <input type="text" id="searchInput"
+                    <div class="input-group d-none d-lg-flex" style="width:200px;">
+                        <input type="text" id="searchInputNav"
                             class="form-control form-control-sm border-end-0 rounded-start-pill"
-                            placeholder="Tìm sách..." onkeydown="if(event.key==='Enter') doSearch()" />
-                        <button class="btn btn-outline-secondary border-start-0 rounded-end-pill" type="button"
-                            onclick="doSearch()">
+                            placeholder="Tìm sách..."
+                            th:value="${keyword}"
+                            onkeydown="if(event.key==='Enter') navSearch()"/>
+                        <button class="btn btn-outline-secondary border-start-0 rounded-end-pill" type="button" onclick="navSearch()">
                             <i class="fa-solid fa-magnifying-glass"></i>
                         </button>
                     </div>
@@ -218,37 +187,22 @@
                         </a>
                     </div>
                     <div class="dropdown ms-2">
-                        <a href="#"
-                            class="d-flex align-items-center text-decoration-none text-secondary dropdown-toggle"
-                            data-bs-toggle="dropdown">
-                            <img th:if="${session.currentUser != null}" th:src="${session.currentUser.image}"
-                                class="rounded-circle" width="30" height="30" alt="Avatar"
-                                onerror="this.style.display='none'" />
+                        <a href="#" class="d-flex align-items-center text-decoration-none text-secondary dropdown-toggle" data-bs-toggle="dropdown">
+                            <img th:if="${session.currentUser != null}" th:src="${session.currentUser.image}" class="rounded-circle" width="30" height="30" alt="Avatar" onerror="this.style.display='none'" />
                             <i th:if="${session.currentUser == null}" class="fa-solid fa-circle-user fs-3"></i>
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg p-3"
-                            style="min-width:220px; border-radius:15px;">
+                        <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg p-3" style="min-width:220px;border-radius:15px;">
                             <li th:if="${session.currentUser != null}">
-                                <div class="text-center mb-2">
-                                    <h6 class="fw-bold text-success mb-0" th:text="${session.currentUser.fullname}">User</h6>
-                                </div>
-                                <hr class="dropdown-divider" />
+                                <div class="text-center mb-2"><h6 class="fw-bold text-success mb-0" th:text="${session.currentUser.fullname}">User</h6></div>
+                                <hr class="dropdown-divider"/>
                             </li>
-                            <li><a class="dropdown-item rounded py-2" href="/user/profile">
-                                    <i class="fa-solid fa-user me-2 text-muted"></i>Thông tin cá nhân</a></li>
-                            <li><a class="dropdown-item py-2 rounded" href="/user/change-password">
-                                    <i class="fa-solid fa-key me-2 text-muted"></i> Đổi mật khẩu</a></li>
-                            <li><a class="dropdown-item rounded py-2" href="/user/order-details">
-                                    <i class="fa-solid fa-box-open me-2 text-muted"></i>Lịch sử mua hàng</a></li>
-                            <li th:if="${session.currentUser != null and session.currentUser.role == true}">
-                                <a class="dropdown-item rounded py-2" href="/admin/dashboard">
-                                    <i class="fa-solid fa-user-shield me-2 text-muted"></i>Trang Quản Trị</a>
-                            </li>
-                            <li><a class="dropdown-item py-2 rounded" href="/user/favourites">
-                                    <i class="fa-solid fa-heart me-2 text-danger"></i> Sách yêu thích</a></li>
-                            <li><hr class="dropdown-divider" /></li>
-                            <li><a class="dropdown-item rounded py-2 text-danger" href="/logout">
-                                    <i class="fa-solid fa-right-from-bracket me-2"></i>Đăng xuất</a></li>
+                            <li><a class="dropdown-item rounded py-2" href="/user/profile"><i class="fa-solid fa-user me-2 text-muted"></i>Thông tin cá nhân</a></li>
+                            <li><a class="dropdown-item py-2 rounded" href="/user/change-password"><i class="fa-solid fa-key me-2 text-muted"></i>Đổi mật khẩu</a></li>
+                            <li><a class="dropdown-item rounded py-2" href="/user/order-details"><i class="fa-solid fa-box-open me-2 text-muted"></i>Lịch sử mua hàng</a></li>
+                            <li th:if="${session.currentUser != null and session.currentUser.role == true}"><a class="dropdown-item rounded py-2" href="/admin/dashboard"><i class="fa-solid fa-user-shield me-2 text-muted"></i>Trang Quản Trị</a></li>
+                            <li><a class="dropdown-item py-2 rounded" href="/user/favourites"><i class="fa-solid fa-heart me-2 text-danger"></i>Sách yêu thích</a></li>
+                            <li><hr class="dropdown-divider"/></li>
+                            <li><a class="dropdown-item rounded py-2 text-danger" href="/logout"><i class="fa-solid fa-right-from-bracket me-2"></i>Đăng xuất</a></li>
                         </ul>
                     </div>
                 </div>
@@ -265,7 +219,6 @@
         </div>
     </div>
 
-    <!-- Flash messages -->
     <span id="flashSuccess" style="display:none" th:text="${successMessage}"></span>
     <span id="flashError"   style="display:none" th:text="${errorMessage}"></span>
     <div th:if="${param.alreadyReviewed}" class="alert alert-warning rounded-3">
@@ -285,7 +238,7 @@
     <!-- Danh sách đơn hàng -->
     <div th:each="order : ${orders}" class="order-card">
 
-        <!-- Header đơn hàng -->
+        <!-- Header -->
         <div class="order-header">
             <div class="d-flex align-items-center gap-3">
                 <div>
@@ -293,27 +246,21 @@
                     <span class="fw-bold" th:text="${order.id}">000</span>
                 </div>
                 <span class="text-muted small"
-                      th:text="${order.createAt != null ? #temporals.format(order.createAt, 'dd/MM/yyyy HH:mm') : ''}">
-                </span>
+                      th:text="${order.createAt != null ? #temporals.format(order.createAt, 'dd/MM/yyyy HH:mm') : ''}"></span>
             </div>
-            <div class="d-flex align-items-center gap-2">
-                <span th:switch="${order.status}">
-                    <span th:case="0" class="order-status status-0"><i class="fa-solid fa-clock me-1"></i>Chờ xác nhận</span>
-                    <span th:case="1" class="order-status status-1"><i class="fa-solid fa-check me-1"></i>Đã xác nhận</span>
-                    <span th:case="2" class="order-status status-2"><i class="fa-solid fa-truck me-1"></i>Đang giao</span>
-                    <span th:case="3" class="order-status status-3"><i class="fa-solid fa-box me-1"></i>Đã giao</span>
-                    <span th:case="4" class="order-status status-4"><i class="fa-solid fa-circle-check me-1"></i>Hoàn thành</span>
-                    <span th:case="5" class="order-status status-5"><i class="fa-solid fa-xmark me-1"></i>Đã hủy</span>
-                    <!-- ✅ MỚI: Yêu cầu hoàn tiền -->
-                    <span th:case="6" class="order-status status-6">
-                        <i class="fa-solid fa-rotate-left me-1"></i>Yêu cầu hoàn tiền
-                    </span>
-                    <span th:case="*" class="order-status status-0">Không xác định</span>
-                </span>
-            </div>
+            <span th:switch="${order.status}">
+                <span th:case="0" class="order-status status-0"><i class="fa-solid fa-clock me-1"></i>Chờ xác nhận</span>
+                <span th:case="1" class="order-status status-1"><i class="fa-solid fa-check me-1"></i>Đã xác nhận</span>
+                <span th:case="2" class="order-status status-2"><i class="fa-solid fa-truck me-1"></i>Đang giao</span>
+                <span th:case="3" class="order-status status-3"><i class="fa-solid fa-box me-1"></i>Đã giao</span>
+                <span th:case="4" class="order-status status-4"><i class="fa-solid fa-circle-check me-1"></i>Hoàn thành</span>
+                <span th:case="5" class="order-status status-5"><i class="fa-solid fa-xmark me-1"></i>Đã hủy</span>
+                <span th:case="6" class="order-status status-6"><i class="fa-solid fa-rotate-left me-1"></i>Yêu cầu hoàn tiền</span>
+                <span th:case="*" class="order-status status-0">Không xác định</span>
+            </span>
         </div>
 
-        <!-- Chi tiết sản phẩm trong đơn -->
+        <!-- Sản phẩm trong đơn -->
         <div th:each="od : ${order.orderDetails}" class="order-item">
             <a th:href="@{'/product/' + ${od.product.slug}}">
                 <img th:src="${od.product.image != null ? od.product.image : '/images/default-book.png'}"
@@ -324,29 +271,19 @@
                 <div class="item-meta">
                     <span th:text="${od.product.author}">Tác giả</span>
                     <span class="mx-1">•</span>
-                    <span>x<span th:text="${od.quantity}">1</span></span>
+                    x<span th:text="${od.quantity}">1</span>
                 </div>
             </div>
             <div class="d-flex flex-column align-items-end gap-2">
-                <div class="item-price"
-                     th:text="${#numbers.formatDecimal(od.price, 0, 'COMMA', 0, 'POINT')} + 'đ'">0đ</div>
-                <!-- Nút đánh giá: chỉ hiện khi hoàn thành (status=4) -->
-                <div th:if="${order.status == 4}">
-                    <div th:if="${reviewedMap != null and reviewedMap[od.id] == false}">
-                        <a th:href="@{'/user/review/write/' + ${od.id}}" class="btn-review">
-                            <i class="fa-solid fa-star me-1"></i>Đánh giá
-                        </a>
-                    </div>
-                    <div th:if="${reviewedMap != null and reviewedMap[od.id] == true}">
-                        <span class="badge-reviewed">
-                            <i class="fa-solid fa-check me-1"></i>Đã đánh giá
-                        </span>
-                    </div>
+                <div class="item-price" th:text="${#numbers.formatDecimal(od.price, 0, 'COMMA', 0, 'POINT')} + 'đ'">0đ</div>
+                <!-- Hiện badge "Đã đánh giá" ngay trên từng sản phẩm nếu đã review -->
+                <div th:if="${order.status == 4 and reviewedMap != null and reviewedMap[od.id] == true}">
+                    <span class="badge-reviewed"><i class="fa-solid fa-check me-1"></i>Đã đánh giá</span>
                 </div>
             </div>
         </div>
 
-        <!-- Footer đơn hàng -->
+        <!-- Footer -->
         <div class="order-footer">
             <div class="text-muted small">
                 <i class="fa-solid fa-location-dot me-1 text-success"></i>
@@ -354,7 +291,17 @@
             </div>
             <div class="d-flex align-items-center gap-2 flex-wrap">
 
-                <!-- Nút Đã nhận hàng: chỉ hiện khi status = 3 -->
+                <!-- NÚT ĐÁNH GIÁ ĐƠN HÀNG: 1 nút duy nhất khi status=4 và còn ít nhất 1 sp chưa review -->
+                <th:block th:if="${order.status == 4}">
+                    <button th:if="${hasUnreviewedMap != null and hasUnreviewedMap[order.id] == true}"
+                            type="button"
+                            class="btn-review-order"
+                            th:onclick="'openReviewModal(' + ${order.id} + ')'">
+                        <i class="fa-solid fa-star me-1"></i>Đánh giá đơn hàng
+                    </button>
+                </th:block>
+
+                <!-- Nút Đã nhận hàng (status=3) -->
                 <form th:if="${order.status == 3}"
                       th:id="'form-confirm-' + ${order.id}"
                       th:action="@{/user/order-details/confirm-received/{id}(id=${order.id})}"
@@ -365,21 +312,18 @@
                     </button>
                 </form>
 
-                <!-- ✅ Nút hoàn tiền (VNPay) / trả hàng (COD): chỉ hiện khi status = 3 -->
+                <!-- Nút yêu cầu hoàn tiền / trả hàng (status=3) -->
                 <th:block th:if="${order.status == 3}">
-                    <!-- VNPay: đã thanh toán online → Yêu cầu hoàn tiền -->
-                    <button th:if="${order.paymentMethod == 1}"
-                            type="button" class="btn btn-outline-warning btn-sm rounded-pill fw-bold"
+                    <button th:if="${order.paymentMethod == 1}" type="button"
+                            class="btn btn-outline-warning btn-sm rounded-pill fw-bold"
                             th:onclick="'openRefundModal(' + ${order.id} + ', \'refund\')'">
                         <i class="fa-solid fa-rotate-left me-1"></i>Yêu cầu hoàn tiền
                     </button>
-                    <!-- COD: thanh toán tiền mặt → Yêu cầu trả hàng -->
-                    <button th:if="${order.paymentMethod == 0}"
-                            type="button" class="btn btn-outline-warning btn-sm rounded-pill fw-bold"
+                    <button th:if="${order.paymentMethod == 0}" type="button"
+                            class="btn btn-outline-warning btn-sm rounded-pill fw-bold"
                             th:onclick="'openRefundModal(' + ${order.id} + ', \'return\')'">
                         <i class="fa-solid fa-box-open me-1"></i>Yêu cầu trả hàng
                     </button>
-                    <!-- Form ẩn để submit -->
                     <form th:id="'form-refund-' + ${order.id}"
                           th:action="@{/user/order-details/request-refund/{id}(id=${order.id})}"
                           method="post" style="display:none;">
@@ -387,12 +331,12 @@
                     </form>
                 </th:block>
 
-                <!-- ✅ MỚI: Thông báo đang chờ xử lý khi status = 6 -->
+                <!-- Đang chờ xử lý hoàn tiền (status=6) -->
                 <span th:if="${order.status == 6}" class="text-warning small fw-semibold fst-italic">
                     <i class="fa-solid fa-clock me-1"></i>Đang chờ xử lý hoàn tiền...
                 </span>
 
-                <!-- Nút Hủy đơn: chỉ hiện khi status 0 hoặc 1 -->
+                <!-- Nút Hủy đơn (status=0 hoặc 1) -->
                 <form th:if="${order.status == 0 or order.status == 1}"
                       th:id="'form-cancel-' + ${order.id}"
                       th:action="@{/user/order-details/cancel/{id}(id=${order.id})}"
@@ -404,16 +348,35 @@
                 </form>
 
                 <div class="order-total ms-2">
-                    Tổng cộng:
-                    <span th:text="${#numbers.formatDecimal(order.total, 0, 'COMMA', 0, 'POINT')} + 'đ'">0đ</span>
+                    Tổng cộng: <span th:text="${#numbers.formatDecimal(order.total, 0, 'COMMA', 0, 'POINT')} + 'đ'">0đ</span>
                 </div>
             </div>
         </div>
 
-    </div>
-</div>
+        <!-- Data cho JS: danh sách OrderDetail chưa review của đơn này -->
+        <script th:if="${order.status == 4}" th:inline="javascript">
+        (function() {
+            const orderId = /*[[${order.id}]]*/ 0;
+            const items = [];
+            /*[# th:each="od : ${order.orderDetails}"]*/
+            /*[# th:if="${reviewedMap != null and reviewedMap[od.id] == false}"]*/
+            items.push({
+                orderDetailId: /*[[${od.id}]]*/ 0,
+                productName:   /*[[${od.product.name}]]*/ '',
+                productAuthor: /*[[${od.product.author}]]*/ '',
+                productImage:  /*[[${od.product.image != null ? od.product.image : '/images/default-book.png'}]]*/ ''
+            });
+            /*[/]*/
+            /*[/]*/
+            if (!window.__reviewData) window.__reviewData = {};
+            window.__reviewData[orderId] = items;
+        })();
+        </script>
 
-<!-- Footer -->
+    </div><!-- end order-card -->
+
+</div><!-- end container -->
+
 <footer class="bg-white border-top py-4 mt-4">
     <div class="container text-center">
         <p class="mb-0 text-muted small">© 2026 <strong>BEOBOOKS</strong>. Tất cả các quyền được bảo lưu.</p>
@@ -423,19 +386,43 @@
 <!-- Toast container -->
 <div class="toast-container-custom" id="toastContainer"></div>
 
-<!-- Modal xác nhận nhận hàng -->
+<!-- ===== REVIEW MODAL (batch) ===== -->
+<div class="review-backdrop" id="reviewBackdrop">
+    <div class="review-modal" id="reviewModal">
+        <div class="review-modal-header">
+            <div>
+                <h5><i class="fa-solid fa-star me-2"></i>Đánh giá đơn hàng</h5>
+                <div style="font-size:0.8rem;opacity:0.85;" id="reviewSubtitle">Đánh giá sẽ được áp dụng cho tất cả sản phẩm</div>
+            </div>
+            <button class="review-close-btn" onclick="closeReviewModal()">✕</button>
+        </div>
+
+        <!-- Sản phẩm sẽ được inject bằng JS -->
+        <div id="reviewProductsContainer"></div>
+
+        <div class="review-modal-footer">
+            <button type="button" class="btn btn-light rounded-pill px-4 fw-bold" onclick="closeReviewModal()">Hủy</button>
+            <button type="button" class="btn-submit-review" id="btnSubmitReviews" onclick="submitAllReviews()">
+                <i class="fa-solid fa-paper-plane me-2"></i>Gửi đánh giá
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Hidden form để submit từng review -->
+<form id="batchReviewForm" action="/user/review/batch-submit" method="post" style="display:none;">
+    <div id="batchReviewInputs"></div>
+</form>
+
+<!-- Modal confirm nhận hàng -->
 <div class="custom-modal-backdrop" id="modalConfirm">
     <div class="custom-modal-box">
-        <div class="custom-modal-icon modal-icon-success">
-            <i class="fa-solid fa-circle-check"></i>
-        </div>
+        <div class="custom-modal-icon modal-icon-success"><i class="fa-solid fa-circle-check"></i></div>
         <div class="custom-modal-title">Xác nhận đã nhận hàng?</div>
         <div class="custom-modal-desc">Bạn xác nhận đã nhận được đơn hàng này.<br>Sau khi xác nhận, đơn hàng sẽ được đánh dấu <strong>Hoàn thành</strong>.</div>
         <div class="d-flex gap-3 justify-content-center">
             <button class="btn btn-light rounded-pill px-4 fw-bold" onclick="closeModal('confirm')">Quay lại</button>
-            <button class="btn btn-success rounded-pill px-4 fw-bold" onclick="submitModal('confirm')">
-                <i class="fa-solid fa-circle-check me-1"></i>Đã nhận hàng
-            </button>
+            <button class="btn btn-success rounded-pill px-4 fw-bold" onclick="submitModal('confirm')"><i class="fa-solid fa-circle-check me-1"></i>Đã nhận hàng</button>
         </div>
     </div>
 </div>
@@ -443,32 +430,22 @@
 <!-- Modal hủy đơn -->
 <div class="custom-modal-backdrop" id="modalCancel">
     <div class="custom-modal-box">
-        <div class="custom-modal-icon modal-icon-danger">
-            <i class="fa-solid fa-triangle-exclamation"></i>
-        </div>
+        <div class="custom-modal-icon modal-icon-danger"><i class="fa-solid fa-triangle-exclamation"></i></div>
         <div class="custom-modal-title">Hủy đơn hàng?</div>
         <div class="custom-modal-desc">Bạn có chắc muốn hủy đơn hàng này không?<br>Hành động này <strong>không thể hoàn tác</strong>.</div>
         <div class="d-flex gap-3 justify-content-center">
             <button class="btn btn-light rounded-pill px-4 fw-bold" onclick="closeModal('cancel')">Giữ lại</button>
-            <button class="btn btn-danger rounded-pill px-4 fw-bold" onclick="submitModal('cancel')">
-                <i class="fa-solid fa-xmark me-1"></i>Hủy đơn
-            </button>
+            <button class="btn btn-danger rounded-pill px-4 fw-bold" onclick="submitModal('cancel')"><i class="fa-solid fa-xmark me-1"></i>Hủy đơn</button>
         </div>
     </div>
 </div>
 
-<!-- ✅ Modal yêu cầu hoàn tiền / trả hàng (dùng chung, title thay đổi theo loại) -->
+<!-- Modal hoàn tiền / trả hàng -->
 <div class="custom-modal-backdrop" id="modalRefund">
-    <div class="custom-modal-box" style="max-width: 440px;">
-        <div class="custom-modal-icon modal-icon-warning">
-            <i class="fa-solid fa-rotate-left" id="refundModalIcon"></i>
-        </div>
+    <div class="custom-modal-box" style="max-width:440px;">
+        <div class="custom-modal-icon modal-icon-warning"><i class="fa-solid fa-rotate-left" id="refundModalIcon"></i></div>
         <div class="custom-modal-title" id="refundModalTitle">Yêu cầu hoàn tiền?</div>
-        <div class="custom-modal-desc" id="refundModalDesc">
-            Vui lòng cho chúng tôi biết lý do để xử lý nhanh nhất.
-        </div>
-
-        <!-- Dropdown lý do -->
+        <div class="custom-modal-desc" id="refundModalDesc">Vui lòng cho chúng tôi biết lý do.</div>
         <div class="text-start mb-4">
             <label class="form-label fw-semibold small mb-1">Lý do <span class="text-danger">*</span></label>
             <select class="form-select form-select-sm rounded-3" id="refundReasonSelect">
@@ -479,116 +456,236 @@
                 <option value="Không đúng mô tả">Không đúng mô tả</option>
                 <option value="Khác">Khác</option>
             </select>
-            <div class="text-danger small mt-1 d-none" id="refundReasonError">
-                Vui lòng chọn lý do!
-            </div>
+            <div class="text-danger small mt-1 d-none" id="refundReasonError">Vui lòng chọn lý do!</div>
         </div>
-
         <div class="d-flex gap-3 justify-content-center">
             <button class="btn btn-light rounded-pill px-4 fw-bold" onclick="closeRefundModal()">Quay lại</button>
-            <button class="btn btn-warning rounded-pill px-4 fw-bold text-dark" onclick="submitRefundModal()">
-                <i class="fa-solid fa-paper-plane me-1"></i>Gửi yêu cầu
-            </button>
+            <button class="btn btn-warning rounded-pill px-4 fw-bold text-dark" onclick="submitRefundModal()"><i class="fa-solid fa-paper-plane me-1"></i>Gửi yêu cầu</button>
         </div>
     </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    let pendingOrderId  = null;
-    let pendingRefundId = null;
+// =============================================
+// CONFIRM / CANCEL / REFUND MODALS
+// =============================================
+let pendingOrderId = null, pendingRefundId = null;
 
-    function openModal(type, orderId) {
-        pendingOrderId = orderId;
-        const ids = { confirm: 'modalConfirm', cancel: 'modalCancel' };
-        document.getElementById(ids[type]).classList.add('show');
+function openModal(type, orderId) {
+    pendingOrderId = orderId;
+    document.getElementById(type === 'confirm' ? 'modalConfirm' : 'modalCancel').classList.add('show');
+}
+function closeModal(type) {
+    document.getElementById(type === 'confirm' ? 'modalConfirm' : 'modalCancel').classList.remove('show');
+    pendingOrderId = null;
+}
+function submitModal(type) {
+    if (!pendingOrderId) return;
+    document.getElementById((type === 'confirm' ? 'form-confirm-' : 'form-cancel-') + pendingOrderId).submit();
+}
+function openRefundModal(orderId, type) {
+    pendingRefundId = orderId;
+    const isRefund = type === 'refund';
+    document.getElementById('refundModalTitle').textContent = isRefund ? 'Yêu cầu hoàn tiền?' : 'Yêu cầu trả hàng?';
+    document.getElementById('refundModalDesc').innerHTML = isRefund
+        ? 'Vui lòng cho chúng tôi biết lý do.<br><small class="text-muted">Chúng tôi sẽ liên hệ lại trong <strong>24 giờ</strong>.</small>'
+        : 'Vui lòng cho chúng tôi biết lý do thu hồi hàng.<br><small class="text-muted">Chúng tôi sẽ liên hệ lại trong <strong>24 giờ</strong>.</small>';
+    document.getElementById('refundReasonSelect').value = '';
+    document.getElementById('refundReasonError').classList.add('d-none');
+    document.getElementById('modalRefund').classList.add('show');
+}
+function closeRefundModal() {
+    document.getElementById('modalRefund').classList.remove('show');
+    pendingRefundId = null;
+}
+function submitRefundModal() {
+    const select = document.getElementById('refundReasonSelect');
+    if (!select.value) { document.getElementById('refundReasonError').classList.remove('d-none'); return; }
+    if (!pendingRefundId) return;
+    const form = document.getElementById('form-refund-' + pendingRefundId);
+    form.querySelector('input[name="reason"]').value = select.value;
+    form.submit();
+}
+document.querySelectorAll('.custom-modal-backdrop').forEach(el => {
+    el.addEventListener('click', e => { if (e.target === el) { el.classList.remove('show'); pendingOrderId = null; } });
+});
+
+// =============================================
+// BATCH REVIEW MODAL
+// =============================================
+let currentOrderId = null;
+// ratings[orderDetailId] = 1..5
+const ratings = {};
+
+function openReviewModal(orderId) {
+    currentOrderId = orderId;
+    const items = (window.__reviewData || {})[orderId] || [];
+
+    if (items.length === 0) {
+        showToast('Không còn sản phẩm nào cần đánh giá!', 'error');
+        return;
     }
 
-    function closeModal(type) {
-        const ids = { confirm: 'modalConfirm', cancel: 'modalCancel' };
-        document.getElementById(ids[type]).classList.remove('show');
-        pendingOrderId = null;
-    }
+    const subtitle = document.getElementById('reviewSubtitle');
+    subtitle.textContent = items.length === 1
+        ? 'Đánh giá sản phẩm trong đơn hàng này'
+        : `Đánh giá ${items.length} sản phẩm trong đơn hàng này`;
 
-    function submitModal(type) {
-        if (!pendingOrderId) return;
-        const formIds = {
-            confirm: 'form-confirm-' + pendingOrderId,
-            cancel:  'form-cancel-'  + pendingOrderId,
-        };
-        document.getElementById(formIds[type]).submit();
-    }
+    const container = document.getElementById('reviewProductsContainer');
+    container.innerHTML = '';
 
-    // ===== Refund modal (dùng chung cho hoàn tiền & trả hàng) =====
-    function openRefundModal(orderId, type) {
-        pendingRefundId = orderId;
+    items.forEach((item, idx) => {
+        ratings[item.orderDetailId] = 0; // chưa chọn sao
 
-        const isRefund = type === 'refund';
-        document.getElementById('refundModalTitle').textContent =
-            isRefund ? 'Yêu cầu hoàn tiền?' : 'Yêu cầu trả hàng?';
-        document.getElementById('refundModalDesc').innerHTML =
-            isRefund
-                ? 'Vui lòng cho chúng tôi biết lý do để xử lý nhanh nhất.<br><small class="text-muted">Chúng tôi sẽ liên hệ lại trong vòng <strong>24 giờ</strong>.</small>'
-                : 'Vui lòng cho chúng tôi biết lý do để sắp xếp thu hồi hàng.<br><small class="text-muted">Chúng tôi sẽ liên hệ lại trong vòng <strong>24 giờ</strong>.</small>';
-        document.getElementById('refundModalIcon').className =
-            isRefund ? 'fa-solid fa-rotate-left' : 'fa-solid fa-box-open';
+        const block = document.createElement('div');
+        block.className = 'review-product-block';
+        block.innerHTML = `
+            <div class="review-product-info">
+                <img src="${escHtml(item.productImage)}" alt="${escHtml(item.productName)}">
+                <div>
+                    <div class="review-product-name">${escHtml(item.productName)}</div>
+                    <div class="review-product-author">${escHtml(item.productAuthor)}</div>
+                </div>
+            </div>
 
-        // Reset dropdown và lỗi
-        document.getElementById('refundReasonSelect').value = '';
-        document.getElementById('refundReasonError').classList.add('d-none');
+            <div class="star-row" id="stars-${item.orderDetailId}">
+                ${[1,2,3,4,5].map(n =>
+                    `<button type="button" class="star-btn"
+                        data-od="${item.orderDetailId}" data-val="${n}"
+                        onclick="selectStar(${item.orderDetailId}, ${n})"
+                        onmouseover="hoverStar(${item.orderDetailId}, ${n})"
+                        onmouseout="unhoverStar(${item.orderDetailId})">
+                        <i class="fa-solid fa-star"></i>
+                    </button>`
+                ).join('')}
+                <span class="ms-2 align-self-center" id="star-label-${item.orderDetailId}"
+                    style="font-size:0.82rem;color:#adb5bd;font-weight:600;"></span>
+            </div>
+            <div class="text-danger small mb-1 d-none" id="star-err-${item.orderDetailId}">
+                Vui lòng chọn số sao!
+            </div>
 
-        document.getElementById('modalRefund').classList.add('show');
-    }
-
-    function closeRefundModal() {
-        document.getElementById('modalRefund').classList.remove('show');
-        pendingRefundId = null;
-    }
-
-    function submitRefundModal() {
-        const select = document.getElementById('refundReasonSelect');
-        if (!select.value) {
-            document.getElementById('refundReasonError').classList.remove('d-none');
-            return;
-        }
-        if (!pendingRefundId) return;
-
-        const form = document.getElementById('form-refund-' + pendingRefundId);
-        // Gán lý do vào input hidden trong form
-        form.querySelector('input[name="reason"]').value = select.value;
-        form.submit();
-    }
-
-    // Đóng modal khi click backdrop
-    document.querySelectorAll('.custom-modal-backdrop').forEach(el => {
-        el.addEventListener('click', function(e) {
-            if (e.target === this) {
-                this.classList.remove('show');
-                pendingOrderId = null;
-            }
-        });
-    });
-
-    // Hiện toast từ flash message
-    function showToast(message, type) {
-        const container = document.getElementById('toastContainer');
-        const toast = document.createElement('div');
-        toast.className = 'toast-custom toast-' + type;
-        toast.innerHTML = `
-            <span class="toast-icon">${type === 'success' ? '✅' : '❌'}</span>
-            <span>${message}</span>
-            <button class="toast-close" onclick="this.parentElement.remove()">✕</button>
+            <textarea class="review-textarea" id="content-${item.orderDetailId}" rows="3"
+                maxlength="500" placeholder="Chia sẻ cảm nhận của bạn về cuốn sách này..."
+                oninput="updateCharCount(${item.orderDetailId}, this.value)"></textarea>
+            <div class="char-count">
+                <span id="char-${item.orderDetailId}">0</span>/500
+            </div>
+            <div class="text-danger small mt-1 d-none" id="content-err-${item.orderDetailId}">
+                Vui lòng nhập nội dung đánh giá!
+            </div>
         `;
-        container.appendChild(toast);
-        setTimeout(() => toast.remove(), 4000);
-    }
-
-    window.addEventListener('DOMContentLoaded', () => {
-        const successMsg = document.getElementById('flashSuccess')?.textContent?.trim();
-        const errorMsg   = document.getElementById('flashError')?.textContent?.trim();
-        if (successMsg) showToast(successMsg, 'success');
-        if (errorMsg)   showToast(errorMsg,   'error');
+        container.appendChild(block);
     });
+
+    document.getElementById('reviewBackdrop').classList.add('show');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeReviewModal() {
+    document.getElementById('reviewBackdrop').classList.remove('show');
+    document.body.style.overflow = '';
+    currentOrderId = null;
+}
+
+// Close on backdrop click
+document.getElementById('reviewBackdrop').addEventListener('click', function(e) {
+    if (e.target === this) closeReviewModal();
+});
+
+const starLabels = ['', 'Tệ', 'Không tốt', 'Bình thường', 'Tốt', 'Tuyệt vời'];
+
+function selectStar(odId, val) {
+    ratings[odId] = val;
+    updateStarUI(odId, val);
+    document.getElementById('star-label-' + odId).textContent = starLabels[val];
+    document.getElementById('star-err-' + odId).classList.add('d-none');
+}
+function hoverStar(odId, val) { updateStarUI(odId, val); }
+function unhoverStar(odId)     { updateStarUI(odId, ratings[odId] || 0); }
+
+function updateStarUI(odId, val) {
+    const row = document.getElementById('stars-' + odId);
+    if (!row) return;
+    row.querySelectorAll('.star-btn').forEach(btn => {
+        btn.classList.toggle('active', parseInt(btn.dataset.val) <= val);
+    });
+}
+
+function updateCharCount(odId, val) {
+    document.getElementById('char-' + odId).textContent = val.length;
+}
+
+function escHtml(str) {
+    if (!str) return '';
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// Submit tất cả review cùng lúc
+function submitAllReviews() {
+    const items = (window.__reviewData || {})[currentOrderId] || [];
+    let hasError = false;
+
+    items.forEach(item => {
+        const odId = item.orderDetailId;
+        const rating  = ratings[odId] || 0;
+        const content = (document.getElementById('content-' + odId)?.value || '').trim();
+
+        if (rating === 0) {
+            document.getElementById('star-err-' + odId).classList.remove('d-none');
+            hasError = true;
+        }
+        if (!content) {
+            document.getElementById('content-err-' + odId).classList.remove('d-none');
+            hasError = true;
+        }
+    });
+
+    if (hasError) return;
+
+    // Build form inputs
+    const inputsContainer = document.getElementById('batchReviewInputs');
+    inputsContainer.innerHTML = '';
+
+    items.forEach((item, idx) => {
+        const odId    = item.orderDetailId;
+        const rating  = ratings[odId];
+        const content = document.getElementById('content-' + odId).value.trim();
+
+        inputsContainer.innerHTML += `
+            <input type="hidden" name="orderDetailIds" value="${odId}">
+            <input type="hidden" name="ratings"        value="${rating}">
+            <input type="hidden" name="contents"       value="${escHtml(content)}">
+        `;
+    });
+
+    document.getElementById('btnSubmitReviews').disabled = true;
+    document.getElementById('batchReviewForm').submit();
+}
+
+// =============================================
+// TOAST
+// =============================================
+function showToast(message, type) {
+    const container = document.getElementById('toastContainer');
+    const toast = document.createElement('div');
+    toast.className = 'toast-custom toast-' + type;
+    toast.innerHTML = `
+        <span class="toast-icon">${type === 'success' ? '✅' : '❌'}</span>
+        <span>${message}</span>
+        <button class="toast-close" onclick="this.parentElement.remove()">✕</button>
+    `;
+    container.appendChild(toast);
+    setTimeout(() => toast.remove(), 4000);
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+    const s = document.getElementById('flashSuccess')?.textContent?.trim();
+    const e = document.getElementById('flashError')?.textContent?.trim();
+    if (s) showToast(s, 'success');
+    if (e) showToast(e, 'error');
+});
 </script>
 </body>
 </html>
