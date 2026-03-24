@@ -13,8 +13,7 @@
 </head>
 
 <body>
-
-     <nav class="navbar navbar-expand-lg sticky-top">
+    <nav class="navbar navbar-expand-lg sticky-top">
         <div class="container">
             <a class="navbar-brand" href="/home">BEO<span style="color: var(--secondary-color)">BOOKS</span></a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -181,8 +180,11 @@
                         th:onclick="'buyNow(' + ${product.id} + ')'" th:disabled="${product.stockQuantity <= 0}">
                         Mua ngay
                     </button>
-                    <button class="btn btn-outline-danger btn-lg px-3 flex-shrink-0" title="Thêm vào yêu thích">
-                        <i class="fa-regular fa-heart"></i>
+                    <button id="favBtn" class="btn btn-lg px-3 flex-shrink-0"
+                        th:class="${isFavourite} ? 'btn btn-danger btn-lg px-3 flex-shrink-0' : 'btn btn-outline-danger btn-lg px-3 flex-shrink-0'"
+                        title="Yêu thích" th:attr="data-product-id=${product.id}, data-is-fav=${isFavourite}"
+                        onclick="toggleFavDetail(this)">
+                        <i th:class="${isFavourite} ? 'fa-solid fa-heart' : 'fa-regular fa-heart'"></i>
                     </button>
                 </div>
             </div>
@@ -560,7 +562,34 @@
 
             setTimeout(() => toast.remove(), 3500);
         }
-    
+        async function toggleFavDetail(btn) {
+            const productId = btn.getAttribute('data-product-id');
+            const res = await fetch('/user/favourites/toggle', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `productId=${productId}`
+            });
+            const data = await res.json();
+
+            if (data.redirect) { window.location.href = data.redirect; return; }
+
+            if (data.success) {
+                const icon = btn.querySelector('i');
+                if (data.isFavourite) {
+                    // Đã thích → fill đỏ
+                    icon.className = 'fa-solid fa-heart';
+                    btn.classList.remove('btn-outline-danger');
+                    btn.classList.add('btn-danger');
+                } else {
+                    // Bỏ thích → outline
+                    icon.className = 'fa-regular fa-heart';
+                    btn.classList.remove('btn-danger');
+                    btn.classList.add('btn-outline-danger');
+                }
+                // Dùng lại hàm toast đã có sẵn trong product-details.html
+                showCartToast(true, data.message, null);
+            }
+        }
     </script>
 </body>
 
