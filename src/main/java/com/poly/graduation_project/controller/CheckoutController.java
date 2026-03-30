@@ -8,8 +8,6 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,6 +28,7 @@ import com.poly.graduation_project.repository.OrderDetailRepository;
 import com.poly.graduation_project.repository.OrderRepository;
 import com.poly.graduation_project.repository.ProductRepository;
 import com.poly.graduation_project.repository.VoucherRepository;
+import com.poly.graduation_project.service.OrderEmailService;
 import com.poly.graduation_project.util.VNPayUtil;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -49,7 +48,7 @@ public class CheckoutController {
     @Autowired private VoucherRepository voucherRepository;
     @Autowired private AddressRepository addressRepository;
     @Autowired private VNPayUtil vnPayUtil;
-    @Autowired private JavaMailSender mailSender;
+    @Autowired private OrderEmailService orderEmailService;
 
     // ============================================================
     // GET: Trang Checkout
@@ -179,7 +178,7 @@ public class CheckoutController {
 
             saveOrderDetails(savedOrder, cartItems);
             clearCartAndStock(currentUser, cartItems);
-            sendConfirmationEmail(currentUser, savedOrder);
+            orderEmailService.sendConfirmationEmail(currentUser, savedOrder);
 
             session.setAttribute("lastOrderId", savedOrder.getId());
             return "redirect:/user/order-success";
@@ -276,7 +275,7 @@ public class CheckoutController {
 
             saveOrderDetails(savedOrder, cartItems);
             clearCartAndStock(currentUser, cartItems);
-            sendConfirmationEmail(currentUser, savedOrder);
+            orderEmailService.sendConfirmationEmail(currentUser, savedOrder);
 
             session.removeAttribute("vnpay_addressText");
             session.removeAttribute("vnpay_voucherId");
@@ -384,25 +383,4 @@ public class CheckoutController {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    // Helper: Gửi email xác nhận
-    private void sendConfirmationEmail(User user, Order order) {
-        try {
-            SimpleMailMessage msg = new SimpleMailMessage();
-            msg.setTo(user.getEmail());
-            msg.setSubject("🎉 BEOBOOKS - Xác nhận đơn hàng #" + order.getId());
-            msg.setText(
-                "Xin chào " + user.getFullname() + ",\n\n" +
-                "Đơn hàng #" + order.getId() + " của bạn đã được đặt thành công!\n\n" +
-                "📦 Địa chỉ giao hàng: " + order.getAddress() + "\n" +
-                "💰 Tổng thanh toán: " + String.format("%,.0f", order.getTotal()) + "đ\n" +
-                "💳 Phương thức: " + (order.getPaymentMethod() == 1 ? "VNPay (Đã thanh toán)" : "Thanh toán khi nhận hàng (COD)") + "\n\n" +
-                "Cảm ơn bạn đã mua sắm tại BEOBOOKS! ❤️\n" +
-                "Chúng tôi sẽ liên hệ xác nhận và giao hàng sớm nhất.\n\n" +
-                "📚 BEOBOOKS - Nơi lan tỏa văn hóa đọc"
-            );
-            mailSender.send(msg);
-        } catch (Exception e) {
-            System.err.println("Lỗi gửi email xác nhận: " + e.getMessage());
-        }
-    }
 }

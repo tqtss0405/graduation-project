@@ -321,7 +321,8 @@
                 <div th:if="${addresses != null and not #lists.isEmpty(addresses)}">
                     <div th:each="addr : ${addresses}" class="address-option"
                          th:classappend="${defaultAddress != null and addr.id == defaultAddress.id} ? 'selected' : ''"
-                         th:onclick="'selectAddress(this, \'' + ${addr.fulladdress != null ? addr.fulladdress : addr.address} + '\')'">
+                         th:attr="data-fulladdress=${addr.fulladdress != null ? addr.fulladdress : addr.address}"
+                         onclick="selectAddress(this, this.getAttribute('data-fulladdress'))">
                         <input type="radio" name="addrRadio"
                                th:value="${addr.id}"
                                th:checked="${defaultAddress != null and addr.id == defaultAddress.id}">
