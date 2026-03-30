@@ -675,3 +675,8 @@ body {
   @keyframes toast-progress { from{width:100%} to{width:0%} }
   @keyframes fadeIn  { from{opacity:0} to{opacity:1} }
   @keyframes scaleIn { from{transform:scale(0.88);opacity:0} to{transform:scale(1);opacity:1} }
+  .q-range-btn.active {
+    background-color: #28a745 !important;
+    border-color: #28a745 !important;
+    color: white !important;
+}

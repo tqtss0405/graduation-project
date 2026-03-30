@@ -17,13 +17,7 @@ public class AdminPageController {
 
     @Autowired
     private UserService userService;
-
-    // Trang Dashboard
-    @GetMapping("/dashboard")
-    public String dashboard(Model model) {
-        return "admin-dashboard";
-    }
-
+   
     // Danh sách khách hàng
     @GetMapping("/customers")
     public String customers(Model model) {
