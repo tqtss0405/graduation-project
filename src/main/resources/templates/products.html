@@ -488,6 +488,7 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/sidebar.js"></script>
     <script>
         // Search
         function doSearch() {
@@ -499,10 +500,6 @@
             const sort  = new URLSearchParams(window.location.search).get('sort') || 'newest';
             url.searchParams.set('sort', sort);
             window.location.href = url.toString();
-        }
-        function navSearch() {
-            const kw = document.getElementById('searchInputNav').value.trim();
-            window.location.href = '/products' + (kw ? '?keyword=' + encodeURIComponent(kw) : '');
         }
 
         // Preset giá
