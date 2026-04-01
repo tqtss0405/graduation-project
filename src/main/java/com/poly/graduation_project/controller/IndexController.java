@@ -31,6 +31,7 @@ import jakarta.servlet.http.HttpSession;
 import scala.collection.View.Updated;
 
 import java.math.BigDecimal;
+import java.text.Normalizer;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -131,13 +132,15 @@ public class IndexController {
         List<Product> all = productRepository.findByActiveTrue();
 
         // --- Lọc keyword (tên, tác giả, nhà xuất bản) ---
-        final String kw = keyword.trim().toLowerCase();
-        if (!kw.isEmpty()) {
-            all = all.stream().filter(p -> (p.getName() != null && p.getName().toLowerCase().contains(kw)) ||
-                    (p.getAuthor() != null && p.getAuthor().toLowerCase().contains(kw)) ||
-                    (p.getPublisher() != null && p.getPublisher().toLowerCase().contains(kw)))
-                    .collect(Collectors.toList());
-        }
+        final String kw = removeAccent(keyword.trim());
+        String[] words = kw.split("\\s+");
+
+        all = all.stream().filter(p -> {
+            String name = removeAccent(p.getName());
+
+            return java.util.Arrays.stream(words)
+                    .allMatch(word -> name.contains(word));
+        }).collect(Collectors.toList());
 
         // --- Lọc danh mục ---
         final Integer finalCatId = categoryId;
@@ -351,5 +354,13 @@ public class IndexController {
         model.addAttribute("vouchers", vouchers);
         model.addAttribute("totalQuantity", totalQuantity);
         return "vouchers";
+    }
+
+    public static String removeAccent(String s) {
+        if (s == null)
+            return "";
+        String temp = Normalizer.normalize(s, Normalizer.Form.NFD);
+        return temp.replaceAll("\\p{InCombiningDiacriticalMarks}+", "")
+                .toLowerCase();
     }
 }
