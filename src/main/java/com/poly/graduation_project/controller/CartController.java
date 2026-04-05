@@ -3,6 +3,7 @@ package com.poly.graduation_project.controller;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -32,37 +33,55 @@ public class CartController {
     // ============================================================
     // GET: Trang giỏ hàng
     // ============================================================
-    @GetMapping("/user/cart")
-    public String cartPage(org.springframework.ui.Model model, HttpSession session) {
-        User currentUser = (User) session.getAttribute("currentUser");
-        List<CartDetail> cartItems = cartDetailRepository.findByUser(currentUser);
+   @GetMapping("/user/cart")
+public String cartPage(org.springframework.ui.Model model, HttpSession session) {
+    User currentUser = (User) session.getAttribute("currentUser");
+    List<CartDetail> cartItems = cartDetailRepository.findByUser(currentUser);
 
-        // Kiểm tra có sản phẩm nào còn active không
-        boolean hasActiveItems = cartItems.stream()
-                .anyMatch(ci -> Boolean.TRUE.equals(ci.getProduct().getActive()));
+    // Sắp xếp: còn hàng lên trên, hết hàng xuống dưới
+    List<CartDetail> sortedItems = cartItems.stream()
+            .sorted((a, b) -> {
+                boolean aOk = Boolean.TRUE.equals(a.getProduct().getActive())
+                        && a.getProduct().getStockQuantity() > 0;
+                boolean bOk = Boolean.TRUE.equals(b.getProduct().getActive())
+                        && b.getProduct().getStockQuantity() > 0;
+                return Boolean.compare(bOk, aOk); // ok lên trước
+            })
+            .collect(Collectors.toList());
 
-        java.math.BigDecimal subtotal = cartItems.stream()
-                .filter(ci -> Boolean.TRUE.equals(ci.getProduct().getActive()))
-                .map(ci -> ci.getProduct().getPrice()
-                        .multiply(java.math.BigDecimal.valueOf(ci.getQuantity())))
-                .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add);
+    boolean hasActiveItems = sortedItems.stream()
+            .anyMatch(ci -> Boolean.TRUE.equals(ci.getProduct().getActive())
+                    && ci.getProduct().getStockQuantity() > 0);
 
-        java.math.BigDecimal shippingFee = (subtotal.compareTo(java.math.BigDecimal.ZERO) == 0)
-                ? java.math.BigDecimal.ZERO // ✅ Không có sp active → không tính ship
-                : subtotal.compareTo(new java.math.BigDecimal("150000")) >= 0
-                        ? java.math.BigDecimal.ZERO
-                        : new java.math.BigDecimal("30000");
+    boolean hasOutOfStock = sortedItems.stream()
+            .anyMatch(ci -> !Boolean.TRUE.equals(ci.getProduct().getActive())
+                    || ci.getProduct().getStockQuantity() <= 0
+                    || ci.getProduct().getStockQuantity() < ci.getQuantity());
 
-        int totalQuantity = cartItems.stream().mapToInt(CartDetail::getQuantity).sum();
+    java.math.BigDecimal subtotal = sortedItems.stream()
+            .filter(ci -> Boolean.TRUE.equals(ci.getProduct().getActive())
+                    && ci.getProduct().getStockQuantity() > 0)
+            .map(ci -> ci.getProduct().getPrice()
+                    .multiply(java.math.BigDecimal.valueOf(ci.getQuantity())))
+            .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add);
 
-        model.addAttribute("cartItems", cartItems);
-        model.addAttribute("hasActiveItems", hasActiveItems); // ✅ Truyền sang template
-        model.addAttribute("subtotal", subtotal);
-        model.addAttribute("shippingFee", shippingFee);
-        model.addAttribute("total", subtotal.add(shippingFee));
-        model.addAttribute("totalQuantity", totalQuantity);
-        return "cart";
-    }
+    java.math.BigDecimal shippingFee = subtotal.compareTo(java.math.BigDecimal.ZERO) == 0
+            ? java.math.BigDecimal.ZERO
+            : subtotal.compareTo(new java.math.BigDecimal("150000")) >= 0
+                    ? java.math.BigDecimal.ZERO
+                    : new java.math.BigDecimal("30000");
+
+    int totalQuantity = sortedItems.stream().mapToInt(CartDetail::getQuantity).sum();
+
+    model.addAttribute("cartItems", sortedItems);
+    model.addAttribute("hasActiveItems", hasActiveItems);
+    model.addAttribute("hasOutOfStock", hasOutOfStock);
+    model.addAttribute("subtotal", subtotal);
+    model.addAttribute("shippingFee", shippingFee);
+    model.addAttribute("total", subtotal.add(shippingFee));
+    model.addAttribute("totalQuantity", totalQuantity);
+    return "cart";
+}
 
     // ============================================================
     // POST: Thêm sản phẩm vào giỏ hàng

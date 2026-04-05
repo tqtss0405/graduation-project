@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/style.css">
-       <script src="/js/sidebar.js"></script>
+    <script src="/js/sidebar.js"></script>
 
     <style>
         body { font-family: 'Quicksand', sans-serif; background: #f8f9fa; }
@@ -49,11 +49,28 @@
             background: #e8f5e9; color: #28a745; border-radius: 50px;
             padding: 4px 12px; font-size: 0.78rem; font-weight: 600; border: 1px solid #c3e6cb;
         }
-        .order-footer {
-            background: #fafafa; padding: 12px 20px;
-            display: flex; justify-content: space-between; align-items: center;
-            flex-wrap: wrap; gap: 8px;
+
+        /* Địa chỉ — hàng riêng */
+        .order-address {
+            padding: 10px 20px;
+            background: #fafafa;
+            border-top: 1px solid #f0f0f0;
+            font-size: 0.83rem;
+            color: #6c757d;
         }
+
+        /* Footer: chỉ chứa nút + phí ship + tổng */
+        .order-footer {
+            background: #fafafa;
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            border-top: 1px solid #f0f0f0;
+        }
+
         .order-total { font-weight: 700; font-size: 1rem; color: #1a1a2e; }
         .order-total span { color: #28a745; font-size: 1.1rem; }
         .empty-state { text-align: center; padding: 60px 20px; background: #fff; border-radius: 16px; }
@@ -85,9 +102,7 @@
         .review-close-btn { background: rgba(255,255,255,0.2); border: none; color: #fff; border-radius: 50%; width: 32px; height: 32px; cursor: pointer; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; transition: background 0.15s; }
         .review-close-btn:hover { background: rgba(255,255,255,0.35); }
 
-        .review-product-block {
-            padding: 18px 24px; border-bottom: 1px solid #f0f0f0;
-        }
+        .review-product-block { padding: 18px 24px; border-bottom: 1px solid #f0f0f0; }
         .review-product-block:last-of-type { border-bottom: none; }
 
         .review-product-info { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
@@ -95,12 +110,10 @@
         .review-product-name { font-weight: 700; font-size: 0.93rem; color: #1a1a2e; }
         .review-product-author { font-size: 0.8rem; color: #6c757d; }
 
-        /* Star rating UI */
         .star-row { display: flex; gap: 4px; margin-bottom: 12px; }
         .star-btn {
             background: none; border: none; cursor: pointer; padding: 0;
-            font-size: 1.5rem; color: #dee2e6; transition: color 0.1s, transform 0.1s;
-            line-height: 1;
+            font-size: 1.5rem; color: #dee2e6; transition: color 0.1s, transform 0.1s; line-height: 1;
         }
         .star-btn:hover, .star-btn.active { color: #ffc107; transform: scale(1.15); }
 
@@ -125,7 +138,6 @@
         .btn-submit-review:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(40,167,69,0.35); }
         .btn-submit-review:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
 
-        /* Nút đánh giá đơn hàng */
         .btn-review-order {
             background: linear-gradient(135deg, #28a745, #20c997);
             color: #fff; border: none; border-radius: 50px;
@@ -134,7 +146,6 @@
         }
         .btn-review-order:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(40,167,69,0.3); }
 
-        /* Custom modal (confirm/cancel/refund) */
         .custom-modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.45); backdrop-filter: blur(3px); z-index: 9998; display: none; align-items: center; justify-content: center; }
         .custom-modal-backdrop.show { display: flex; }
         .custom-modal-box { background: #fff; border-radius: 20px; padding: 32px 28px 24px; max-width: 400px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.18); text-align: center; animation: popIn 0.22s ease; }
@@ -145,7 +156,6 @@
         .custom-modal-title { font-weight: 700; font-size: 1.1rem; color: #1a1a2e; margin-bottom: 8px; }
         .custom-modal-desc  { color: #6c757d; font-size: 0.9rem; margin-bottom: 24px; }
 
-        /* Toast */
         .toast-container-custom { position: fixed; top: 24px; right: 24px; z-index: 10000; display: flex; flex-direction: column; gap: 10px; }
         .toast-custom { display: flex; align-items: center; gap: 12px; padding: 14px 18px; border-radius: 14px; box-shadow: 0 8px 28px rgba(0,0,0,0.14); font-weight: 600; font-size: 0.9rem; min-width: 280px; max-width: 380px; animation: toastIn 0.3s ease; }
         @keyframes toastIn { from { transform: translateX(100px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
@@ -156,60 +166,60 @@
 </head>
 <body>
 
-    <nav class="navbar navbar-expand-lg sticky-top">
-        <div class="container">
-            <a class="navbar-brand" href="/home">BEO<span style="color: var(--secondary-color)">BOOKS</span></a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav mx-auto">
-                    <li class="nav-item"><a class="nav-link" href="/home">Trang chủ</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/products">Sản phẩm</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/vouchers">Mã giảm giá</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/contact">Liên hệ</a></li>
-                </ul>
-                <div class="d-flex align-items-center gap-3">
-                    <div class="input-group d-none d-lg-flex" style="width:200px;">
-                        <input type="text" id="searchInputNav"
-                            class="form-control form-control-sm border-end-0 rounded-start-pill"
-                            placeholder="Tìm sách..."
-                            th:value="${keyword}"
-                            onkeydown="if(event.key==='Enter') navSearch()"/>
-                        <button class="btn btn-outline-secondary border-start-0 rounded-end-pill" type="button" onclick="navSearch()">
-                            <i class="fa-solid fa-magnifying-glass"></i>
-                        </button>
-                    </div>
-                    <div class="position-relative">
-                        <a href="/user/cart">
-                            <i class="fa-solid fa-cart-shopping fs-5 text-secondary"></i>
-                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-                                style="font-size:10px" th:text="${totalQuantity}">0</span>
-                        </a>
-                    </div>
-                    <div class="dropdown ms-2">
-                        <a href="#" class="d-flex align-items-center text-decoration-none text-secondary dropdown-toggle" data-bs-toggle="dropdown">
-                            <img th:if="${session.currentUser != null}" th:src="${session.currentUser.image}" class="rounded-circle" width="30" height="30" alt="Avatar" onerror="this.style.display='none'" />
-                            <i th:if="${session.currentUser == null}" class="fa-solid fa-circle-user fs-3"></i>
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg p-3" style="min-width:220px;border-radius:15px;">
-                            <li th:if="${session.currentUser != null}">
-                                <div class="text-center mb-2"><h6 class="fw-bold text-success mb-0" th:text="${session.currentUser.fullname}">User</h6></div>
-                                <hr class="dropdown-divider"/>
-                            </li>
-                            <li><a class="dropdown-item rounded py-2" href="/user/profile"><i class="fa-solid fa-user me-2 text-muted"></i>Thông tin cá nhân</a></li>
-                            <li><a class="dropdown-item py-2 rounded" href="/user/change-password"><i class="fa-solid fa-key me-2 text-muted"></i>Đổi mật khẩu</a></li>
-                            <li><a class="dropdown-item rounded py-2" href="/user/order-details"><i class="fa-solid fa-box-open me-2 text-muted"></i>Lịch sử mua hàng</a></li>
-                            <li th:if="${session.currentUser != null and session.currentUser.role == true}"><a class="dropdown-item rounded py-2" href="/admin/dashboard"><i class="fa-solid fa-user-shield me-2 text-muted"></i>Trang Quản Trị</a></li>
-                            <li><a class="dropdown-item py-2 rounded" href="/user/favourites"><i class="fa-solid fa-heart me-2 text-danger"></i>Sách yêu thích</a></li>
-                            <li><hr class="dropdown-divider"/></li>
-                            <li><a class="dropdown-item rounded py-2 text-danger" href="/logout"><i class="fa-solid fa-right-from-bracket me-2"></i>Đăng xuất</a></li>
-                        </ul>
-                    </div>
+<nav class="navbar navbar-expand-lg sticky-top">
+    <div class="container">
+        <a class="navbar-brand" href="/home">BEO<span style="color: var(--secondary-color)">BOOKS</span></a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav mx-auto">
+                <li class="nav-item"><a class="nav-link" href="/home">Trang chủ</a></li>
+                <li class="nav-item"><a class="nav-link" href="/products">Sản phẩm</a></li>
+                <li class="nav-item"><a class="nav-link" href="/vouchers">Mã giảm giá</a></li>
+                <li class="nav-item"><a class="nav-link" href="/contact">Liên hệ</a></li>
+            </ul>
+            <div class="d-flex align-items-center gap-3">
+                <div class="input-group d-none d-lg-flex" style="width:200px;">
+                    <input type="text" id="searchInputNav"
+                        class="form-control form-control-sm border-end-0 rounded-start-pill"
+                        placeholder="Tìm sách..."
+                        th:value="${keyword}"
+                        onkeydown="if(event.key==='Enter') navSearch()"/>
+                    <button class="btn btn-outline-secondary border-start-0 rounded-end-pill" type="button" onclick="navSearch()">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </button>
+                </div>
+                <div class="position-relative">
+                    <a href="/user/cart">
+                        <i class="fa-solid fa-cart-shopping fs-5 text-secondary"></i>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                            style="font-size:10px" th:text="${totalQuantity}">0</span>
+                    </a>
+                </div>
+                <div class="dropdown ms-2">
+                    <a href="#" class="d-flex align-items-center text-decoration-none text-secondary dropdown-toggle" data-bs-toggle="dropdown">
+                        <img th:if="${session.currentUser != null}" th:src="${session.currentUser.image}" class="rounded-circle" width="30" height="30" alt="Avatar" onerror="this.style.display='none'" />
+                        <i th:if="${session.currentUser == null}" class="fa-solid fa-circle-user fs-3"></i>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg p-3" style="min-width:220px;border-radius:15px;">
+                        <li th:if="${session.currentUser != null}">
+                            <div class="text-center mb-2"><h6 class="fw-bold text-success mb-0" th:text="${session.currentUser.fullname}">User</h6></div>
+                            <hr class="dropdown-divider"/>
+                        </li>
+                        <li><a class="dropdown-item rounded py-2" href="/user/profile"><i class="fa-solid fa-user me-2 text-muted"></i>Thông tin cá nhân</a></li>
+                        <li><a class="dropdown-item py-2 rounded" href="/user/change-password"><i class="fa-solid fa-key me-2 text-muted"></i>Đổi mật khẩu</a></li>
+                        <li><a class="dropdown-item rounded py-2" href="/user/order-details"><i class="fa-solid fa-box-open me-2 text-muted"></i>Lịch sử mua hàng</a></li>
+                        <li th:if="${session.currentUser != null and session.currentUser.role == true}"><a class="dropdown-item rounded py-2" href="/admin/dashboard"><i class="fa-solid fa-user-shield me-2 text-muted"></i>Trang Quản Trị</a></li>
+                        <li><a class="dropdown-item py-2 rounded" href="/user/favourites"><i class="fa-solid fa-heart me-2 text-danger"></i>Sách yêu thích</a></li>
+                        <li><hr class="dropdown-divider"/></li>
+                        <li><a class="dropdown-item rounded py-2 text-danger" href="/logout"><i class="fa-solid fa-right-from-bracket me-2"></i>Đăng xuất</a></li>
+                    </ul>
                 </div>
             </div>
         </div>
-    </nav>
+    </div>
+</nav>
 
 <div class="container py-5" style="max-width: 860px;">
     <div class="d-flex align-items-center gap-3 mb-4">
@@ -277,32 +287,34 @@
             </div>
             <div class="d-flex flex-column align-items-end gap-2">
                 <div class="item-price" th:text="${#numbers.formatDecimal(od.price, 0, 'COMMA', 0, 'POINT')} + 'đ'">0đ</div>
-                <!-- Hiện badge "Đã đánh giá" ngay trên từng sản phẩm nếu đã review -->
                 <div th:if="${order.status == 4 and reviewedMap != null and reviewedMap[od.id] == true}">
                     <span class="badge-reviewed"><i class="fa-solid fa-check me-1"></i>Đã đánh giá</span>
                 </div>
             </div>
         </div>
 
-        <!-- Footer -->
+        <!-- Địa chỉ — hàng riêng, không ảnh hưởng footer -->
+        <div class="order-address">
+            <i class="fa-solid fa-location-dot me-1 text-success"></i>
+            <span th:text="${order.address != null ? order.address : 'Chưa có địa chỉ'}">Địa chỉ</span>
+        </div>
+
+        <!-- Footer: nút hành động | phí ship + tổng -->
         <div class="order-footer">
-            <div class="text-muted small">
-                <i class="fa-solid fa-location-dot me-1 text-success"></i>
-                <span th:text="${order.address != null ? order.address : 'Chưa có địa chỉ'}">Địa chỉ</span>
-            </div>
+
+            <!-- Nút hành động -->
             <div class="d-flex align-items-center gap-2 flex-wrap">
 
-                <!-- NÚT ĐÁNH GIÁ ĐƠN HÀNG: 1 nút duy nhất khi status=4 và còn ít nhất 1 sp chưa review -->
+                <!-- Đánh giá (status=4) -->
                 <th:block th:if="${order.status == 4}">
                     <button th:if="${hasUnreviewedMap != null and hasUnreviewedMap[order.id] == true}"
-                            type="button"
-                            class="btn-review-order"
+                            type="button" class="btn-review-order"
                             th:onclick="'openReviewModal(' + ${order.id} + ')'">
                         <i class="fa-solid fa-star me-1"></i>Đánh giá đơn hàng
                     </button>
                 </th:block>
 
-                <!-- Nút Đã nhận hàng (status=3) -->
+                <!-- Đã nhận hàng (status=3) -->
                 <form th:if="${order.status == 3}"
                       th:id="'form-confirm-' + ${order.id}"
                       th:action="@{/user/order-details/confirm-received/{id}(id=${order.id})}"
@@ -313,7 +325,7 @@
                     </button>
                 </form>
 
-                <!-- Nút yêu cầu hoàn tiền / trả hàng (status=3) -->
+                <!-- Hoàn tiền / trả hàng (status=3) -->
                 <th:block th:if="${order.status == 3}">
                     <button th:if="${order.paymentMethod == 1}" type="button"
                             class="btn btn-outline-warning btn-sm rounded-pill fw-bold"
@@ -332,12 +344,12 @@
                     </form>
                 </th:block>
 
-                <!-- Đang chờ xử lý hoàn tiền (status=6) -->
+                <!-- Đang chờ hoàn tiền (status=6) -->
                 <span th:if="${order.status == 6}" class="text-warning small fw-semibold fst-italic">
                     <i class="fa-solid fa-clock me-1"></i>Đang chờ xử lý hoàn tiền...
                 </span>
 
-                <!-- Nút Hủy đơn (status=0 hoặc 1) -->
+                <!-- Hủy đơn (status=0,1) -->
                 <form th:if="${order.status == 0 or order.status == 1}"
                       th:id="'form-cancel-' + ${order.id}"
                       th:action="@{/user/order-details/cancel/{id}(id=${order.id})}"
@@ -348,13 +360,27 @@
                     </button>
                 </form>
 
-                <div class="order-total ms-2">
+            </div>
+
+            <!-- Phí ship + Tổng — luôn bên phải, không bị địa chỉ đẩy -->
+            <div class="d-flex flex-column align-items-end gap-1">
+                <div class="text-muted small">
+                    <i class="fa-solid fa-truck me-1 text-success"></i>
+                    Phí ship:
+                    <span th:if="${order.shippingFee == null or order.shippingFee == 0}"
+                          class="text-success fw-semibold">Miễn phí 🎉</span>
+                    <span th:unless="${order.shippingFee == null or order.shippingFee == 0}"
+                          class="fw-semibold"
+                          th:text="${#numbers.formatDecimal(order.shippingFee, 0, 'COMMA', 0, 'POINT')} + 'đ'">0đ</span>
+                </div>
+                <div class="order-total">
                     Tổng cộng: <span th:text="${#numbers.formatDecimal(order.total, 0, 'COMMA', 0, 'POINT')} + 'đ'">0đ</span>
                 </div>
             </div>
+
         </div>
 
-        <!-- Data cho JS: danh sách OrderDetail chưa review của đơn này -->
+        <!-- JS data cho review modal -->
         <script th:if="${order.status == 4}" th:inline="javascript">
         (function() {
             const orderId = /*[[${order.id}]]*/ 0;
@@ -397,10 +423,7 @@
             </div>
             <button class="review-close-btn" onclick="closeReviewModal()">✕</button>
         </div>
-
-        <!-- Sản phẩm sẽ được inject bằng JS -->
         <div id="reviewProductsContainer"></div>
-
         <div class="review-modal-footer">
             <button type="button" class="btn btn-light rounded-pill px-4 fw-bold" onclick="closeReviewModal()">Hủy</button>
             <button type="button" class="btn-submit-review" id="btnSubmitReviews" onclick="submitAllReviews()">
@@ -516,7 +539,6 @@ document.querySelectorAll('.custom-modal-backdrop').forEach(el => {
 // BATCH REVIEW MODAL
 // =============================================
 let currentOrderId = null;
-// ratings[orderDetailId] = 1..5
 const ratings = {};
 
 function openReviewModal(orderId) {
@@ -536,8 +558,8 @@ function openReviewModal(orderId) {
     const container = document.getElementById('reviewProductsContainer');
     container.innerHTML = '';
 
-    items.forEach((item, idx) => {
-        ratings[item.orderDetailId] = 0; // chưa chọn sao
+    items.forEach((item) => {
+        ratings[item.orderDetailId] = 0;
 
         const block = document.createElement('div');
         block.className = 'review-product-block';
@@ -549,7 +571,6 @@ function openReviewModal(orderId) {
                     <div class="review-product-author">${escHtml(item.productAuthor)}</div>
                 </div>
             </div>
-
             <div class="star-row" id="stars-${item.orderDetailId}">
                 ${[1,2,3,4,5].map(n =>
                     `<button type="button" class="star-btn"
@@ -566,7 +587,6 @@ function openReviewModal(orderId) {
             <div class="text-danger small mb-1 d-none" id="star-err-${item.orderDetailId}">
                 Vui lòng chọn số sao!
             </div>
-
             <textarea class="review-textarea" id="content-${item.orderDetailId}" rows="3"
                 maxlength="500" placeholder="Chia sẻ cảm nhận của bạn về cuốn sách này..."
                 oninput="updateCharCount(${item.orderDetailId}, this.value)"></textarea>
@@ -590,7 +610,6 @@ function closeReviewModal() {
     currentOrderId = null;
 }
 
-// Close on backdrop click
 document.getElementById('reviewBackdrop').addEventListener('click', function(e) {
     if (e.target === this) closeReviewModal();
 });
@@ -623,7 +642,6 @@ function escHtml(str) {
     return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-// Submit tất cả review cùng lúc
 function submitAllReviews() {
     const items = (window.__reviewData || {})[currentOrderId] || [];
     let hasError = false;
@@ -645,11 +663,10 @@ function submitAllReviews() {
 
     if (hasError) return;
 
-    // Build form inputs
     const inputsContainer = document.getElementById('batchReviewInputs');
     inputsContainer.innerHTML = '';
 
-    items.forEach((item, idx) => {
+    items.forEach((item) => {
         const odId    = item.orderDetailId;
         const rating  = ratings[odId];
         const content = document.getElementById('content-' + odId).value.trim();

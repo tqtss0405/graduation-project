@@ -6,10 +6,13 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.poly.graduation_project.model.Order;
+import com.poly.graduation_project.model.OrderDetail;
 import com.poly.graduation_project.model.User;
 import com.poly.graduation_project.repository.OrderRepository;
+import com.poly.graduation_project.repository.ProductRepository;
 
 import jakarta.servlet.http.HttpSession;
+import jakarta.transaction.Transactional;
 
 @Controller
 @RequestMapping("/user/order-details")
@@ -18,6 +21,8 @@ public class UserOrderController {
     @Autowired
     private OrderRepository orderRepository;
 
+    @Autowired
+    private ProductRepository productRepository;
     // ================================================
     // POST: User xác nhận đã nhận hàng (status 3 → 4)
     // ================================================
@@ -51,32 +56,38 @@ public class UserOrderController {
     // ================================================
     // POST: User hủy đơn (chỉ hủy được khi status 0 hoặc 1)
     // ================================================
-    @PostMapping("/cancel/{id}")
-    public String cancelOrder(
-            @PathVariable Integer id,
-            HttpSession session,
-            RedirectAttributes ra) {
+   @PostMapping("/cancel/{id}")
+@Transactional
+public String cancelOrder(@PathVariable Integer id,
+                           HttpSession session,
+                           RedirectAttributes ra) {
 
-        User currentUser = (User) session.getAttribute("currentUser");
+    User currentUser = (User) session.getAttribute("currentUser");
+    Order order = orderRepository.findById(id).orElse(null);
 
-        Order order = orderRepository.findById(id).orElse(null);
-
-        if (order == null || !order.getUser().getId().equals(currentUser.getId())) {
-            ra.addFlashAttribute("errorMessage", "Không tìm thấy đơn hàng!");
-            return "redirect:/user/order-details";
-        }
-
-        if (order.getStatus() >= 2) {
-            ra.addFlashAttribute("errorMessage", "Không thể hủy đơn hàng khi hàng đã được giao đi!");
-            return "redirect:/user/order-details";
-        }
-
-        order.setStatus(5);
-        orderRepository.save(order);
-
-        ra.addFlashAttribute("successMessage", "Đã hủy đơn hàng #" + id + " thành công!");
+    if (order == null || !order.getUser().getId().equals(currentUser.getId())) {
         return "redirect:/user/order-details";
     }
+
+    if (order.getStatus() != 0 && order.getStatus() != 1) {
+        ra.addFlashAttribute("errorMessage", "Không thể hủy đơn hàng này!");
+        return "redirect:/user/order-details";
+    }
+
+    // Restock
+    if (order.getOrderDetails() != null) {
+        for (OrderDetail od : order.getOrderDetails()) {
+            var product = od.getProduct();
+            product.setStockQuantity(product.getStockQuantity() + od.getQuantity());
+            productRepository.save(product);
+        }
+    }
+
+    order.setStatus(5);
+    orderRepository.save(order);
+    ra.addFlashAttribute("successMessage", "Đã hủy đơn hàng thành công!");
+    return "redirect:/user/order-details";
+}
 
     // ================================================
     // POST: User yêu cầu hoàn tiền / trả hàng (status 3 → 6)

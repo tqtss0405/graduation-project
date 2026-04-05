@@ -31,19 +31,20 @@ public class AddressController {
     // ──────────────────────────────────────────────────────────────
     @PostMapping("/add")
     public String addAddress(
-            @RequestParam("provinceId")  String provinceId,
-            @RequestParam("districtId")  String districtId,
-            @RequestParam("wardcode")    String wardcode,
-            @RequestParam("address")     String addressStr,
+            @RequestParam("provinceId") String provinceId,
+            @RequestParam("districtId") String districtId,
+            @RequestParam("wardcode") String wardcode,
+            @RequestParam("address") String addressStr,
             @RequestParam("fulladdress") String fulladdress,
             @RequestParam(value = "isDefault", required = false) List<String> isDefaultValues,
             HttpSession session) {
 
         boolean isDefault = isDefaultValues != null
-            && isDefaultValues.stream().anyMatch(v -> "true".equalsIgnoreCase(v));
+                && isDefaultValues.stream().anyMatch(v -> "true".equalsIgnoreCase(v));
 
         User user = (User) session.getAttribute("currentUser");
-        if (user == null) return "redirect:/login";
+        if (user == null)
+            return "redirect:/login";
 
         if (Boolean.TRUE.equals(isDefault)) {
             clearDefaultAddress(user);
@@ -85,14 +86,14 @@ public class AddressController {
             return ResponseEntity.ok(res);
         }
 
-        res.put("success",     true);
-        res.put("id",          addr.getId());
-        res.put("provinceId",  addr.getProvinceId());
-        res.put("districtId",  addr.getDistrictId());
-        res.put("wardcode",    addr.getWardcode());
-        res.put("address",     addr.getAddress());
+        res.put("success", true);
+        res.put("id", addr.getId());
+        res.put("provinceId", addr.getProvinceId());
+        res.put("districtId", addr.getDistrictId());
+        res.put("wardcode", addr.getWardcode());
+        res.put("address", addr.getAddress());
         res.put("fulladdress", addr.getFulladdress());
-        res.put("isDefault",   Boolean.TRUE.equals(addr.getIsDefault()));
+        res.put("isDefault", Boolean.TRUE.equals(addr.getIsDefault()));
         return ResponseEntity.ok(res);
     }
 
@@ -102,19 +103,20 @@ public class AddressController {
     @PostMapping("/update/{id}")
     public String updateAddress(
             @PathVariable Integer id,
-            @RequestParam("provinceId")  String provinceId,
-            @RequestParam("districtId")  String districtId,
-            @RequestParam("wardcode")    String wardcode,
-            @RequestParam("address")     String addressStr,
+            @RequestParam("provinceId") String provinceId,
+            @RequestParam("districtId") String districtId,
+            @RequestParam("wardcode") String wardcode,
+            @RequestParam("address") String addressStr,
             @RequestParam("fulladdress") String fulladdress,
             @RequestParam(value = "isDefault", required = false) List<String> isDefaultValues,
             HttpSession session) {
 
         boolean isDefault = isDefaultValues != null
-            && isDefaultValues.stream().anyMatch(v -> "true".equalsIgnoreCase(v));
+                && isDefaultValues.stream().anyMatch(v -> "true".equalsIgnoreCase(v));
 
         User user = (User) session.getAttribute("currentUser");
-        if (user == null) return "redirect:/login";
+        if (user == null)
+            return "redirect:/login";
 
         Address addr = addressRepository.findById(id).orElse(null);
         if (addr == null || !addr.getUser().getId().equals(user.getId()))
@@ -138,10 +140,11 @@ public class AddressController {
     // ──────────────────────────────────────────────────────────────
     // Đặt địa chỉ mặc định
     // ──────────────────────────────────────────────────────────────
-    @RequestMapping(value = "/set-default/{id}", method = {RequestMethod.GET, RequestMethod.POST})
+    @RequestMapping(value = "/set-default/{id}", method = { RequestMethod.GET, RequestMethod.POST })
     public String setDefault(@PathVariable Integer id, HttpSession session) {
         User user = (User) session.getAttribute("currentUser");
-        if (user == null) return "redirect:/login";
+        if (user == null)
+            return "redirect:/login";
 
         Address addr = addressRepository.findById(id).orElse(null);
         if (addr != null
@@ -155,14 +158,14 @@ public class AddressController {
     }
 
     // ──────────────────────────────────────────────────────────────
-    // Xóa địa chỉ (soft delete)
+    // Xóa địa chỉ
     // ──────────────────────────────────────────────────────────────
     @GetMapping("/delete/{id}")
     public String deleteAddress(@PathVariable Integer id, HttpSession session) {
         User user = (User) session.getAttribute("currentUser");
         Address addr = addressRepository.findById(id).orElse(null);
         if (addr != null && user != null && addr.getUser().getId().equals(user.getId())) {
-            addressService.delete(id);
+            addressRepository.deleteById(id);
         }
         return "redirect:/user/profile";
     }

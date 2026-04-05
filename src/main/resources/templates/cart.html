@@ -1,18 +1,19 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Giỏ hàng - BEOBOOKS</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="/css/style.css" />
     <script src="/js/sidebar.js"></script>
     <style>
         body {
-            font-family: 'Quicksand', sans-serif;
+            font-family: "Quicksand", sans-serif;
             background: #f5f7fa;
         }
 
@@ -151,7 +152,7 @@
             border: none;
             font-weight: 700;
             font-size: 0.9rem;
-            font-family: 'Quicksand', sans-serif;
+            font-family: "Quicksand", sans-serif;
             outline: none;
             background: transparent;
         }
@@ -241,7 +242,9 @@
             color: #fff;
             width: 100%;
             cursor: pointer;
-            transition: transform 0.15s, box-shadow 0.15s;
+            transition:
+                transform 0.15s,
+                box-shadow 0.15s;
             text-decoration: none;
             display: block;
             text-align: center;
@@ -295,6 +298,71 @@
             animation: slideIn 0.3s ease;
         }
 
+        /* Confirm modal */
+        .confirm-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.45);
+            backdrop-filter: blur(3px);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .confirm-backdrop.show {
+            display: flex;
+        }
+
+        .confirm-box {
+            background: #fff;
+            border-radius: 20px;
+            padding: 28px 24px 20px;
+            max-width: 360px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18);
+            text-align: center;
+            animation: popIn 0.2s ease;
+        }
+
+        @keyframes popIn {
+            from {
+                transform: scale(0.88);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .confirm-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: #fff0f0;
+            color: #dc3545;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            margin: 0 auto 14px;
+        }
+
+        .confirm-title {
+            font-weight: 700;
+            font-size: 1rem;
+            color: #1a1a2e;
+            margin-bottom: 6px;
+        }
+
+        .confirm-desc {
+            color: #6c757d;
+            font-size: 0.88rem;
+            margin-bottom: 20px;
+        }
+
         @keyframes slideIn {
             from {
                 transform: translateX(120%);
@@ -310,7 +378,6 @@
 </head>
 
 <body>
-
     <nav class="navbar navbar-expand-lg sticky-top">
         <div class="container">
             <a class="navbar-brand" href="/home">BEO<span style="color: var(--secondary-color)">BOOKS</span></a>
@@ -319,46 +386,85 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav mx-auto">
-                    <li class="nav-item"><a class="nav-link" href="/home">Trang chủ</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/products">Sản phẩm</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/vouchers">Mã giảm giá</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/contact">Liên hệ</a></li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/home">Trang chủ</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/products">Sản phẩm</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/vouchers">Mã giảm giá</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/contact">Liên hệ</a>
+                    </li>
                 </ul>
                 <div class="d-flex align-items-center gap-3">
-                    <div class="input-group d-none d-lg-flex" style="width:200px;">
+                    <div class="input-group d-none d-lg-flex" style="width: 200px">
                         <input type="text" id="searchInputNav"
                             class="form-control form-control-sm border-end-0 rounded-start-pill"
-                            placeholder="Tìm sách..."
-                            th:value="${keyword}"
-                            onkeydown="if(event.key==='Enter') navSearch()"/>
-                        <button class="btn btn-outline-secondary border-start-0 rounded-end-pill" type="button" onclick="navSearch()">
+                            placeholder="Tìm sách..." th:value="${keyword}" onkeydown="
+                                    if (event.key === 'Enter') navSearch();
+                                " />
+                        <button class="btn btn-outline-secondary border-start-0 rounded-end-pill" type="button"
+                            onclick="navSearch()">
                             <i class="fa-solid fa-magnifying-glass"></i>
                         </button>
                     </div>
                     <div class="position-relative">
                         <a href="/user/cart">
                             <i class="fa-solid fa-cart-shopping fs-5 text-secondary"></i>
-                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-                                style="font-size:10px" th:text="${totalQuantity}">0</span>
+                            <span
+                                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                                style="font-size: 10px" th:text="${totalQuantity}">0</span>
                         </a>
                     </div>
                     <div class="dropdown ms-2">
-                        <a href="#" class="d-flex align-items-center text-decoration-none text-secondary dropdown-toggle" data-bs-toggle="dropdown">
-                            <img th:if="${session.currentUser != null}" th:src="${session.currentUser.image}" class="rounded-circle" width="30" height="30" alt="Avatar" onerror="this.style.display='none'" />
+                        <a href="#"
+                            class="d-flex align-items-center text-decoration-none text-secondary dropdown-toggle"
+                            data-bs-toggle="dropdown">
+                            <img th:if="${session.currentUser != null}" th:src="${session.currentUser.image}"
+                                class="rounded-circle" width="30" height="30" alt="Avatar"
+                                onerror="this.style.display = 'none'" />
                             <i th:if="${session.currentUser == null}" class="fa-solid fa-circle-user fs-3"></i>
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg p-3" style="min-width:220px;border-radius:15px;">
+                        <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg p-3"
+                            style="min-width: 220px; border-radius: 15px">
                             <li th:if="${session.currentUser != null}">
-                                <div class="text-center mb-2"><h6 class="fw-bold text-success mb-0" th:text="${session.currentUser.fullname}">User</h6></div>
-                                <hr class="dropdown-divider"/>
+                                <div class="text-center mb-2">
+                                    <h6 class="fw-bold text-success mb-0" th:text="${session.currentUser.fullname}">
+                                        User
+                                    </h6>
+                                </div>
+                                <hr class="dropdown-divider" />
                             </li>
-                            <li><a class="dropdown-item rounded py-2" href="/user/profile"><i class="fa-solid fa-user me-2 text-muted"></i>Thông tin cá nhân</a></li>
-                            <li><a class="dropdown-item py-2 rounded" href="/user/change-password"><i class="fa-solid fa-key me-2 text-muted"></i>Đổi mật khẩu</a></li>
-                            <li><a class="dropdown-item rounded py-2" href="/user/order-details"><i class="fa-solid fa-box-open me-2 text-muted"></i>Lịch sử mua hàng</a></li>
-                            <li th:if="${session.currentUser != null and session.currentUser.role == true}"><a class="dropdown-item rounded py-2" href="/admin/dashboard"><i class="fa-solid fa-user-shield me-2 text-muted"></i>Trang Quản Trị</a></li>
-                            <li><a class="dropdown-item py-2 rounded" href="/user/favourites"><i class="fa-solid fa-heart me-2 text-danger"></i>Sách yêu thích</a></li>
-                            <li><hr class="dropdown-divider"/></li>
-                            <li><a class="dropdown-item rounded py-2 text-danger" href="/logout"><i class="fa-solid fa-right-from-bracket me-2"></i>Đăng xuất</a></li>
+                            <li>
+                                <a class="dropdown-item rounded py-2" href="/user/profile"><i
+                                        class="fa-solid fa-user me-2 text-muted"></i>Thông tin cá nhân</a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item py-2 rounded" href="/user/change-password"><i
+                                        class="fa-solid fa-key me-2 text-muted"></i>Đổi mật khẩu</a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item rounded py-2" href="/user/order-details"><i
+                                        class="fa-solid fa-box-open me-2 text-muted"></i>Lịch sử mua hàng</a>
+                            </li>
+                            <li th:if="${session.currentUser != null and session.currentUser.role == true}">
+                                <a class="dropdown-item rounded py-2" href="/admin/dashboard"><i
+                                        class="fa-solid fa-user-shield me-2 text-muted"></i>Trang Quản Trị</a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item py-2 rounded" href="/user/favourites"><i
+                                        class="fa-solid fa-heart me-2 text-danger"></i>Sách yêu thích</a>
+                            </li>
+                            <li>
+                                <hr class="dropdown-divider" />
+                            </li>
+                            <li>
+                                <a class="dropdown-item rounded py-2 text-danger" href="/logout"><i
+                                        class="fa-solid fa-right-from-bracket me-2"></i>Đăng xuất</a>
+                            </li>
                         </ul>
                     </div>
                 </div>
@@ -375,12 +481,21 @@
             <span class="badge bg-success rounded-pill ms-1" th:text="${#lists.size(cartItems)} + ' sản phẩm'">0 sản
                 phẩm</span>
         </div>
-
+        <div th:if="${hasOutOfStock}" class="alert alert-warning rounded-3 d-flex align-items-center gap-2 mb-3">
+            <i class="fa-solid fa-triangle-exclamation fa-lg"></i>
+            <span>Một số sản phẩm đã <strong>hết hàng</strong> hoặc
+                <strong>không đủ số lượng</strong>. Vui lòng kiểm tra lại
+                trước khi đặt hàng.</span>
+        </div>
         <!-- TRỐNG -->
         <div th:if="${cartItems == null or #lists.isEmpty(cartItems)}" class="empty-cart">
-            <div style="font-size:5rem; margin-bottom:20px; opacity:0.2;">🛒</div>
+            <div style="font-size: 5rem; margin-bottom: 20px; opacity: 0.2">
+                🛒
+            </div>
             <h4 class="fw-bold text-muted mb-2">Giỏ hàng trống</h4>
-            <p class="text-muted mb-4">Hãy thêm sách vào giỏ hàng để tiếp tục mua sắm!</p>
+            <p class="text-muted mb-4">
+                Hãy thêm sách vào giỏ hàng để tiếp tục mua sắm!
+            </p>
             <a href="/products" class="btn btn-success rounded-pill px-5 fw-bold">
                 <i class="fa-solid fa-book me-2"></i>Khám phá sách
             </a>
@@ -388,7 +503,6 @@
 
         <!-- CÓ SẢN PHẨM -->
         <div th:if="${cartItems != null and not #lists.isEmpty(cartItems)}" class="row g-4">
-
             <!-- Bảng sản phẩm -->
             <div class="col-lg-8">
                 <div class="cart-table-wrap">
@@ -403,52 +517,73 @@
                             </tr>
                         </thead>
                         <tbody id="cartBody">
-                            <tr th:each="item : ${cartItems}" th:id="'row-' + ${item.id}">
+                            <tr th:each="item : ${cartItems}" th:id="'row-' + ${item.id}"
+                                th:classappend="${!item.product.active or item.product.stockQuantity <= 0} ? 'cart-row-disabled' : ''">
                                 <td>
                                     <div class="product-cell">
                                         <a th:href="@{'/product/' + ${item.product.slug}}">
                                             <img th:src="${item.product.image != null ? item.product.image : '/images/default-book.png'}"
-                                                th:alt="${item.product.name}">
+                                                th:alt="${item.product.name}" />
                                         </a>
                                         <div>
-                                            <div class="product-name" th:text="${item.product.name}">Tên sách</div>
-                                            <div class="product-author" th:text="${item.product.author}">Tác giả</div>
-                                            <!-- ✅ THÊM: Hiển thị trạng thái sản phẩm -->
-                                            <div th:if="${!item.product.active}">
-                                                <span class="badge bg-danger mt-1">Sản phẩm đã ngừng bán</span>
+                                            <div class="product-name" th:text="${item.product.name}">
+                                                Tên sách
                                             </div>
-                                            <div class="product-stock" th:if="${item.product.active}">
-                                                Còn <span th:text="${item.product.stockQuantity}">0</span> cuốn
+                                            <div class="product-author" th:text="${item.product.author}">
+                                                Tác giả
+                                            </div>
+                                            <!-- Badge hết hàng -->
+                                            <span th:if="${!item.product.active}"
+                                                class="out-of-stock-badge mt-1 d-inline-block">Ngừng bán</span>
+                                            <span th:if="${item.product.active and item.product.stockQuantity <= 0}"
+                                                class="out-of-stock-badge mt-1 d-inline-block">Hết hàng</span>
+                                            <div class="product-stock"
+                                                th:if="${item.product.active and item.product.stockQuantity > 0}">
+                                                Còn
+                                                <span th:text="${item.product.stockQuantity}">0</span>
+                                                cuốn
                                             </div>
                                         </div>
                                     </div>
                                 </td>
+
+                                <!-- Đơn giá -->
                                 <td class="text-center">
-                                    <!-- ✅ Nếu disabled thì gạch giá -->
-                                    <span th:if="${!item.product.active}"
-                                        class="text-muted text-decoration-line-through"
-                                        th:text="${#numbers.formatDecimal(item.product.price, 0, 'COMMA', 0, 'POINT')} + 'đ'">0đ</span>
-                                    <span th:if="${item.product.active}" class="price-text"
+                                    <span th:class="${!item.product.active or item.product.stockQuantity <= 0}
+                        ? 'text-muted text-decoration-line-through'
+                        : 'price-text'"
                                         th:text="${#numbers.formatDecimal(item.product.price, 0, 'COMMA', 0, 'POINT')} + 'đ'">0đ</span>
                                 </td>
+
+                                <!-- Số lượng -->
                                 <td class="text-center">
-                                    <!-- ✅ Nếu disabled thì ẩn nút tăng giảm -->
-                                    <div th:if="${item.product.active}" class="qty-control">
+                                    <div th:if="${item.product.active and item.product.stockQuantity > 0}"
+                                        class="qty-control">
                                         <button class="qty-btn" type="button"
-                                            th:attr="onclick='updateQty(' + ${item.id} + ', -1, ' + ${item.product.stockQuantity} + ')'">−</button>
+                                            th:attr="onclick='updateQty(' + ${item.id} + ', -1, ' + ${item.product.stockQuantity} + ')'">
+                                            −
+                                        </button>
                                         <input type="text" class="qty-input" th:id="'qty-' + ${item.id}"
-                                            th:value="${item.quantity}" readonly>
+                                            th:value="${item.quantity}" readonly />
                                         <button class="qty-btn" type="button"
-                                            th:attr="onclick='updateQty(' + ${item.id} + ', 1, ' + ${item.product.stockQuantity} + ')'">+</button>
+                                            th:attr="onclick='updateQty(' + ${item.id} + ', 1, ' + ${item.product.stockQuantity} + ')'">
+                                            +
+                                        </button>
                                     </div>
-                                    <span th:if="${!item.product.active}" class="text-muted small">—</span>
+                                    <span th:unless="${item.product.active and item.product.stockQuantity > 0}"
+                                        class="text-muted">—</span>
                                 </td>
+
+                                <!-- Thành tiền -->
                                 <td class="text-center">
-                                    <!-- ✅ Nếu disabled thì hiển thị 0đ -->
-                                    <span th:if="${!item.product.active}" class="text-muted">0đ</span>
-                                    <span th:if="${item.product.active}" class="line-total" th:id="'line-' + ${item.id}"
+                                    <span th:if="${item.product.active and item.product.stockQuantity > 0}"
+                                        class="line-total" th:id="'line-' + ${item.id}"
                                         th:text="${#numbers.formatDecimal(item.product.price.multiply(new java.math.BigDecimal(item.quantity)), 0, 'COMMA', 0, 'POINT')} + 'đ'">0đ</span>
+                                    <span th:unless="${item.product.active and item.product.stockQuantity > 0}"
+                                        class="text-muted">—</span>
                                 </td>
+
+                                <!-- Xóa -->
                                 <td class="text-center">
                                     <button class="remove-btn" th:attr="onclick='removeItem(' + ${item.id} + ')'">
                                         <i class="fa-solid fa-xmark"></i>
@@ -460,7 +595,8 @@
                 </div>
 
                 <a href="/products" class="btn btn-outline-success rounded-pill mt-2">
-                    <i class="fa-solid fa-arrow-left me-2"></i>Tiếp tục mua sắm
+                    <i class="fa-solid fa-arrow-left me-2"></i>Tiếp tục mua
+                    sắm
                 </a>
             </div>
 
@@ -474,8 +610,8 @@
                     <!-- Freeship progress -->
                     <div class="mb-3">
                         <small id="shipMsg" class="text-muted"></small>
-                        <div class="progress mt-1" style="height:6px;">
-                            <div class="progress-bar bg-success" id="shipProgress" role="progressbar" style="width:0%">
+                        <div class="progress mt-1" style="height: 6px">
+                            <div class="progress-bar bg-success" id="shipProgress" role="progressbar" style="width: 0%">
                             </div>
                         </div>
                     </div>
@@ -500,16 +636,16 @@
                     </div>
 
                     <div class="mt-4">
-                        <!-- ✅ Chỉ hiện nút khi có sản phẩm active -->
                         <a th:if="${hasActiveItems}" href="/user/checkout" class="btn-checkout">
-                            <i class="fa-solid fa-lock me-2"></i>Tiến hành đặt hàng
+                            <i class="fa-solid fa-lock me-2"></i>Tiến hành
+                            đặt hàng
                         </a>
-                        <!-- ✅ Hiện thông báo khi tất cả sp đã ngừng bán -->
                         <div th:unless="${hasActiveItems}" class="alert alert-warning text-center rounded-3 fw-bold">
                             <i class="fa-solid fa-triangle-exclamation me-2"></i>
                             Giỏ hàng không có sản phẩm nào còn bán
                         </div>
                     </div>
+
                     <div class="secure-note">
                         <i class="fa-solid fa-shield-halved text-success"></i>
                         Thanh toán an toàn & bảo mật
@@ -522,7 +658,6 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         const FREE_SHIP = 150000;
-        const SHIP_FEE = 30000;
 
         function formatMoney(n) {
             return Number(n).toLocaleString('vi-VN') + 'đ';
@@ -553,8 +688,7 @@
             document.getElementById('subtotalDisplay').textContent = formatMoney(data.subtotal);
             document.getElementById('shipFeeDisplay').textContent =
                 Number(data.shippingFee) === 0 ? 'Miễn phí 🎉' : formatMoney(data.shippingFee);
-            document.getElementById('totalDisplay').textContent = formatMoney(data.total);
-            document.getElementById('cartBadge').textContent = data.cartCount || 0;
+            document.getElementById('totalDisplay').textContent = formatMoney(data.subtotal);
             updateShipProgress(Number(data.subtotal));
         }
 
@@ -577,31 +711,74 @@
             }
         }
 
-        async function removeItem(cartDetailId) {
-            if (!confirm('Bạn có muốn xóa sản phẩm này?')) return;
-            const res = await fetch('/user/cart/remove/' + cartDetailId, { method: 'POST' });
-            const data = await res.json();
-            if (data.success) {
-                document.getElementById('row-' + cartDetailId)?.remove();
-                updateSummaryUI(data);
-                showToast('Đã xóa sản phẩm khỏi giỏ hàng!');
-                if (data.isEmpty) setTimeout(() => location.reload(), 600);
-            }
+        let pendingRemoveId = null;
+
+        function removeItem(cartDetailId) {
+            pendingRemoveId = cartDetailId;
+            document.getElementById('confirmBackdrop').classList.add('show');
         }
 
-        // Khởi tạo progress khi load trang
+        function closeConfirm() {
+            document.getElementById('confirmBackdrop').classList.remove('show');
+            pendingRemoveId = null;
+        }
+        async function doRemove() {
+            if (!pendingRemoveId) return;
+            const id = pendingRemoveId;
+            closeConfirm();
+
+            const res = await fetch('/user/cart/remove/' + id, { method: 'POST' });
+            const data = await res.json();
+            if (data.success) {
+                document.getElementById('row-' + id)?.remove();
+                updateSummaryUI(data);
+                showToast('Đã xóa sản phẩm khỏi giỏ hàng!');
+                const remainingRows = document.querySelectorAll('#cartBody tr').length;
+                if (remainingRows === 0) setTimeout(() => location.reload(), 600);
+            }
+        }
         window.addEventListener('DOMContentLoaded', () => {
             const txt = document.getElementById('subtotalDisplay')?.textContent || '0';
             const num = parseFloat(txt.replace(/[^0-9]/g, '')) || 0;
             updateShipProgress(num);
+
+            document.getElementById('confirmBackdrop').addEventListener('click', function (e) {
+                if (e.target === this) closeConfirm();
+            });
         });
-        function doSearch() {
-            const keyword = document.getElementById('searchInput').value.trim();
-            if (keyword) {
-                window.location.href = '/products?keyword=' + encodeURIComponent(keyword);
-            }
-        }
     </script>
+
+    <!-- Modal confirm — đặt SAU script -->
+    <div class="confirm-backdrop" id="confirmBackdrop">
+        <div class="confirm-box">
+            <div class="confirm-icon">
+                <i class="fa-solid fa-trash-can"></i>
+            </div>
+            <div class="confirm-title">Xóa sản phẩm?</div>
+            <div class="confirm-desc">Bạn có chắc muốn xóa sản phẩm này khỏi giỏ hàng không?</div>
+            <div class="d-flex gap-2 justify-content-center">
+                <button class="btn btn-light rounded-pill px-4 fw-bold" onclick="closeConfirm()">Giữ lại</button>
+                <button class="btn btn-danger rounded-pill px-4 fw-bold" onclick="doRemove()">
+                    <i class="fa-solid fa-trash-can me-1"></i>Xóa
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="confirm-backdrop" id="confirmBackdrop">
+        <div class="confirm-box">
+            <div class="confirm-icon">
+                <i class="fa-solid fa-trash-can"></i>
+            </div>
+            <div class="confirm-title">Xóa sản phẩm?</div>
+            <div class="confirm-desc">Bạn có chắc muốn xóa sản phẩm này khỏi giỏ hàng không?</div>
+            <div class="d-flex gap-2 justify-content-center">
+                <button class="btn btn-light rounded-pill px-4 fw-bold" onclick="closeConfirm()">Giữ lại</button>
+                <button class="btn btn-danger rounded-pill px-4 fw-bold" id="confirmOkBtn">
+                    <i class="fa-solid fa-trash-can me-1"></i>Xóa
+                </button>
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>

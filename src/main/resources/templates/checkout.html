@@ -8,288 +8,181 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/style.css">
-     <script src="/js/sidebar.js"></script>
+    <script src="/js/sidebar.js"></script>
     <style>
         body { font-family: 'Quicksand', sans-serif; background: #f5f7fa; }
-
         .checkout-wrapper { max-width: 1100px; margin: 0 auto; padding: 32px 16px 60px; }
-
         .section-card {
-            background: #fff;
-            border-radius: 18px;
+            background: #fff; border-radius: 18px;
             box-shadow: 0 2px 16px rgba(0,0,0,0.06);
-            padding: 24px 28px;
-            margin-bottom: 20px;
+            padding: 24px 28px; margin-bottom: 20px;
         }
-
         .card-title {
-            font-weight: 700;
-            font-size: 1rem;
-            color: #1a1a2e;
-            margin-bottom: 18px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            font-weight: 700; font-size: 1rem; color: #1a1a2e;
+            margin-bottom: 18px; display: flex; align-items: center; gap: 8px;
         }
-
         .card-title i { color: #28a745; }
-
-        /* Address options */
         .address-option {
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-            padding: 14px 16px;
-            border: 2px solid #e9ecef;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.15s;
-            margin-bottom: 10px;
+            display: flex; align-items: flex-start; gap: 12px;
+            padding: 14px 16px; border: 2px solid #e9ecef;
+            border-radius: 12px; cursor: pointer;
+            transition: all 0.15s; margin-bottom: 10px;
         }
-
         .address-option:hover { border-color: #28a745; background: #f8fffe; }
         .address-option.selected { border-color: #28a745; background: #f0faf4; }
-
         .address-option input[type="radio"] { accent-color: #28a745; margin-top: 3px; flex-shrink: 0; }
-
         .address-label { font-weight: 600; font-size: 0.9rem; margin-bottom: 2px; }
         .address-text { color: #6c757d; font-size: 0.85rem; }
         .default-badge {
-            background: #d4edda; color: #155724;
-            border-radius: 50px; padding: 1px 8px;
-            font-size: 0.72rem; font-weight: 700;
-            margin-left: 6px;
+            background: #d4edda; color: #155724; border-radius: 50px;
+            padding: 1px 8px; font-size: 0.72rem; font-weight: 700; margin-left: 6px;
         }
-
-        /* New address form */
         .new-address-toggle {
-            padding: 12px 16px;
-            border: 2px dashed #c8e6c9;
-            border-radius: 12px;
-            cursor: pointer;
-            text-align: center;
-            color: #28a745;
-            font-weight: 600;
-            font-size: 0.9rem;
-            transition: all 0.15s;
-            margin-bottom: 10px;
+            padding: 12px 16px; border: 2px dashed #c8e6c9; border-radius: 12px;
+            cursor: pointer; text-align: center; color: #28a745;
+            font-weight: 600; font-size: 0.9rem; transition: all 0.15s; margin-bottom: 10px;
         }
-
         .new-address-toggle:hover { border-color: #28a745; background: #f0faf4; }
-
-        /* Order items preview */
         .order-item-preview {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 10px 0;
-            border-bottom: 1px solid #f5f5f5;
+            display: flex; align-items: center; gap: 12px;
+            padding: 10px 0; border-bottom: 1px solid #f5f5f5;
         }
-
         .order-item-preview:last-child { border-bottom: none; }
-
         .order-item-preview img {
-            width: 52px; height: 65px;
-            object-fit: cover;
-            border-radius: 8px;
-            flex-shrink: 0;
+            width: 52px; height: 65px; object-fit: cover;
+            border-radius: 8px; flex-shrink: 0;
         }
-
-        /* Payment methods */
         .payment-option {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            padding: 16px 18px;
-            border: 2px solid #e9ecef;
-            border-radius: 14px;
-            cursor: pointer;
-            transition: all 0.15s;
-            margin-bottom: 10px;
+            display: flex; align-items: center; gap: 16px;
+            padding: 16px 18px; border: 2px solid #e9ecef;
+            border-radius: 14px; cursor: pointer; transition: all 0.15s; margin-bottom: 10px;
         }
-
         .payment-option:hover { border-color: #28a745; background: #f8fffe; }
         .payment-option.selected { border-color: #28a745; background: #f0faf4; }
-
         .payment-option input[type="radio"] { accent-color: #28a745; }
-
         .payment-icon {
-            width: 48px; height: 48px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.4rem;
-            flex-shrink: 0;
+            width: 48px; height: 48px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.4rem; flex-shrink: 0;
         }
-
         .payment-icon.cod { background: #fff3e0; color: #e65100; }
         .payment-icon.vnpay { background: #e8f5e9; }
-
-        /* Voucher */
-        .voucher-input-group {
-            display: flex;
-            gap: 10px;
-        }
-
+        .voucher-input-group { display: flex; gap: 10px; }
         .voucher-result {
-            margin-top: 10px;
-            padding: 10px 14px;
-            border-radius: 10px;
-            font-size: 0.88rem;
-            font-weight: 600;
-            display: none;
+            margin-top: 10px; padding: 10px 14px; border-radius: 10px;
+            font-size: 0.88rem; font-weight: 600; display: none;
         }
-
         .voucher-result.success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+            background: #d4edda; color: #155724; border: 1px solid #c3e6cb;
+            display: flex; align-items: center; justify-content: space-between;
         }
-
         .voucher-result.error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; display: block; }
-
-        /* Summary */
         .summary-card {
-            background: #fff;
-            border-radius: 18px;
+            background: #fff; border-radius: 18px;
             box-shadow: 0 2px 16px rgba(0,0,0,0.06);
-            padding: 24px;
-            position: sticky;
-            top: 80px;
+            padding: 24px; position: sticky; top: 80px;
         }
-
         .summary-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 12px;
-            font-size: 0.92rem;
+            display: flex; justify-content: space-between;
+            margin-bottom: 12px; font-size: 0.92rem;
         }
-
         .summary-row .label { color: #6c757d; }
         .summary-row .value { font-weight: 600; }
-
         .summary-total {
-            display: flex;
-            justify-content: space-between;
-            font-weight: 700;
-            font-size: 1.1rem;
-            border-top: 2px solid #f0f0f0;
-            padding-top: 14px;
-            margin-top: 8px;
+            display: flex; justify-content: space-between;
+            font-weight: 700; font-size: 1.1rem;
+            border-top: 2px solid #f0f0f0; padding-top: 14px; margin-top: 8px;
         }
-
         .total-amount { color: #28a745; font-size: 1.35rem; }
-
         .btn-place-order {
             background: linear-gradient(135deg, #28a745, #20c997);
-            border: none;
-            border-radius: 50px;
-            padding: 14px;
-            font-weight: 700;
-            font-size: 1rem;
-            color: #fff;
-            width: 100%;
-            cursor: pointer;
-            transition: transform 0.15s, box-shadow 0.15s;
-            margin-top: 16px;
+            border: none; border-radius: 50px; padding: 14px;
+            font-weight: 700; font-size: 1rem; color: #fff;
+            width: 100%; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; margin-top: 16px;
         }
-
-        .btn-place-order:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(40,167,69,0.35);
-        }
-
-        .btn-place-order:disabled {
-            opacity: 0.7;
-            cursor: not-allowed;
-            transform: none;
-        }
-
+        .btn-place-order:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(40,167,69,0.35); }
+        .btn-place-order:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
         .secure-note {
-            text-align: center;
-            color: #adb5bd;
-            font-size: 0.78rem;
-            margin-top: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 4px;
+            text-align: center; color: #adb5bd; font-size: 0.78rem; margin-top: 10px;
+            display: flex; align-items: center; justify-content: center; gap: 4px;
         }
-
-        /* Form inputs */
         .form-control, .form-select {
-            border-radius: 10px;
-            border: 1.5px solid #e0e0e0;
-            font-family: 'Quicksand', sans-serif;
-            font-weight: 500;
+            border-radius: 10px; border: 1.5px solid #e0e0e0;
+            font-family: 'Quicksand', sans-serif; font-weight: 500;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #28a745; box-shadow: 0 0 0 3px rgba(40,167,69,0.12);
         }
 
-        .form-control:focus, .form-select:focus {
-            border-color: #28a745;
-            box-shadow: 0 0 0 3px rgba(40,167,69,0.12);
+        /* ── Ship fee badge ── */
+        .ship-fee-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: #e8f5e9; color: #2e7d32;
+            border-radius: 50px; padding: 4px 12px;
+            font-size: 0.82rem; font-weight: 700;
         }
+        .ship-fee-badge.loading { background: #f5f5f5; color: #9e9e9e; }
+        .ship-fee-badge.error   { background: #fff3e0; color: #e65100; }
+        .ship-spinner { animation: spin 1s linear infinite; display: inline-block; }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
- <nav class="navbar navbar-expand-lg sticky-top">
-        <div class="container">
-            <a class="navbar-brand" href="/home">BEO<span style="color: var(--secondary-color)">BOOKS</span></a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav mx-auto">
-                    <li class="nav-item"><a class="nav-link" href="/home">Trang chủ</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/products">Sản phẩm</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/vouchers">Mã giảm giá</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/contact">Liên hệ</a></li>
-                </ul>
-                <div class="d-flex align-items-center gap-3">
-                    <div class="input-group d-none d-lg-flex" style="width:200px;">
-                        <input type="text" id="searchInputNav"
-                            class="form-control form-control-sm border-end-0 rounded-start-pill"
-                            placeholder="Tìm sách..."
-                            th:value="${keyword}"
-                            onkeydown="if(event.key==='Enter') navSearch()"/>
-                        <button class="btn btn-outline-secondary border-start-0 rounded-end-pill" type="button" onclick="navSearch()">
-                            <i class="fa-solid fa-magnifying-glass"></i>
-                        </button>
-                    </div>
-                    <div class="position-relative">
-                        <a href="/user/cart">
-                            <i class="fa-solid fa-cart-shopping fs-5 text-secondary"></i>
-                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-                                style="font-size:10px" th:text="${totalQuantity}">0</span>
-                        </a>
-                    </div>
-                    <div class="dropdown ms-2">
-                        <a href="#" class="d-flex align-items-center text-decoration-none text-secondary dropdown-toggle" data-bs-toggle="dropdown">
-                            <img th:if="${session.currentUser != null}" th:src="${session.currentUser.image}" class="rounded-circle" width="30" height="30" alt="Avatar" onerror="this.style.display='none'" />
-                            <i th:if="${session.currentUser == null}" class="fa-solid fa-circle-user fs-3"></i>
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg p-3" style="min-width:220px;border-radius:15px;">
-                            <li th:if="${session.currentUser != null}">
-                                <div class="text-center mb-2"><h6 class="fw-bold text-success mb-0" th:text="${session.currentUser.fullname}">User</h6></div>
-                                <hr class="dropdown-divider"/>
-                            </li>
-                            <li><a class="dropdown-item rounded py-2" href="/user/profile"><i class="fa-solid fa-user me-2 text-muted"></i>Thông tin cá nhân</a></li>
-                            <li><a class="dropdown-item py-2 rounded" href="/user/change-password"><i class="fa-solid fa-key me-2 text-muted"></i>Đổi mật khẩu</a></li>
-                            <li><a class="dropdown-item rounded py-2" href="/user/order-details"><i class="fa-solid fa-box-open me-2 text-muted"></i>Lịch sử mua hàng</a></li>
-                            <li th:if="${session.currentUser != null and session.currentUser.role == true}"><a class="dropdown-item rounded py-2" href="/admin/dashboard"><i class="fa-solid fa-user-shield me-2 text-muted"></i>Trang Quản Trị</a></li>
-                            <li><a class="dropdown-item py-2 rounded" href="/user/favourites"><i class="fa-solid fa-heart me-2 text-danger"></i>Sách yêu thích</a></li>
-                            <li><hr class="dropdown-divider"/></li>
-                            <li><a class="dropdown-item rounded py-2 text-danger" href="/logout"><i class="fa-solid fa-right-from-bracket me-2"></i>Đăng xuất</a></li>
-                        </ul>
-                    </div>
+<!-- ── NAVBAR ── -->
+<nav class="navbar navbar-expand-lg sticky-top">
+    <div class="container">
+        <a class="navbar-brand" href="/home">BEO<span style="color: var(--secondary-color)">BOOKS</span></a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav mx-auto">
+                <li class="nav-item"><a class="nav-link" href="/home">Trang chủ</a></li>
+                <li class="nav-item"><a class="nav-link" href="/products">Sản phẩm</a></li>
+                <li class="nav-item"><a class="nav-link" href="/vouchers">Mã giảm giá</a></li>
+                <li class="nav-item"><a class="nav-link" href="/contact">Liên hệ</a></li>
+            </ul>
+            <div class="d-flex align-items-center gap-3">
+                <div class="input-group d-none d-lg-flex" style="width:200px;">
+                    <input type="text" id="searchInputNav"
+                        class="form-control form-control-sm border-end-0 rounded-start-pill"
+                        placeholder="Tìm sách..."
+                        onkeydown="if(event.key==='Enter') navSearch()"/>
+                    <button class="btn btn-outline-secondary border-start-0 rounded-end-pill" type="button" onclick="navSearch()">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </button>
+                </div>
+                <div class="position-relative">
+                    <a href="/user/cart">
+                        <i class="fa-solid fa-cart-shopping fs-5 text-secondary"></i>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                            style="font-size:10px" th:text="${totalQuantity}">0</span>
+                    </a>
+                </div>
+                <div class="dropdown ms-2">
+                    <a href="#" class="d-flex align-items-center text-decoration-none text-secondary dropdown-toggle" data-bs-toggle="dropdown">
+                        <img th:if="${session.currentUser != null}" th:src="${session.currentUser.image}" class="rounded-circle" width="30" height="30" alt="Avatar" onerror="this.style.display='none'" />
+                        <i th:if="${session.currentUser == null}" class="fa-solid fa-circle-user fs-3"></i>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg p-3" style="min-width:220px;border-radius:15px;">
+                        <li th:if="${session.currentUser != null}">
+                            <div class="text-center mb-2"><h6 class="fw-bold text-success mb-0" th:text="${session.currentUser.fullname}">User</h6></div>
+                            <hr class="dropdown-divider"/>
+                        </li>
+                        <li><a class="dropdown-item rounded py-2" href="/user/profile"><i class="fa-solid fa-user me-2 text-muted"></i>Thông tin cá nhân</a></li>
+                        <li><a class="dropdown-item py-2 rounded" href="/user/change-password"><i class="fa-solid fa-key me-2 text-muted"></i>Đổi mật khẩu</a></li>
+                        <li><a class="dropdown-item rounded py-2" href="/user/order-details"><i class="fa-solid fa-box-open me-2 text-muted"></i>Lịch sử mua hàng</a></li>
+                        <li th:if="${session.currentUser != null and session.currentUser.role == true}"><a class="dropdown-item rounded py-2" href="/admin/dashboard"><i class="fa-solid fa-user-shield me-2 text-muted"></i>Trang Quản Trị</a></li>
+                        <li><a class="dropdown-item py-2 rounded" href="/user/favourites"><i class="fa-solid fa-heart me-2 text-danger"></i>Sách yêu thích</a></li>
+                        <li><hr class="dropdown-divider"/></li>
+                        <li><a class="dropdown-item rounded py-2 text-danger" href="/logout"><i class="fa-solid fa-right-from-bracket me-2"></i>Đăng xuất</a></li>
+                    </ul>
                 </div>
             </div>
         </div>
-    </nav>
+    </div>
+</nav>
 
 <!-- Flash: VNPay error -->
 <div th:if="${paymentError}" class="container mt-3">
@@ -307,22 +200,24 @@
     </div>
 
     <div class="row g-4">
-        <!-- CỘT TRÁI -->
+        <!-- ── CỘT TRÁI ── -->
         <div class="col-lg-7">
 
-            <!-- 1. Thông tin nhận hàng -->
+            <!-- 1. Địa chỉ -->
             <div class="section-card">
                 <div class="card-title">
                     <i class="fa-solid fa-location-dot"></i>
                     Địa chỉ nhận hàng
                 </div>
 
-                <!-- Địa chỉ đã có -->
+                <!-- Địa chỉ đã lưu -->
                 <div th:if="${addresses != null and not #lists.isEmpty(addresses)}">
                     <div th:each="addr : ${addresses}" class="address-option"
                          th:classappend="${defaultAddress != null and addr.id == defaultAddress.id} ? 'selected' : ''"
-                         th:attr="data-fulladdress=${addr.fulladdress != null ? addr.fulladdress : addr.address}"
-                         onclick="selectAddress(this, this.getAttribute('data-fulladdress'))">
+                         th:attr="data-fulladdress=${addr.fulladdress != null ? addr.fulladdress : addr.address},
+                                  data-district=${addr.districtId},
+                                  data-ward=${addr.wardcode}"
+                         onclick="selectSavedAddress(this)">
                         <input type="radio" name="addrRadio"
                                th:value="${addr.id}"
                                th:checked="${defaultAddress != null and addr.id == defaultAddress.id}">
@@ -338,45 +233,47 @@
                     </div>
                 </div>
 
-                <!-- Nhập địa chỉ mới -->
+                <!-- Thêm địa chỉ mới -->
                 <div class="new-address-toggle" onclick="toggleNewAddress()">
                     <i class="fa-solid fa-plus me-2"></i>Thêm địa chỉ mới
                 </div>
                 <div id="newAddressForm" style="display:none;">
-    <div class="row g-2">
-        <!-- Tỉnh/Thành -->
-        <div class="col-md-4">
-            <label class="form-label small fw-semibold text-muted">Tỉnh / Thành phố <span class="text-danger">*</span></label>
-            <select class="form-select" id="newProvince">
-                <option value="" disabled selected>-- Chọn Tỉnh/Thành --</option>
-            </select>
-        </div>
-        <!-- Quận/Huyện -->
-        <div class="col-md-4">
-            <label class="form-label small fw-semibold text-muted">Quận / Huyện <span class="text-danger">*</span></label>
-            <select class="form-select" id="newDistrict" disabled>
-                <option value="" disabled selected>-- Chọn Quận/Huyện --</option>
-            </select>
-        </div>
-        <!-- Phường/Xã -->
-        <div class="col-md-4">
-            <label class="form-label small fw-semibold text-muted">Phường / Xã <span class="text-danger">*</span></label>
-            <select class="form-select" id="newWard" disabled>
-                <option value="" disabled selected>-- Chọn Phường/Xã --</option>
-            </select>
-        </div>
-        <!-- Số nhà, tên đường -->
-        <div class="col-12 mt-1">
-            <label class="form-label small fw-semibold text-muted">Số nhà, tên đường <span class="text-danger">*</span></label>
-            <input type="text" class="form-control" id="newStreet"
-                   placeholder="VD: 123 Đường Lê Lợi">
-        </div>
-    </div>
-</div>
+                    <div class="row g-2">
+                        <div class="col-md-4">
+                            <label class="form-label small fw-semibold text-muted">Tỉnh / Thành phố <span class="text-danger">*</span></label>
+                            <select class="form-select" id="newProvince" onchange="onProvinceChange()">
+                                <option value="" disabled selected>-- Chọn Tỉnh/Thành --</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-semibold text-muted">Quận / Huyện <span class="text-danger">*</span></label>
+                            <select class="form-select" id="newDistrict" disabled onchange="onDistrictChange()">
+                                <option value="" disabled selected>-- Chọn Quận/Huyện --</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-semibold text-muted">Phường / Xã <span class="text-danger">*</span></label>
+                            <select class="form-select" id="newWard" disabled onchange="onWardChange()">
+                                <option value="" disabled selected>-- Chọn Phường/Xã --</option>
+                            </select>
+                        </div>
+                        <div class="col-12 mt-1">
+                            <label class="form-label small fw-semibold text-muted">Số nhà, tên đường <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="newStreet"
+                                   placeholder="VD: 123 Đường Lê Lợi"
+                                   oninput="updateNewAddress()">
+                        </div>
+                    </div>
+                </div>
 
-                <!-- Input ẩn chứa địa chỉ cuối cùng -->
+                <!-- Input ẩn -->
                 <input type="hidden" id="finalAddress"
                        th:value="${defaultAddress != null ? (defaultAddress.fulladdress != null ? defaultAddress.fulladdress : defaultAddress.address) : ''}">
+                <!-- District & Ward ID dùng để tính phí GHN -->
+                <input type="hidden" id="finalDistrictId"
+                       th:value="${defaultAddress != null ? defaultAddress.districtId : ''}">
+                <input type="hidden" id="finalWardCode"
+                       th:value="${defaultAddress != null ? defaultAddress.wardcode : ''}">
 
                 <div class="mt-3">
                     <label class="form-label fw-semibold small">Tên người nhận</label>
@@ -391,7 +288,7 @@
                 <div class="mt-2">
                     <label class="form-label fw-semibold small">Ghi chú (tùy chọn)</label>
                     <textarea class="form-control" id="orderNote" rows="2"
-                              placeholder="Ghi chú cho đơn hàng (thời gian giao, yêu cầu đặc biệt...)"></textarea>
+                              placeholder="Ghi chú cho đơn hàng..."></textarea>
                 </div>
             </div>
 
@@ -401,24 +298,20 @@
                     <i class="fa-solid fa-credit-card"></i>
                     Phương thức thanh toán
                 </div>
-
                 <div class="payment-option selected" id="codOption" onclick="selectPayment('cod')">
                     <input type="radio" name="paymentMethod" id="payCod" value="cod" checked>
-                    <div class="payment-icon cod">
-                        <i class="fa-solid fa-money-bill-wave"></i>
-                    </div>
+                    <div class="payment-icon cod"><i class="fa-solid fa-money-bill-wave"></i></div>
                     <div>
                         <div class="fw-bold">Thanh toán khi nhận hàng (COD)</div>
                         <div class="text-muted small">Trả tiền mặt khi nhận được sách</div>
                     </div>
                 </div>
-
                 <div class="payment-option" id="vnpayOption" onclick="selectPayment('vnpay')">
                     <input type="radio" name="paymentMethod" id="payVnpay" value="vnpay">
                     <div class="payment-icon vnpay">
                         <img src="https://sandbox.vnpayment.vn/paymentv2/images/img/logo-icon/vnpay-logo.svg"
                              alt="VNPay" height="30"
-                             onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=\'fa-solid fa-qrcode\' style=\'color:#28a745; font-size:1.4rem\'></i>'">
+                             onerror="this.style.display='none';this.parentElement.innerHTML='<i class=\'fa-solid fa-qrcode\' style=\'color:#28a745;font-size:1.4rem\'></i>'">
                     </div>
                     <div>
                         <div class="fw-bold">Thanh toán qua VNPay</div>
@@ -444,11 +337,11 @@
                 </div>
                 <div class="voucher-result" id="voucherResult"></div>
                 <input type="hidden" id="appliedVoucherId" value="">
-                <input type="hidden" id="discountAmount" value="0">
+                <input type="hidden" id="discountAmountInput" value="0">
             </div>
         </div>
 
-        <!-- CỘT PHẢI: Tóm tắt đơn hàng -->
+        <!-- ── CỘT PHẢI: Tóm tắt ── -->
         <div class="col-lg-5">
             <div class="summary-card">
                 <div class="fw-bold mb-3" style="font-size:1rem; color:#1a1a2e;">
@@ -457,13 +350,13 @@
                 </div>
 
                 <!-- Danh sách sản phẩm -->
-                <div style="max-height: 280px; overflow-y: auto;" class="mb-3">
+                <div style="max-height: 260px; overflow-y: auto;" class="mb-3">
                     <div th:each="item : ${cartItems}" class="order-item-preview">
                         <div class="position-relative">
                             <img th:src="${item.product.image != null ? item.product.image : '/images/default-book.png'}"
                                  th:alt="${item.product.name}">
                             <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill"
-                                  style="background:#28a745; font-size:0.7rem;"
+                                  style="background:#28a745;font-size:0.7rem;"
                                   th:text="${item.quantity}">1</span>
                         </div>
                         <div class="flex-grow-1">
@@ -482,13 +375,17 @@
                     <span class="value" id="coSubtotal"
                           th:text="${#numbers.formatDecimal(subtotal, 0, 'COMMA', 0, 'POINT')} + 'đ'">0đ</span>
                 </div>
-                <div class="summary-row">
+
+                <!-- Phí ship: hiển thị động từ GHN -->
+                <div class="summary-row align-items-center">
                     <span class="label">Phí vận chuyển</span>
-                    <span class="value" id="coShipFee"
-                          th:text="${shippingFee.compareTo(T(java.math.BigDecimal).ZERO) == 0 ? 'Miễn phí 🎉' : #numbers.formatDecimal(shippingFee, 0, 'COMMA', 0, 'POINT') + 'đ'}">
-                        0đ
+                    <span id="coShipFeeWrap">
+                        <span class="ship-fee-badge loading" id="coShipFee">
+                            <i class="fa-solid fa-circle-notch ship-spinner"></i> Đang tính...
+                        </span>
                     </span>
                 </div>
+
                 <div class="summary-row" id="discountRow" style="display:none;">
                     <span class="label text-success"><i class="fa-solid fa-tag me-1"></i>Giảm giá</span>
                     <span class="value text-success" id="discountDisplay">-0đ</span>
@@ -496,11 +393,10 @@
 
                 <div class="summary-total">
                     <span>Tổng thanh toán</span>
-                    <span class="total-amount" id="coTotal"
-                          th:text="${#numbers.formatDecimal(total, 0, 'COMMA', 0, 'POINT')} + 'đ'">0đ</span>
+                    <span class="total-amount" id="coTotal">—</span>
                 </div>
 
-                <button class="btn-place-order" id="placeOrderBtn" onclick="placeOrder()">
+                <button class="btn-place-order" id="placeOrderBtn" onclick="placeOrder()" disabled>
                     <i class="fa-solid fa-check-circle me-2"></i>
                     <span id="btnText">Đặt hàng ngay</span>
                 </button>
@@ -514,221 +410,325 @@
     </div>
 </div>
 
-<!-- Hidden forms for submission -->
+<!-- Hidden forms -->
 <form id="codForm" action="/user/checkout/cod" method="post" style="display:none;">
-    <input type="hidden" name="addressText" id="codAddress">
-    <input type="hidden" name="voucherId" id="codVoucher">
-    <input type="hidden" name="note" id="codNote">
+    <input type="hidden" name="addressText"  id="codAddress">
+    <input type="hidden" name="voucherId"    id="codVoucher">
+    <input type="hidden" name="note"         id="codNote">
+    <input type="hidden" name="shippingFee"  id="codShipFee">
 </form>
-
 <form id="vnpayForm" action="/user/checkout/vnpay" method="post" style="display:none;">
-    <input type="hidden" name="addressText" id="vnAddress">
-    <input type="hidden" name="voucherId" id="vnVoucher">
-    <input type="hidden" name="note" id="vnNote">
+    <input type="hidden" name="addressText"  id="vnAddress">
+    <input type="hidden" name="voucherId"    id="vnVoucher">
+    <input type="hidden" name="note"         id="vnNote">
+    <input type="hidden" name="shippingFee"  id="vnShipFee">
 </form>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-    const baseSubtotal = parseFloat('[[${subtotal}]]') || 0;
-    const baseShip = parseFloat('[[${shippingFee}]]') || 0;
-    let discountAmt = 0;
-    let selectedPayment = 'cod';
-    let appliedVoucherId = '';
-
-    function formatMoney(n) { return Number(n).toLocaleString('vi-VN') + 'đ'; }
-
-    function selectAddress(el, addrText) {
-        document.querySelectorAll('.address-option').forEach(o => o.classList.remove('selected'));
-        el.classList.add('selected');
-        el.querySelector('input[type="radio"]').checked = true;
-        document.getElementById('finalAddress').value = addrText;
-        document.getElementById('newAddressForm').style.display = 'none';
-    }
-
-    function toggleNewAddress() {
-        const form = document.getElementById('newAddressForm');
-        form.style.display = form.style.display === 'none' ? 'block' : 'none';
-        if (form.style.display === 'block') {
-            document.querySelectorAll('.address-option').forEach(o => {
-                o.classList.remove('selected');
-                o.querySelector('input[type="radio"]').checked = false;
-            });
-            document.getElementById('finalAddress').value = '';
-        }
-    }
-
-    function onNewAddressInput(val) {
-        document.getElementById('finalAddress').value = val;
-    }
-
-    function selectPayment(method) {
-        selectedPayment = method;
-        document.getElementById('codOption').classList.toggle('selected', method === 'cod');
-        document.getElementById('vnpayOption').classList.toggle('selected', method === 'vnpay');
-        document.getElementById('payCod').checked = method === 'cod';
-        document.getElementById('payVnpay').checked = method === 'vnpay';
-        const btn = document.getElementById('placeOrderBtn');
-        const btnText = document.getElementById('btnText');
-        if (method === 'vnpay') {
-            btnText.textContent = 'Tiếp tục thanh toán VNPay';
-        } else {
-            btnText.textContent = 'Đặt hàng ngay';
-        }
-    }
-
-    async function applyVoucher() {
-        const code = document.getElementById('voucherCode').value.trim();
-        if (!code) return;
-
-        const res = await fetch('/user/checkout/apply-voucher', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: `code=${encodeURIComponent(code)}`
-        });
-        const data = await res.json();
-        const resultEl = document.getElementById('voucherResult');
-
-        if (data.success) {
-            resultEl.className = 'voucher-result success';
-            resultEl.innerHTML = `
-                <div><i class="fa-solid fa-tag me-2"></i>${data.message}</div>
-                <button type="button" class="btn btn-sm btn-outline-danger rounded-pill" onclick="removeVoucher()">Xóa</button>
-            `;
-            appliedVoucherId = data.voucherId;
-            discountAmt = parseFloat(data.discountAmount) || 0;
-            document.getElementById('appliedVoucherId').value = appliedVoucherId;
-            document.getElementById('discountAmount').value = discountAmt;
-            updateTotal();
-        } else {
-            resultEl.className = 'voucher-result error';
-            resultEl.innerHTML = `<i class="fa-solid fa-xmark-circle me-2"></i>${data.message}`;
-            resultEl.style.display = 'block';
-            discountAmt = 0;
-            appliedVoucherId = '';
-            updateTotal();
-        }
-    }
-
-    function removeVoucher() {
-        discountAmt = 0;
-        appliedVoucherId = '';
-        document.getElementById('voucherCode').value = '';
-        document.getElementById('voucherResult').className = 'voucher-result';
-        document.getElementById('voucherResult').style.display = 'none';
-        document.getElementById('appliedVoucherId').value = '';
-        updateTotal();
-    }
-
-    function updateTotal() {
-        const total = Math.max(0, baseSubtotal + baseShip - discountAmt);
-        document.getElementById('coTotal').textContent = formatMoney(total);
-        const discountRow = document.getElementById('discountRow');
-        if (discountAmt > 0) {
-            discountRow.style.display = 'flex';
-            document.getElementById('discountDisplay').textContent = '-' + formatMoney(discountAmt);
-        } else {
-            discountRow.style.display = 'none';
-        }
-    }
-
-    function placeOrder() {
-        const address = document.getElementById('finalAddress').value.trim();
-        if (!address) {
-            alert('Vui lòng chọn hoặc nhập địa chỉ nhận hàng!');
-            return;
-        }
-
-        const note = document.getElementById('orderNote').value;
-        const voucherId = appliedVoucherId || '';
-
-        const btn = document.getElementById('placeOrderBtn');
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i>Đang xử lý...';
-
-        if (selectedPayment === 'cod') {
-            document.getElementById('codAddress').value = address;
-            document.getElementById('codVoucher').value = voucherId;
-            document.getElementById('codNote').value = note;
-            document.getElementById('codForm').submit();
-        } else {
-            document.getElementById('vnAddress').value = address;
-            document.getElementById('vnVoucher').value = voucherId;
-            document.getElementById('vnNote').value = note;
-            document.getElementById('vnpayForm').submit();
-        }
-    }
-</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
 <script>
-    // ===== CASCADE ĐỊA CHỈ MỚI =====
-    const newProvince = document.getElementById('newProvince');
-    const newDistrict = document.getElementById('newDistrict');
-    const newWard     = document.getElementById('newWard');
+// ═══════════════════════════════════════════════════════
+//  CÁC BIẾN TOÀN CỤC
+// ═══════════════════════════════════════════════════════
+const baseSubtotal = parseFloat('[[${subtotal}]]') || 0;
+let currentShipFee = 0;       // phí ship GHN (cập nhật động)
+let discountAmt    = 0;       // số tiền giảm
+let selectedPayment = 'cod';
+let appliedVoucherId = '';
+let shipFeeLoading = false;
 
-    // Load tỉnh khi trang mở
-    axios.get('https://provinces.open-api.vn/api/?depth=1').then(res => {
-        res.data.forEach(p => {
-            const opt = document.createElement('option');
-            opt.value = p.code;
-            opt.text  = p.name;
-            opt.dataset.name = p.name;
-            newProvince.appendChild(opt);
+// Địa chỉ mặc định (nếu có)
+let selectedDistrictId = '[[${defaultAddress != null ? defaultAddress.districtId : ""}]]';
+let selectedWardCode   = '[[${defaultAddress != null ? defaultAddress.wardcode   : ""}]]';
+
+// ═══════════════════════════════════════════════════════
+//  FORMAT
+// ═══════════════════════════════════════════════════════
+function formatMoney(n) { return Number(n).toLocaleString('vi-VN') + 'đ'; }
+
+// ═══════════════════════════════════════════════════════
+//  TÍNH PHÍ SHIP GHN
+// ═══════════════════════════════════════════════════════
+async function fetchShippingFee(districtId, wardCode) {
+    if (!districtId || !wardCode) return;
+
+    shipFeeLoading = true;
+    const badge = document.getElementById('coShipFee');
+    badge.className = 'ship-fee-badge loading';
+    badge.innerHTML = '<i class="fa-solid fa-circle-notch ship-spinner"></i> Đang tính...';
+    document.getElementById('placeOrderBtn').disabled = true;
+
+    try {
+        const res = await fetch('/api/shipping-fee', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                toDistrictId: parseInt(districtId),
+                toWardCode: String(wardCode)
+            })
         });
-    });
+        const data = await res.json();
 
-    newProvince.addEventListener('change', function () {
-        // Reset quận/xã
-        newDistrict.innerHTML = '<option value="" disabled selected>-- Chọn Quận/Huyện --</option>';
-        newWard.innerHTML     = '<option value="" disabled selected>-- Chọn Phường/Xã --</option>';
-        newDistrict.disabled  = true;
-        newWard.disabled      = true;
-        updateNewAddress();
-
-        axios.get(`https://provinces.open-api.vn/api/p/${this.value}?depth=2`).then(res => {
-            res.data.districts.forEach(d => {
-                const opt = document.createElement('option');
-                opt.value = d.code;
-                opt.text  = d.name;
-                opt.dataset.name = d.name;
-                newDistrict.appendChild(opt);
-            });
-            newDistrict.disabled = false;
-        });
-    });
-
-    newDistrict.addEventListener('change', function () {
-        newWard.innerHTML    = '<option value="" disabled selected>-- Chọn Phường/Xã --</option>';
-        newWard.disabled     = true;
-        updateNewAddress();
-
-        axios.get(`https://provinces.open-api.vn/api/d/${this.value}?depth=2`).then(res => {
-            res.data.wards.forEach(w => {
-                const opt = document.createElement('option');
-                opt.value = w.code;
-                opt.text  = w.name;
-                opt.dataset.name = w.name;
-                newWard.appendChild(opt);
-            });
-            newWard.disabled = false;
-        });
-    });
-
-    newWard.addEventListener('change', updateNewAddress);
-    document.getElementById('newStreet').addEventListener('input', updateNewAddress);
-
-    // Ghép chuỗi địa chỉ đầy đủ → đưa vào finalAddress
-    function updateNewAddress() {
-        const province = newProvince.options[newProvince.selectedIndex]?.dataset.name || '';
-        const district = newDistrict.options[newDistrict.selectedIndex]?.dataset.name || '';
-        const ward     = newWard.options[newWard.selectedIndex]?.dataset.name || '';
-        const street   = document.getElementById('newStreet').value.trim();
-
-        if (province && district && ward && street) {
-            document.getElementById('finalAddress').value = `${street}, ${ward}, ${district}, ${province}`;
+        if (data.success || data.fee != null) {
+            currentShipFee = data.fee || 0;
+            badge.className = 'ship-fee-badge';
+            badge.innerHTML = currentShipFee === 0
+                ? '<i class="fa-solid fa-truck text-success"></i> Miễn phí 🎉'
+                : '<i class="fa-solid fa-truck"></i> ' + formatMoney(currentShipFee);
         } else {
-            document.getElementById('finalAddress').value = '';
+            // Fallback
+            currentShipFee = 30000;
+            badge.className = 'ship-fee-badge error';
+            badge.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> ' + formatMoney(currentShipFee) + ' (ước tính)';
         }
+    } catch {
+        currentShipFee = 30000;
+        badge.className = 'ship-fee-badge error';
+        badge.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> ' + formatMoney(currentShipFee) + ' (ước tính)';
     }
+
+    shipFeeLoading = false;
+    updateTotal();
+    document.getElementById('placeOrderBtn').disabled = false;
+}
+
+// ═══════════════════════════════════════════════════════
+//  CẬP NHẬT TỔNG
+// ═══════════════════════════════════════════════════════
+function updateTotal() {
+    const total = Math.max(0, baseSubtotal + currentShipFee - discountAmt);
+    document.getElementById('coTotal').textContent = formatMoney(total);
+
+    if (discountAmt > 0) {
+        document.getElementById('discountRow').style.display = 'flex';
+        document.getElementById('discountDisplay').textContent = '-' + formatMoney(discountAmt);
+    } else {
+        document.getElementById('discountRow').style.display = 'none';
+    }
+}
+
+// ═══════════════════════════════════════════════════════
+//  CHỌN ĐỊA CHỈ ĐÃ LƯU
+// ═══════════════════════════════════════════════════════
+function selectSavedAddress(el) {
+    // Đọc dữ liệu từ data-* attribute (an toàn với Thymeleaf 3.1+)
+    const addrText   = el.getAttribute('data-fulladdress') || '';
+    const districtId = el.getAttribute('data-district') || '';
+    const wardCode   = el.getAttribute('data-ward') || '';
+
+    document.querySelectorAll('.address-option').forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+    el.querySelector('input[type="radio"]').checked = true;
+
+    document.getElementById('finalAddress').value    = addrText;
+    document.getElementById('finalDistrictId').value = districtId;
+    document.getElementById('finalWardCode').value   = wardCode;
+    document.getElementById('newAddressForm').style.display = 'none';
+
+    selectedDistrictId = districtId;
+    selectedWardCode   = wardCode;
+    fetchShippingFee(districtId, wardCode);
+}
+
+// ═══════════════════════════════════════════════════════
+//  ĐỊA CHỈ MỚI — TOGGLE + CASCADE
+// ═══════════════════════════════════════════════════════
+function toggleNewAddress() {
+    const form = document.getElementById('newAddressForm');
+    const isHidden = form.style.display === 'none';
+    form.style.display = isHidden ? 'block' : 'none';
+    if (isHidden) {
+        document.querySelectorAll('.address-option').forEach(o => {
+            o.classList.remove('selected');
+            o.querySelector('input[type="radio"]').checked = false;
+        });
+        document.getElementById('finalAddress').value    = '';
+        document.getElementById('finalDistrictId').value = '';
+        document.getElementById('finalWardCode').value   = '';
+        // Reset phí ship
+        selectedDistrictId = '';
+        selectedWardCode   = '';
+        currentShipFee = 0;
+        const badge = document.getElementById('coShipFee');
+        badge.className = 'ship-fee-badge loading';
+        badge.innerHTML = '<i class="fa-solid fa-circle-notch ship-spinner"></i> Chọn địa chỉ...';
+        document.getElementById('placeOrderBtn').disabled = true;
+        updateTotal();
+    }
+}
+
+// ─ Tải tỉnh thành khi load trang ─
+axios.get('https://provinces.open-api.vn/api/?depth=1').then(res => {
+    const sel = document.getElementById('newProvince');
+    res.data.forEach(p => {
+        const opt = document.createElement('option');
+        opt.value = p.code; opt.text = p.name; opt.dataset.name = p.name;
+        sel.appendChild(opt);
+    });
+});
+
+function onProvinceChange() {
+    const sel = document.getElementById('newProvince');
+    const distSel = document.getElementById('newDistrict');
+    const wardSel = document.getElementById('newWard');
+    distSel.innerHTML = '<option value="" disabled selected>-- Chọn Quận/Huyện --</option>';
+    wardSel.innerHTML = '<option value="" disabled selected>-- Chọn Phường/Xã --</option>';
+    distSel.disabled = true; wardSel.disabled = true;
+    document.getElementById('finalAddress').value = '';
+    updateNewAddress();
+
+    axios.get(`https://provinces.open-api.vn/api/p/${sel.value}?depth=2`).then(res => {
+        res.data.districts.forEach(d => {
+            const opt = document.createElement('option');
+            opt.value = d.code; opt.text = d.name; opt.dataset.name = d.name;
+            distSel.appendChild(opt);
+        });
+        distSel.disabled = false;
+    });
+}
+
+function onDistrictChange() {
+    const distSel = document.getElementById('newDistrict');
+    const wardSel = document.getElementById('newWard');
+    wardSel.innerHTML = '<option value="" disabled selected>-- Chọn Phường/Xã --</option>';
+    wardSel.disabled = true;
+    updateNewAddress();
+
+    axios.get(`https://provinces.open-api.vn/api/d/${distSel.value}?depth=2`).then(res => {
+        res.data.wards.forEach(w => {
+            const opt = document.createElement('option');
+            // GHN dùng WardCode là chuỗi (w.code từ provinces API là số nhưng GHN cần chuỗi)
+            opt.value = w.code; opt.text = w.name; opt.dataset.name = w.name;
+            wardSel.appendChild(opt);
+        });
+        wardSel.disabled = false;
+    });
+}
+
+function onWardChange() {
+    updateNewAddress();
+    const distSel = document.getElementById('newDistrict');
+    const wardSel = document.getElementById('newWard');
+
+    if (distSel.value && wardSel.value) {
+        // GHN district ID: từ provinces API (code quận là số, GHN cũng dùng số)
+        // Ward code: GHN dùng string → dùng .value trực tiếp
+        selectedDistrictId = distSel.value;
+        selectedWardCode   = String(wardSel.value);
+        fetchShippingFee(selectedDistrictId, selectedWardCode);
+    }
+}
+
+function updateNewAddress() {
+    const province = document.getElementById('newProvince').options[document.getElementById('newProvince').selectedIndex]?.dataset.name || '';
+    const district = document.getElementById('newDistrict').options[document.getElementById('newDistrict').selectedIndex]?.dataset.name || '';
+    const ward     = document.getElementById('newWard').options[document.getElementById('newWard').selectedIndex]?.dataset.name || '';
+    const street   = document.getElementById('newStreet').value.trim();
+
+    if (province && district && ward && street) {
+        document.getElementById('finalAddress').value = `${street}, ${ward}, ${district}, ${province}`;
+    } else {
+        document.getElementById('finalAddress').value = '';
+    }
+}
+
+// ═══════════════════════════════════════════════════════
+//  PAYMENT METHOD
+// ═══════════════════════════════════════════════════════
+function selectPayment(method) {
+    selectedPayment = method;
+    document.getElementById('codOption').classList.toggle('selected', method === 'cod');
+    document.getElementById('vnpayOption').classList.toggle('selected', method === 'vnpay');
+    document.getElementById('payCod').checked   = method === 'cod';
+    document.getElementById('payVnpay').checked = method === 'vnpay';
+    document.getElementById('btnText').textContent =
+        method === 'vnpay' ? 'Tiếp tục thanh toán VNPay' : 'Đặt hàng ngay';
+}
+
+// ═══════════════════════════════════════════════════════
+//  VOUCHER
+// ═══════════════════════════════════════════════════════
+async function applyVoucher() {
+    const code = document.getElementById('voucherCode').value.trim();
+    if (!code) return;
+    const res = await fetch('/user/checkout/apply-voucher', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `code=${encodeURIComponent(code)}&shippingFee=${currentShipFee}`
+    });
+    const data = await res.json();
+    const resultEl = document.getElementById('voucherResult');
+    if (data.success) {
+        resultEl.className = 'voucher-result success';
+        resultEl.innerHTML = `<div><i class="fa-solid fa-tag me-2"></i>${data.message}</div>
+            <button type="button" class="btn btn-sm btn-outline-danger rounded-pill" onclick="removeVoucher()">Xóa</button>`;
+        appliedVoucherId = data.voucherId;
+        discountAmt      = parseFloat(data.discountAmount) || 0;
+        document.getElementById('appliedVoucherId').value = appliedVoucherId;
+        document.getElementById('discountAmountInput').value = discountAmt;
+        updateTotal();
+    } else {
+        resultEl.className = 'voucher-result error';
+        resultEl.innerHTML = `<i class="fa-solid fa-xmark-circle me-2"></i>${data.message}`;
+        resultEl.style.display = 'block';
+        discountAmt = 0; appliedVoucherId = '';
+        updateTotal();
+    }
+}
+
+function removeVoucher() {
+    discountAmt = 0; appliedVoucherId = '';
+    document.getElementById('voucherCode').value = '';
+    document.getElementById('voucherResult').className = 'voucher-result';
+    document.getElementById('voucherResult').style.display = 'none';
+    document.getElementById('appliedVoucherId').value = '';
+    updateTotal();
+}
+
+// ═══════════════════════════════════════════════════════
+//  ĐẶT HÀNG
+// ═══════════════════════════════════════════════════════
+function placeOrder() {
+    const address = document.getElementById('finalAddress').value.trim();
+    if (!address) { alert('Vui lòng chọn hoặc nhập địa chỉ nhận hàng!'); return; }
+    if (shipFeeLoading) { alert('Hệ thống đang tính phí vận chuyển, vui lòng đợi!'); return; }
+
+    const note      = document.getElementById('orderNote').value;
+    const voucherId = appliedVoucherId || '';
+
+    const btn = document.getElementById('placeOrderBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i>Đang xử lý...';
+
+    if (selectedPayment === 'cod') {
+        document.getElementById('codAddress').value  = address;
+        document.getElementById('codVoucher').value  = voucherId;
+        document.getElementById('codNote').value     = note;
+        document.getElementById('codShipFee').value  = currentShipFee;
+        document.getElementById('codForm').submit();
+    } else {
+        document.getElementById('vnAddress').value   = address;
+        document.getElementById('vnVoucher').value   = voucherId;
+        document.getElementById('vnNote').value      = note;
+        document.getElementById('vnShipFee').value   = currentShipFee;
+        document.getElementById('vnpayForm').submit();
+    }
+}
+
+// ═══════════════════════════════════════════════════════
+//  KHỞI TẠO — tính phí ship ngay nếu có địa chỉ mặc định
+// ═══════════════════════════════════════════════════════
+window.addEventListener('DOMContentLoaded', () => {
+    if (selectedDistrictId && selectedWardCode) {
+        fetchShippingFee(selectedDistrictId, selectedWardCode);
+    } else {
+        // Không có địa chỉ mặc định → hiện trạng thái chờ
+        const badge = document.getElementById('coShipFee');
+        badge.className = 'ship-fee-badge loading';
+        badge.innerHTML = '<i class="fa-solid fa-location-dot"></i> Chọn địa chỉ để tính phí';
+        document.getElementById('coTotal').textContent = '—';
+    }
+});
 </script>
 </body>
 </html>

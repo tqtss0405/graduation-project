@@ -983,3 +983,16 @@ footer .form-control:focus {
     font-size: 0.85rem;
     display: none;
 }
+
+.cart-row-disabled {
+    opacity: 0.5;
+    pointer-events: none; /* disable tăng giảm */
+}
+.cart-row-disabled .remove-btn {
+    pointer-events: all; /* nhưng vẫn cho xóa */
+}
+.out-of-stock-badge {
+    background: #f8d7da; color: #721c24;
+    border-radius: 50px; padding: 2px 8px;
+    font-size: 0.72rem; font-weight: 700;
+}

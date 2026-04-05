@@ -32,7 +32,8 @@ public class Order {
     @Column(precision = 12, scale = 2)
     private BigDecimal total;
 
-    private Boolean freeShip;
+    @Column(precision = 10, scale = 2)
+    private BigDecimal shippingFee;
     private LocalDateTime createAt;
     private Integer paymentMethod;
     private Integer paymentStatus;
