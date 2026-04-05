@@ -199,9 +199,22 @@
  
     <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
         <div class="col" th:each="p : ${products}">
-            <div class="card book-card h-100 position-relative">
  
-                <!-- Nút yêu thích: tim đặc nếu đã thích, tim rỗng nếu chưa -->
+            <!-- Card mờ nếu hết hàng -->
+            <div class="card book-card h-100 position-relative"
+                 th:classappend="${p.stockQuantity == null or p.stockQuantity <= 0} ? ' out-of-stock-card' : ''">
+ 
+                <!-- Badge HẾT HÀNG -->
+                <div th:if="${p.stockQuantity == null or p.stockQuantity <= 0}"
+                     class="position-absolute top-0 start-0 m-2"
+                     style="z-index:3;">
+                    <span class="badge rounded-pill px-2 py-1"
+                          style="background:#dc3545; color:#fff; font-size:0.72rem; font-weight:700; letter-spacing:0.3px;">
+                        <i class="fa-solid fa-ban me-1" style="font-size:0.65rem;"></i>Hết hàng
+                    </span>
+                </div>
+ 
+                <!-- Nút yêu thích -->
                 <button class="btn-fav position-absolute"
                         style="top:8px; right:8px; z-index:2;
                                width:32px; height:32px; border-radius:50%;
@@ -220,24 +233,32 @@
                 </button>
  
                 <a th:href="@{'/product/' + ${p.slug}}" class="text-decoration-none text-dark">
-                    <div class="book-img-container">
+                    <!-- Ảnh bìa — mờ nếu hết hàng -->
+                    <div class="book-img-container position-relative">
                         <img th:src="${p.image != null ? p.image : '/images/default-book.png'}"
-                             alt="Book" class="book-img" />
+                             alt="Book" class="book-img"
+                             th:style="${p.stockQuantity == null or p.stockQuantity <= 0} ? 'opacity:0.45; filter:grayscale(40%);' : ''"/>
                     </div>
                     <div class="card-body">
                         <h6 class="book-title" th:text="${p.name}">Tên sách</h6>
                         <p class="book-author" th:text="${p.author}">Tác giả</p>
                         <div class="d-flex justify-content-between align-items-center mt-3">
-                            <span class="text-danger fw-bold fs-5"
-                                th:text="${#numbers.formatDecimal(p.price, 0, 'COMMA', 0, 'POINT')} + 'đ'">
-                                0đ
-                            </span>
-                            <button class="btn-add-cart"
+                            <span class="fw-bold fs-5"
+                                  th:classappend="${p.stockQuantity == null or p.stockQuantity <= 0} ? ' text-muted text-decoration-line-through' : ' text-danger'"
+                                  th:text="${#numbers.formatDecimal(p.price, 0, 'COMMA', 0, 'POINT')} + 'đ'">0đ</span>
+ 
+                            <!-- Nút thêm giỏ: ẩn nếu hết hàng, thay bằng thông báo -->
+                            <button th:if="${p.stockQuantity != null and p.stockQuantity > 0}"
+                                    class="btn-add-cart"
                                     title="Thêm vào giỏ"
                                     th:attr="data-product-id=${p.id}"
                                     onclick="event.preventDefault(); event.stopPropagation(); addToCartIndex(this)">
                                 <i class="fa-solid fa-cart-plus"></i>
                             </button>
+                            <span th:unless="${p.stockQuantity != null and p.stockQuantity > 0}"
+                                  class="text-muted small fst-italic" style="font-size:0.75rem;">
+                                Tạm hết
+                            </span>
                         </div>
                     </div>
                 </a>

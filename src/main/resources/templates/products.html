@@ -347,34 +347,59 @@
 
                 <!-- Lưới sản phẩm -->
                 <div class="row row-cols-1 row-cols-md-3 g-4">
-                    <div class="col" th:each="p : ${products}">
-                        <div class="card book-card h-100">
-                            <a th:href="@{'/product/' + ${p.slug}}" class="text-decoration-none">
-                                <div class="book-img-container">
-                                    <img th:src="${p.image != null ? p.image : '/images/default-book.png'}" class="book-img" th:alt="${p.name}">
-                                </div>
-                                <div class="card-body d-flex flex-column">
-                                    <span class="badge mb-1" th:if="${p.category != null}"
-                                          th:style="'background-color:' + ${p.category.color}"
-                                          th:text="${p.category.name}">Danh mục</span>
-                                    <h6 class="fw-bold mb-1 text-dark" th:text="${p.name}">Tên sách</h6>
-                                    <p class="text-muted small mb-2" th:text="${p.author}">Tác giả</p>
-                                    <div class="d-flex justify-content-between align-items-center mb-3 mt-auto">
-                                        <span class="text-danger fw-bold"
-                                            th:text="${#numbers.formatDecimal(p.price, 0, 'POINT', 0, 'COMMA')} + 'đ'">0đ</span>
-                                        <button class="btn btn-outline-success btn-sm rounded-circle"
-                                                th:onclick="|event.preventDefault(); addToCartList(${p.id})|"
-                                                title="Thêm vào giỏ">
-                                            <i class="fa-solid fa-cart-plus"></i>
-                                        </button>
-                                    </div>
-                                    <a th:href="@{'/product/' + ${p.slug}}" class="btn btn-outline-success w-100 btn-sm rounded-pill">
-                                        Chi tiết sản phẩm
-                                    </a>
-                                </div>
-                            </a>
-                        </div>
-                    </div>
+                   
+<div class="col" th:each="p : ${products}">
+ 
+    <!-- Card mờ nếu hết hàng -->
+    <div class="card book-card h-100 position-relative"
+         th:classappend="${p.stockQuantity == null or p.stockQuantity <= 0} ? ' out-of-stock-card' : ''">
+ 
+        <!-- Badge HẾT HÀNG -->
+        <div th:if="${p.stockQuantity == null or p.stockQuantity <= 0}"
+             class="position-absolute top-0 start-0 m-2"
+             style="z-index:3;">
+            <span class="badge rounded-pill px-2 py-1"
+                  style="background:#dc3545; color:#fff; font-size:0.72rem; font-weight:700;">
+                <i class="fa-solid fa-ban me-1" style="font-size:0.65rem;"></i>Hết hàng
+            </span>
+        </div>
+ 
+        <a th:href="@{'/product/' + ${p.slug}}" class="text-decoration-none text-dark">
+            <div class="book-img-container">
+                <img th:src="${p.image != null ? p.image : '/images/default-book.png'}"
+                     class="book-img"
+                     th:alt="${p.name}"
+                     th:style="${p.stockQuantity == null or p.stockQuantity <= 0}
+                               ? 'opacity:0.45; filter:grayscale(40%);' : ''"/>
+            </div>
+            <div class="card-body p-3">
+                <h6 class="book-title mb-1" th:text="${p.name}">Tên sách</h6>
+                <p class="book-author small mb-2" th:text="${p.author}">Tác giả</p>
+ 
+                <div class="d-flex justify-content-between align-items-center mt-auto">
+                    <span class="fw-bold"
+                          th:classappend="${p.stockQuantity == null or p.stockQuantity <= 0}
+                                         ? ' text-muted text-decoration-line-through fs-6'
+                                         : ' text-danger fs-5'"
+                          th:text="${#numbers.formatDecimal(p.price, 0, 'COMMA', 0, 'POINT')} + 'đ'">
+                        0đ
+                    </span>
+ 
+                    <!-- Nút thêm giỏ (chỉ hiện khi còn hàng) -->
+                    <button th:if="${p.stockQuantity != null and p.stockQuantity > 0}"
+                            class="btn-add-cart"
+                            title="Thêm vào giỏ"
+                            th:attr="data-product-id=${p.id}"
+                            onclick="event.preventDefault(); event.stopPropagation(); addToCartProducts(this)">
+                        <i class="fa-solid fa-cart-plus"></i>
+                    </button>
+                    <span th:unless="${p.stockQuantity != null and p.stockQuantity > 0}"
+                          class="text-muted fst-italic" style="font-size:0.75rem;">Tạm hết</span>
+                </div>
+            </div>
+        </a>
+    </div>
+</div>
 
                     <!-- Empty -->
                     <div class="col-12 text-center py-5" th:if="${#lists.isEmpty(products)}">
@@ -490,6 +515,53 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/js/sidebar.js"></script>
     <script>
+
+        async function addToCartProducts(btn) {
+    const productId = btn.getAttribute('data-product-id');
+    const res = await fetch('/user/cart/add', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `productId=${productId}&quantity=1`
+    });
+    const data = await res.json();
+    if (data.redirect) { window.location.href = data.redirect; return; }
+ 
+    // Cập nhật badge giỏ
+    if (data.cartCount != null) {
+        document.querySelectorAll('.badge.bg-danger').forEach(el => {
+            if (el.closest('a[href="/user/cart"]')) el.textContent = data.cartCount;
+        });
+    }
+ 
+    // Toast thông báo
+    showProductsToast(data.success, data.message);
+}
+function showProductsToast(success, message) {
+    document.getElementById('productsToast')?.remove();
+    const toast = document.createElement('div');
+    toast.id = 'productsToast';
+    toast.style.cssText = `
+        position:fixed; top:80px; right:20px; z-index:9999;
+        background:#fff; border-radius:14px; padding:14px 18px;
+        box-shadow:0 4px 24px rgba(0,0,0,0.13);
+        border-left:4px solid ${success ? '#28a745' : '#dc3545'};
+        display:flex; align-items:center; gap:10px;
+        font-family:'Quicksand',sans-serif; font-weight:600;
+        font-size:0.92rem; max-width:320px; animation:slideIn 0.3s ease;
+    `;
+    toast.innerHTML = `
+        <i class="fa-solid fa-${success ? 'check-circle' : 'xmark-circle'}"
+           style="color:${success ? '#28a745' : '#dc3545'}; font-size:1.2rem; flex-shrink:0;"></i>
+        <span>${message}</span>
+    `;
+    if (!document.getElementById('toastStyle')) {
+        const s = document.createElement('style'); s.id = 'toastStyle';
+        s.textContent = '@keyframes slideIn{from{transform:translateX(120%);opacity:0}to{transform:translateX(0);opacity:1}}';
+        document.head.appendChild(s);
+    }
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+}
         // Search
         function doSearch() {
             const kw = document.getElementById('searchInput').value.trim();
