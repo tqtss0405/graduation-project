@@ -16,14 +16,17 @@
         .data-table tbody tr { transition:background 0.15s; }
         .data-table tbody tr:hover { background:#f6fdf8; }
         .data-table tbody td { padding:13px 18px; vertical-align:middle; border-color:#f0f0f0; font-size:0.93rem; }
-
+        .data-table tbody td .badge { white-space: nowrap; }
+        .data-table tbody td .status-active,
+        .data-table tbody td .status-inactive { white-space: nowrap; display: inline-block; }
+ 
         .search-bar-wrapper { background:#fff; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.06); padding:14px 18px; margin-bottom:16px; display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
         .search-input-group { position:relative; flex:1; min-width:200px; max-width:380px; }
         .search-input-group .fa-magnifying-glass { position:absolute; left:14px; top:50%; transform:translateY(-50%); color:#adb5bd; font-size:0.88rem; }
         .search-input-group input { padding-left:38px; border-radius:10px; border:1.5px solid #e9ecef; font-size:0.9rem; height:40px; width:100%; outline:none; font-family:'Quicksand',sans-serif; transition:border-color 0.2s; }
         .search-input-group input:focus { border-color:#28a745; box-shadow:0 0 0 3px rgba(40,167,69,0.1); }
         .search-result-info { font-size:0.83rem; color:#6c757d; white-space:nowrap; }
-
+ 
         .table-footer { padding:12px 18px; background:#f8f9fa; border-top:1px solid #e9ecef; font-size:0.83rem; color:#6c757d; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; }
         .pagination-wrapper { display:flex; align-items:center; gap:4px; }
         .page-btn { min-width:34px; height:34px; padding:0 8px; border-radius:8px; border:1.5px solid #e9ecef; background:#fff; color:#495057; font-size:0.85rem; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.15s; }
@@ -31,7 +34,7 @@
         .page-btn.active { background:#28a745; border-color:#28a745; color:#fff; }
         .page-btn:disabled { opacity:0.4; cursor:not-allowed; }
         .empty-state { padding:60px 0; text-align:center; color:#adb5bd; }
-
+ 
         .filter-row { background:#fff; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.06); padding:14px 18px; margin-bottom:16px; }
     </style>
 </head>
@@ -49,7 +52,7 @@
             <li class="nav-item mt-5"><a href="/logout" class="nav-link text-danger"><i class="fa-solid fa-right-from-bracket"></i> Thoát</a></li>
         </ul>
     </nav>
-
+ 
     <main class="main-content">
         <div class="admin-header">
             <div>
@@ -65,7 +68,7 @@
                 <i class="fa-solid fa-chevron-down ms-2"></i>
             </div>
         </div>
-
+ 
         <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
             <i class="fa-solid fa-circle-exclamation me-2"></i><span th:text="${errorMessage}"></span>
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
@@ -74,7 +77,7 @@
             <i class="fa-solid fa-circle-check me-2"></i><span th:text="${successMessage}"></span>
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
-
+ 
         <!-- Filter & Search -->
         <div class="search-bar-wrapper">
             <div class="search-input-group">
@@ -95,7 +98,7 @@
             </button>
             <span class="search-result-info" id="searchInfo"></span>
         </div>
-
+ 
         <!-- Table -->
         <div class="table-wrapper">
             <table class="table data-table">
@@ -161,7 +164,7 @@
             </div>
         </div>
     </main>
-
+ 
     <!-- Modal Thêm/Sửa sản phẩm -->
     <div class="modal fade" id="productModal" tabindex="-1">
         <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
@@ -217,7 +220,7 @@
             </div>
         </div>
     </div>
-
+ 
     <!-- Modal Xem chi tiết -->
     <div class="modal fade" id="viewProductModal" tabindex="-1">
         <div class="modal-dialog modal-lg modal-dialog-centered">
@@ -247,12 +250,12 @@
             </div>
         </div>
     </div>
-
+ 
     <!-- Modal Xóa / Ẩn sản phẩm -->
     <div class="modal fade" id="deleteModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content border-0 shadow-lg rounded-4">
-
+ 
                 <!-- Trường hợp 1: Có thể xóa vĩnh viễn -->
                 <div id="deleteSection">
                     <div class="modal-header bg-danger text-white">
@@ -275,7 +278,7 @@
                         </form>
                     </div>
                 </div>
-
+ 
                 <!-- Trường hợp 2: Không thể xóa, chỉ được ẩn/đặt hết hàng -->
                 <div id="hideSection" style="display:none;">
                     <div class="modal-header text-white" style="background: linear-gradient(135deg, #f093fb, #f5576c);">
@@ -290,7 +293,7 @@
                             <p class="fw-bold fs-6 mb-1" id="hideProductName" style="color:#1a1a2e;"></p>
                             <p class="text-muted small mb-0" id="hideReason"></p>
                         </div>
-
+ 
                         <div class="rounded-3 p-3 mb-3" style="background:#fff8e1;border:1.5px solid #ffe082;">
                             <div class="fw-semibold small mb-2" style="color:#b45309;"><i class="fa-solid fa-lightbulb me-1"></i>Bạn có thể chọn một trong hai cách sau:</div>
                             <div class="d-flex flex-column gap-2">
@@ -324,11 +327,11 @@
                         </form>
                     </div>
                 </div>
-
+ 
             </div>
         </div>
     </div>
-
+ 
     <!-- Profile Modal -->
     <div class="modal fade" id="profileModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
@@ -353,7 +356,7 @@
             </div>
         </div>
     </div>
-
+ 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/js/admin-avt.js"></script>
     <script src="/js/sidebar.js"></script>
@@ -373,10 +376,10 @@
         function submitHideForm(){const selected=document.querySelector('input[name="hideAction"]:checked');if(!selected)return;document.getElementById('hideAction').value=selected.value;document.getElementById('hideForm').submit();}
         function resetGalleryPreview(){document.getElementById('galleryPreviewContainer').innerHTML='<div class="text-muted w-100 text-center align-self-center small" id="galleryPlaceholder"><i class="fa-solid fa-images me-1"></i> Có thể chọn nhiều ảnh cùng lúc</div>';}
         window.addEventListener('DOMContentLoaded',()=>{const e=document.querySelector('.alert-danger');if(e)e.scrollIntoView({behavior:'smooth'});});
-
+ 
         function resetGalleryPreview(){document.getElementById('galleryPreviewContainer').innerHTML='<div class="text-muted w-100 text-center align-self-center small" id="galleryPlaceholder"><i class="fa-solid fa-images me-1"></i> Có thể chọn nhiều ảnh cùng lúc</div>';}
         window.addEventListener('DOMContentLoaded',()=>{const e=document.querySelector('.alert-danger');if(e)e.scrollIntoView({behavior:'smooth'});});
-
+ 
         // ===== SEARCH + PAGINATION =====
         const PAGE_SIZE = 10;
         let currentPage = 1, filteredRows = [];
