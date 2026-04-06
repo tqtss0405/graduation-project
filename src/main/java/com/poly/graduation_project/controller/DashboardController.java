@@ -3,7 +3,11 @@ package com.poly.graduation_project.controller;
 import com.poly.graduation_project.model.Order;
 import com.poly.graduation_project.model.Product;
 import com.poly.graduation_project.repository.*;
+import com.poly.graduation_project.service.SessionService;
+import com.poly.graduation_project.model.User;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,7 +25,8 @@ import java.util.stream.Collectors;
 @Controller
 @RequiredArgsConstructor
 public class DashboardController {
-
+    @Autowired
+private SessionService sessionService;
     private final OrderRepository       orderRepository;
     private final UserRepository        userRepository;
     private final ProductRepository     productRepository;
@@ -37,7 +42,8 @@ public class DashboardController {
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
             Model model,
             RedirectAttributes redirectAttributes) {
-
+                User currentUser = (User) sessionService.getAttribute("currentUser");
+    model.addAttribute("currentUser", currentUser);
         // ── VALIDATE: fromDate phải <= toDate ─────────────────────────────────
         if (fromDate != null && toDate != null && fromDate.isAfter(toDate)) {
             redirectAttributes.addFlashAttribute("dateError",

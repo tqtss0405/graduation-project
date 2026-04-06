@@ -18,6 +18,7 @@
             font-weight: 600;
             transition: all .2s;
         }
+
         .period-tabs .btn.active {
             background: #198754;
             color: #fff;
@@ -32,6 +33,7 @@
             position: relative;
             overflow: hidden;
         }
+
         .stat-card .stat-icon {
             position: absolute;
             right: 1rem;
@@ -39,37 +41,78 @@
             font-size: 2.5rem;
             opacity: .2;
         }
-        .stat-card.blue   { background: linear-gradient(135deg, #4facfe, #00f2fe); }
-        .stat-card.green  { background: linear-gradient(135deg, #43e97b, #38f9d7); }
-        .stat-card.orange { background: linear-gradient(135deg, #fa8231, #f7971e); }
-        .stat-card.purple { background: linear-gradient(135deg, #a18cd1, #fbc2eb); }
-        .stat-label  { font-size: .8rem; opacity: .9; text-transform: uppercase; letter-spacing: .05em; }
-        .stat-value  { font-size: 1.8rem; font-weight: 700; margin: .25rem 0; }
-        .stat-change { font-size: .78rem; opacity: .9; }
-        .trend-up    { color: #d4ffec; }
-        .trend-down  { color: #ffe0e0; }
+
+        .stat-card.blue {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+        }
+
+        .stat-card.green {
+            background: linear-gradient(135deg, #43e97b, #38f9d7);
+        }
+
+        .stat-card.orange {
+            background: linear-gradient(135deg, #fa8231, #f7971e);
+        }
+
+        .stat-card.purple {
+            background: linear-gradient(135deg, #a18cd1, #fbc2eb);
+        }
+
+        .stat-label {
+            font-size: .8rem;
+            opacity: .9;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin: .25rem 0;
+        }
+
+        .stat-change {
+            font-size: .78rem;
+            opacity: .9;
+        }
+
+        .trend-up {
+            color: #d4ffec;
+        }
+
+        .trend-down {
+            color: #ffe0e0;
+        }
 
         /* ── Charts & tables ── */
         .chart-container {
             background: #fff;
             border-radius: 16px;
             padding: 1.5rem;
-            box-shadow: 0 2px 15px rgba(0,0,0,.06);
+            box-shadow: 0 2px 15px rgba(0, 0, 0, .06);
         }
-        .chart-title { font-weight: 700; font-size: 1rem; margin-bottom: 1rem; }
+
+        .chart-title {
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+
         .filter-section {
             background: #fff;
             border-radius: 16px;
             padding: 1.25rem 1.5rem;
-            box-shadow: 0 2px 15px rgba(0,0,0,.06);
+            box-shadow: 0 2px 15px rgba(0, 0, 0, .06);
             margin-bottom: 1.5rem;
         }
+
         .report-table {
             background: #fff;
             border-radius: 16px;
             padding: 1rem;
-            box-shadow: 0 2px 15px rgba(0,0,0,.06);
+            box-shadow: 0 2px 15px rgba(0, 0, 0, .06);
         }
+
         .report-table table thead th {
             background: #f8f9fa;
             font-size: .8rem;
@@ -80,7 +123,7 @@
         /* ── Date inputs highlight on error ── */
         .date-error {
             border-color: #dc3545 !important;
-            box-shadow: 0 0 0 .2rem rgba(220,53,69,.2) !important;
+            box-shadow: 0 0 0 .2rem rgba(220, 53, 69, .2) !important;
         }
 
         /* ════════════════════════════════════════════
@@ -95,59 +138,80 @@
             max-width: 420px;
             background: #fff;
             border-radius: 14px;
-            box-shadow: 0 8px 32px rgba(0,0,0,.18);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, .18);
             display: flex;
             align-items: flex-start;
             gap: .85rem;
             padding: 1rem 1.25rem;
             opacity: 0;
             transform: translateX(120%);
-            transition: opacity .35s ease, transform .35s cubic-bezier(.34,1.56,.64,1);
+            transition: opacity .35s ease, transform .35s cubic-bezier(.34, 1.56, .64, 1);
             pointer-events: none;
             border-left: 5px solid #dc3545;
         }
+
         #customToast.show {
             opacity: 1;
             transform: translateX(0);
             pointer-events: auto;
         }
+
         #customToast.hide {
             opacity: 0;
             transform: translateX(120%);
         }
+
         .toast-icon-wrap {
             flex-shrink: 0;
-            width: 38px; height: 38px;
+            width: 38px;
+            height: 38px;
             border-radius: 50%;
             background: linear-gradient(135deg, #ff6b6b, #dc3545);
-            display: flex; align-items: center; justify-content: center;
-            color: #fff; font-size: 1.05rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 1.05rem;
         }
-        .toast-body { flex: 1; }
+
+        .toast-body {
+            flex: 1;
+        }
+
         .toast-title {
             font-weight: 700;
             font-size: .9rem;
             color: #dc3545;
             margin-bottom: .2rem;
         }
+
         .toast-msg {
             font-size: .82rem;
             color: #555;
             line-height: 1.45;
         }
+
         .toast-close {
-            background: none; border: none;
-            color: #aaa; font-size: 1rem;
-            cursor: pointer; padding: 0; line-height: 1;
+            background: none;
+            border: none;
+            color: #aaa;
+            font-size: 1rem;
+            cursor: pointer;
+            padding: 0;
+            line-height: 1;
             align-self: flex-start;
             transition: color .15s;
         }
-        .toast-close:hover { color: #555; }
+
+        .toast-close:hover {
+            color: #555;
+        }
 
         /* Progress bar inside toast */
         .toast-progress {
             position: absolute;
-            bottom: 0; left: 0;
+            bottom: 0;
+            left: 0;
             height: 3px;
             background: #dc3545;
             border-radius: 0 0 0 14px;
@@ -155,9 +219,15 @@
             transform-origin: left;
             animation: toastProgress 4s linear forwards;
         }
+
         @keyframes toastProgress {
-            from { transform: scaleX(1); }
-            to   { transform: scaleX(0); }
+            from {
+                transform: scaleX(1);
+            }
+
+            to {
+                transform: scaleX(0);
+            }
         }
     </style>
 </head>
@@ -204,267 +274,277 @@
 
     <!-- ===== MAIN ===== -->
     <main class="main-content">
-
         <!-- Header -->
-        <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="admin-header">
             <div>
                 <h3 class="fw-bold m-0">Báo cáo &amp; Thống kê</h3>
                 <p class="text-muted mb-0">Tổng quan hiệu suất kinh doanh</p>
             </div>
-        </div>
+            <div class="admin-profile" onclick="window.location.href='/user/profile'" style="cursor:pointer;">
+                <img th:src="${currentUser != null && currentUser.image != null ? currentUser.image : 
+                  'https://ui-avatars.com/api/?name=' + (currentUser != null ? currentUser.fullname : 'Admin') + '&background=28a745&color=fff'}"
+                    alt="Admin" class="admin-avatar">
+                <div class="admin-info">
+                    <h6 th:text="${currentUser != null ? currentUser.fullname : 'Admin'}">Admin</h6>
+                    <small><i class="fa-solid fa-circle text-success" style="font-size:.5rem;"></i> Đang hoạt
+                        động</small>
+                </div>
+                <i class="fa-solid fa-chevron-down ms-2"></i>
+            </div>
+            </div>
 
-        <!-- ===== BỘ LỌC ===== -->
-        <div class="filter-section">
-            <form method="get" action="/admin/dashboard" id="filterForm" novalidate>
-                <div class="row g-3 align-items-end">
 
-                    <!-- Tab nhanh -->
-                    <div class="col-12 col-lg-auto">
-                        <label class="form-label small fw-bold text-muted d-block">Chu kỳ nhanh</label>
-                        <div class="period-tabs d-flex flex-wrap gap-2">
-                            <button type="submit" name="period" value="day"
+            <!-- ===== BỘ LỌC ===== -->
+            <div class="filter-section">
+                <form method="get" action="/admin/dashboard" id="filterForm" novalidate>
+                    <div class="row g-3 align-items-end">
+
+                        <!-- Tab nhanh -->
+                        <div class="col-12 col-lg-auto">
+                            <label class="form-label small fw-bold text-muted d-block">Chu kỳ nhanh</label>
+                            <div class="period-tabs d-flex flex-wrap gap-2">
+                                <button type="submit" name="period" value="day"
                                     th:classappend="${period == 'day'} ? 'active' : ''"
                                     class="btn btn-outline-success btn-sm">
-                                <i class="fa-regular fa-sun me-1"></i>Hôm nay
-                            </button>
-                            <button type="submit" name="period" value="week"
+                                    <i class="fa-regular fa-sun me-1"></i>Hôm nay
+                                </button>
+                                <button type="submit" name="period" value="week"
                                     th:classappend="${period == 'week'} ? 'active' : ''"
                                     class="btn btn-outline-success btn-sm">
-                                <i class="fa-regular fa-calendar-week me-1"></i>Tuần này
-                            </button>
-                            <button type="submit" name="period" value="month"
+                                    <i class="fa-regular fa-calendar-week me-1"></i>Tuần này
+                                </button>
+                                <button type="submit" name="period" value="month"
                                     th:classappend="${period == 'month' or period == null} ? 'active' : ''"
                                     class="btn btn-outline-success btn-sm">
-                                <i class="fa-regular fa-calendar me-1"></i>Tháng này
-                            </button>
-                            <button type="submit" name="period" value="year"
+                                    <i class="fa-regular fa-calendar me-1"></i>Tháng này
+                                </button>
+                                <button type="submit" name="period" value="year"
                                     th:classappend="${period == 'year'} ? 'active' : ''"
                                     class="btn btn-outline-success btn-sm">
-                                <i class="fa-regular fa-calendar-days me-1"></i>Năm nay
+                                    <i class="fa-regular fa-calendar-days me-1"></i>Năm nay
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Divider dọc (ẩn trên mobile) -->
+                        <div class="col-auto d-none d-lg-flex align-items-center" style="height:36px">
+                            <div style="width:1px;height:100%;background:#dee2e6;margin-top:1.6rem"></div>
+                        </div>
+
+                        <!-- Khoảng tùy chọn -->
+                        <div class="col-6 col-md-auto">
+                            <label class="form-label small fw-bold text-muted">Từ ngày</label>
+                            <input type="date" id="fromDate" name="fromDate" class="form-control form-control-sm"
+                                th:value="${fromDate}" style="min-width:145px">
+                        </div>
+                        <div class="col-6 col-md-auto">
+                            <label class="form-label small fw-bold text-muted">Đến ngày</label>
+                            <input type="date" id="toDate" name="toDate" class="form-control form-control-sm"
+                                th:value="${toDate}" style="min-width:145px">
+                        </div>
+                        <div class="col-auto">
+                            <button type="submit" id="btnFilter" class="btn btn-success btn-sm">
+                                <i class="fa-solid fa-filter me-1"></i>Lọc
                             </button>
                         </div>
-                    </div>
 
-                    <!-- Divider dọc (ẩn trên mobile) -->
-                    <div class="col-auto d-none d-lg-flex align-items-center" style="height:36px">
-                        <div style="width:1px;height:100%;background:#dee2e6;margin-top:1.6rem"></div>
-                    </div>
-
-                    <!-- Khoảng tùy chọn -->
-                    <div class="col-6 col-md-auto">
-                        <label class="form-label small fw-bold text-muted">Từ ngày</label>
-                        <input type="date" id="fromDate" name="fromDate"
-                               class="form-control form-control-sm"
-                               th:value="${fromDate}"
-                               style="min-width:145px">
-                    </div>
-                    <div class="col-6 col-md-auto">
-                        <label class="form-label small fw-bold text-muted">Đến ngày</label>
-                        <input type="date" id="toDate" name="toDate"
-                               class="form-control form-control-sm"
-                               th:value="${toDate}"
-                               style="min-width:145px">
-                    </div>
-                    <div class="col-auto">
-                        <button type="submit" id="btnFilter" class="btn btn-success btn-sm">
-                            <i class="fa-solid fa-filter me-1"></i>Lọc
-                        </button>
-                    </div>
-
-                    <!-- Badge hiển thị kỳ đang chọn -->
-                    <div class="col-auto d-flex align-items-end">
-                        <span class="badge rounded-pill bg-success-subtle text-success border border-success-subtle px-3 py-2"
-                              style="font-size:.78rem;font-weight:600">
-                            <i class="fa-solid fa-clock-rotate-left me-1"></i>
-                            <span th:switch="${period}">
-                                <span th:case="'day'">Hôm nay</span>
-                                <span th:case="'week'">Tuần này</span>
-                                <span th:case="'year'">Năm nay</span>
-                                <span th:case="'custom'">
-                                    Tùy chỉnh:
-                                    <span th:text="${fromDate}">—</span> →
-                                    <span th:text="${toDate}">—</span>
+                        <!-- Badge hiển thị kỳ đang chọn -->
+                        <div class="col-auto d-flex align-items-end">
+                            <span
+                                class="badge rounded-pill bg-success-subtle text-success border border-success-subtle px-3 py-2"
+                                style="font-size:.78rem;font-weight:600">
+                                <i class="fa-solid fa-clock-rotate-left me-1"></i>
+                                <span th:switch="${period}">
+                                    <span th:case="'day'">Hôm nay</span>
+                                    <span th:case="'week'">Tuần này</span>
+                                    <span th:case="'year'">Năm nay</span>
+                                    <span th:case="'custom'">
+                                        Tùy chỉnh:
+                                        <span th:text="${fromDate}">—</span> →
+                                        <span th:text="${toDate}">—</span>
+                                    </span>
+                                    <span th:case="*">Tháng này</span>
                                 </span>
-                                <span th:case="*">Tháng này</span>
                             </span>
-                        </span>
+                        </div>
+
                     </div>
+                </form>
+            </div>
 
+            <!-- ===== KPI CARDS ===== -->
+            <div class="row g-4 mb-4">
+
+                <div class="col-xl-3 col-md-6">
+                    <div class="stat-card blue">
+                        <i class="fa-solid fa-dollar-sign stat-icon"></i>
+                        <div class="stat-label">Doanh thu</div>
+                        <div class="stat-value"
+                            th:text="${#numbers.formatDecimal(revenue / 1000000, 1, 'COMMA', 1, 'POINT')} + 'M'">0M
+                        </div>
+                        <div class="stat-change">
+                            <span th:if="${revenueChange >= 0}">
+                                <i class="fa-solid fa-arrow-up trend-up"></i>
+                                +<span th:text="${revenueChange}">0</span>% so với kỳ trước
+                            </span>
+                            <span th:if="${revenueChange < 0}">
+                                <i class="fa-solid fa-arrow-down trend-down"></i>
+                                <span th:text="${revenueChange}">0</span>% so với kỳ trước
+                            </span>
+                        </div>
+                    </div>
                 </div>
-            </form>
-        </div>
 
-        <!-- ===== KPI CARDS ===== -->
-        <div class="row g-4 mb-4">
+                <div class="col-xl-3 col-md-6">
+                    <div class="stat-card green">
+                        <i class="fa-solid fa-shopping-cart stat-icon"></i>
+                        <div class="stat-label">Đơn hàng</div>
+                        <div class="stat-value" th:text="${#numbers.formatInteger(orderCount, 1, 'COMMA')}">0</div>
+                        <div class="stat-change">
+                            <span th:if="${orderChange >= 0}">
+                                <i class="fa-solid fa-arrow-up trend-up"></i>
+                                +<span th:text="${orderChange}">0</span>% so với kỳ trước
+                            </span>
+                            <span th:if="${orderChange < 0}">
+                                <i class="fa-solid fa-arrow-down trend-down"></i>
+                                <span th:text="${orderChange}">0</span>% so với kỳ trước
+                            </span>
+                        </div>
+                    </div>
+                </div>
 
-            <div class="col-xl-3 col-md-6">
-                <div class="stat-card blue">
-                    <i class="fa-solid fa-dollar-sign stat-icon"></i>
-                    <div class="stat-label">Doanh thu</div>
-                    <div class="stat-value"
-                         th:text="${#numbers.formatDecimal(revenue / 1000000, 1, 'COMMA', 1, 'POINT')} + 'M'">0M</div>
-                    <div class="stat-change">
-                        <span th:if="${revenueChange >= 0}">
-                            <i class="fa-solid fa-arrow-up trend-up"></i>
-                            +<span th:text="${revenueChange}">0</span>% so với kỳ trước
-                        </span>
-                        <span th:if="${revenueChange < 0}">
-                            <i class="fa-solid fa-arrow-down trend-down"></i>
-                            <span th:text="${revenueChange}">0</span>% so với kỳ trước
-                        </span>
+                <div class="col-xl-3 col-md-6">
+                    <div class="stat-card orange">
+                        <i class="fa-solid fa-users stat-icon"></i>
+                        <div class="stat-label">Khách hàng mới</div>
+                        <div class="stat-value" th:text="${newCustomers}">0</div>
+                        <div class="stat-change">
+                            <span th:if="${customerChange >= 0}">
+                                <i class="fa-solid fa-arrow-up trend-up"></i>
+                                +<span th:text="${customerChange}">0</span>% so với kỳ trước
+                            </span>
+                            <span th:if="${customerChange < 0}">
+                                <i class="fa-solid fa-arrow-down trend-down"></i>
+                                <span th:text="${customerChange}">0</span>% so với kỳ trước
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-md-6">
+                    <div class="stat-card purple">
+                        <i class="fa-solid fa-book stat-icon"></i>
+                        <div class="stat-label">Sản phẩm bán ra</div>
+                        <div class="stat-value" th:text="${#numbers.formatInteger(soldQty, 1, 'COMMA')}">0</div>
+                        <div class="stat-change">
+                            <span th:if="${soldQtyChange >= 0}">
+                                <i class="fa-solid fa-arrow-up trend-up"></i>
+                                +<span th:text="${soldQtyChange}">0</span>% so với kỳ trước
+                            </span>
+                            <span th:if="${soldQtyChange < 0}">
+                                <i class="fa-solid fa-arrow-down trend-down"></i>
+                                <span th:text="${soldQtyChange}">0</span>% so với kỳ trước
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== BIỂU ĐỒ HÀNG 1 ===== -->
+            <div class="row g-4 mb-4">
+                <div class="col-lg-8">
+                    <div class="chart-container">
+                        <div class="chart-title">
+                            <i class="fa-solid fa-chart-line text-success me-2"></i>Doanh thu theo thời gian
+                        </div>
+                        <canvas id="revenueChart" height="90"></canvas>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="chart-container">
+                        <div class="chart-title">
+                            <i class="fa-solid fa-chart-pie text-success me-2"></i>Phân loại đơn hàng
+                        </div>
+                        <canvas id="orderStatusChart"></canvas>
+                        <div class="text-center mt-3 text-muted small">
+                            Tổng hệ thống: <strong th:text="${totalOrders}">0</strong> đơn
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== BIỂU ĐỒ HÀNG 2 ===== -->
+            <div class="row g-4 mb-4">
+                <div class="col-lg-6">
+                    <div class="chart-container">
+                        <div class="chart-title">
+                            <i class="fa-solid fa-layer-group text-success me-2"></i>Top danh mục bán chạy
+                        </div>
+                        <canvas id="categoryChart" height="120"></canvas>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="chart-container">
+                        <div class="chart-title">
+                            <i class="fa-solid fa-chart-bar text-success me-2"></i>Đơn hàng theo thời gian
+                        </div>
+                        <canvas id="orderTrendChart" height="120"></canvas>
                     </div>
                 </div>
             </div>
 
-            <div class="col-xl-3 col-md-6">
-                <div class="stat-card green">
-                    <i class="fa-solid fa-shopping-cart stat-icon"></i>
-                    <div class="stat-label">Đơn hàng</div>
-                    <div class="stat-value" th:text="${#numbers.formatInteger(orderCount, 1, 'COMMA')}">0</div>
-                    <div class="stat-change">
-                        <span th:if="${orderChange >= 0}">
-                            <i class="fa-solid fa-arrow-up trend-up"></i>
-                            +<span th:text="${orderChange}">0</span>% so với kỳ trước
-                        </span>
-                        <span th:if="${orderChange < 0}">
-                            <i class="fa-solid fa-arrow-down trend-down"></i>
-                            <span th:text="${orderChange}">0</span>% so với kỳ trước
-                        </span>
-                    </div>
+            <!-- ===== TOP SẢN PHẨM ===== -->
+            <div class="report-table">
+                <div class="p-3 pb-0 d-flex justify-content-between align-items-center">
+                    <h6 class="fw-bold mb-3">
+                        <i class="fa-solid fa-trophy text-warning me-2"></i>Top sản phẩm bán chạy trong kỳ
+                    </h6>
                 </div>
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Xếp hạng</th>
+                            <th>Tên sách</th>
+                            <th>Danh mục</th>
+                            <th>Đã bán</th>
+                            <th>Doanh thu</th>
+                            <th>Đánh giá</th>
+                            <th>Tồn kho</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:if="${topProducts.empty}">
+                            <td colspan="7" class="text-center text-muted py-4">
+                                Chưa có dữ liệu bán hàng trong kỳ này
+                            </td>
+                        </tr>
+                        <tr th:each="p, stat : ${topProducts}">
+                            <td>
+                                <span th:if="${stat.index == 0}" class="badge bg-warning text-dark">🥇 1</span>
+                                <span th:if="${stat.index == 1}" class="badge bg-secondary">🥈 2</span>
+                                <span th:if="${stat.index == 2}" class="badge bg-danger">🥉 3</span>
+                                <span th:if="${stat.index >= 3}" class="badge bg-light text-dark"
+                                    th:text="${stat.index + 1}">4</span>
+                            </td>
+                            <td class="fw-bold" th:text="${p.name}">—</td>
+                            <td th:text="${p.category}">—</td>
+                            <td><strong th:text="${p.sold}">0</strong> cuốn</td>
+                            <td class="text-success fw-bold"
+                                th:text="${#numbers.formatInteger(p.revenue, 1, 'COMMA')} + 'đ'">0đ</td>
+                            <td>
+                                <span class="text-warning">★</span>
+                                <span th:text="${p.rating}">0</span>
+                            </td>
+                            <td>
+                                <span th:if="${p.stock > 50}" class="badge bg-success" th:text="${p.stock}">—</span>
+                                <span th:if="${p.stock > 10 and p.stock <= 50}" class="badge bg-warning text-dark"
+                                    th:text="${p.stock}">—</span>
+                                <span th:if="${p.stock <= 10}" class="badge bg-danger" th:text="${p.stock}">—</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
-
-            <div class="col-xl-3 col-md-6">
-                <div class="stat-card orange">
-                    <i class="fa-solid fa-users stat-icon"></i>
-                    <div class="stat-label">Khách hàng mới</div>
-                    <div class="stat-value" th:text="${newCustomers}">0</div>
-                    <div class="stat-change">
-                        <span th:if="${customerChange >= 0}">
-                            <i class="fa-solid fa-arrow-up trend-up"></i>
-                            +<span th:text="${customerChange}">0</span>% so với kỳ trước
-                        </span>
-                        <span th:if="${customerChange < 0}">
-                            <i class="fa-solid fa-arrow-down trend-down"></i>
-                            <span th:text="${customerChange}">0</span>% so với kỳ trước
-                        </span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-xl-3 col-md-6">
-                <div class="stat-card purple">
-                    <i class="fa-solid fa-book stat-icon"></i>
-                    <div class="stat-label">Sản phẩm bán ra</div>
-                    <div class="stat-value" th:text="${#numbers.formatInteger(soldQty, 1, 'COMMA')}">0</div>
-                    <div class="stat-change">
-                        <span th:if="${soldQtyChange >= 0}">
-                            <i class="fa-solid fa-arrow-up trend-up"></i>
-                            +<span th:text="${soldQtyChange}">0</span>% so với kỳ trước
-                        </span>
-                        <span th:if="${soldQtyChange < 0}">
-                            <i class="fa-solid fa-arrow-down trend-down"></i>
-                            <span th:text="${soldQtyChange}">0</span>% so với kỳ trước
-                        </span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ===== BIỂU ĐỒ HÀNG 1 ===== -->
-        <div class="row g-4 mb-4">
-            <div class="col-lg-8">
-                <div class="chart-container">
-                    <div class="chart-title">
-                        <i class="fa-solid fa-chart-line text-success me-2"></i>Doanh thu theo thời gian
-                    </div>
-                    <canvas id="revenueChart" height="90"></canvas>
-                </div>
-            </div>
-            <div class="col-lg-4">
-                <div class="chart-container">
-                    <div class="chart-title">
-                        <i class="fa-solid fa-chart-pie text-success me-2"></i>Phân loại đơn hàng
-                    </div>
-                    <canvas id="orderStatusChart"></canvas>
-                    <div class="text-center mt-3 text-muted small">
-                        Tổng hệ thống: <strong th:text="${totalOrders}">0</strong> đơn
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ===== BIỂU ĐỒ HÀNG 2 ===== -->
-        <div class="row g-4 mb-4">
-            <div class="col-lg-6">
-                <div class="chart-container">
-                    <div class="chart-title">
-                        <i class="fa-solid fa-layer-group text-success me-2"></i>Top danh mục bán chạy
-                    </div>
-                    <canvas id="categoryChart" height="120"></canvas>
-                </div>
-            </div>
-            <div class="col-lg-6">
-                <div class="chart-container">
-                    <div class="chart-title">
-                        <i class="fa-solid fa-chart-bar text-success me-2"></i>Đơn hàng theo thời gian
-                    </div>
-                    <canvas id="orderTrendChart" height="120"></canvas>
-                </div>
-            </div>
-        </div>
-
-        <!-- ===== TOP SẢN PHẨM ===== -->
-        <div class="report-table">
-            <div class="p-3 pb-0 d-flex justify-content-between align-items-center">
-                <h6 class="fw-bold mb-3">
-                    <i class="fa-solid fa-trophy text-warning me-2"></i>Top sản phẩm bán chạy trong kỳ
-                </h6>
-            </div>
-            <table class="table table-hover mb-0">
-                <thead>
-                    <tr>
-                        <th>Xếp hạng</th>
-                        <th>Tên sách</th>
-                        <th>Danh mục</th>
-                        <th>Đã bán</th>
-                        <th>Doanh thu</th>
-                        <th>Đánh giá</th>
-                        <th>Tồn kho</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr th:if="${topProducts.empty}">
-                        <td colspan="7" class="text-center text-muted py-4">
-                            Chưa có dữ liệu bán hàng trong kỳ này
-                        </td>
-                    </tr>
-                    <tr th:each="p, stat : ${topProducts}">
-                        <td>
-                            <span th:if="${stat.index == 0}" class="badge bg-warning text-dark">🥇 1</span>
-                            <span th:if="${stat.index == 1}" class="badge bg-secondary">🥈 2</span>
-                            <span th:if="${stat.index == 2}" class="badge bg-danger">🥉 3</span>
-                            <span th:if="${stat.index >= 3}" class="badge bg-light text-dark"
-                                  th:text="${stat.index + 1}">4</span>
-                        </td>
-                        <td class="fw-bold" th:text="${p.name}">—</td>
-                        <td th:text="${p.category}">—</td>
-                        <td><strong th:text="${p.sold}">0</strong> cuốn</td>
-                        <td class="text-success fw-bold"
-                            th:text="${#numbers.formatInteger(p.revenue, 1, 'COMMA')} + 'đ'">0đ</td>
-                        <td>
-                            <span class="text-warning">★</span>
-                            <span th:text="${p.rating}">0</span>
-                        </td>
-                        <td>
-                            <span th:if="${p.stock > 50}"            class="badge bg-success"            th:text="${p.stock}">—</span>
-                            <span th:if="${p.stock > 10 and p.stock <= 50}" class="badge bg-warning text-dark" th:text="${p.stock}">—</span>
-                            <span th:if="${p.stock <= 10}"           class="badge bg-danger"             th:text="${p.stock}">—</span>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
 
     </main>
 
@@ -477,8 +557,8 @@
         let toastTimer = null;
 
         function showToast(msg) {
-            const toast    = document.getElementById('customToast');
-            const msgEl    = document.getElementById('toastMsg');
+            const toast = document.getElementById('customToast');
+            const msgEl = document.getElementById('toastMsg');
             const progress = document.getElementById('toastProgress');
 
             msgEl.textContent = msg;
@@ -508,8 +588,8 @@
     <script>
         (function () {
             const fromInput = document.getElementById('fromDate');
-            const toInput   = document.getElementById('toDate');
-            const form      = document.getElementById('filterForm');
+            const toInput = document.getElementById('toDate');
+            const form = document.getElementById('filterForm');
 
             // Tự động điều chỉnh toDate khi fromDate thay đổi
             fromInput.addEventListener('change', function () {
@@ -536,7 +616,7 @@
             // Chặn submit nếu ngày không hợp lệ
             form.addEventListener('submit', function (e) {
                 const from = fromInput.value;
-                const to   = toInput.value;
+                const to = toInput.value;
 
                 // Nếu chỉ điền 1 trong 2 ngày
                 if ((from && !to) || (!from && to)) {
@@ -578,14 +658,14 @@
     ═══════════════════════════════════════════════ -->
     <script th:inline="javascript">
         /*<![CDATA[*/
-        const chartLabels  = /*[[${chartLabels}]]*/  [];
-        const chartRevenue = /*[[${chartRevenue}]]*/ [];
-        const chartOrders  = /*[[${chartOrders}]]*/  [];
-        const catLabels    = /*[[${categoryLabels}]]*/[];
-        const catData      = /*[[${categoryData}]]*/ [];
+        const chartLabels = /*[[${chartLabels}]]*/[];
+        const chartRevenue = /*[[${chartRevenue}]]*/[];
+        const chartOrders = /*[[${chartOrders}]]*/[];
+        const catLabels = /*[[${categoryLabels}]]*/[];
+        const catData = /*[[${categoryData}]]*/[];
         const cntCompleted = /*[[${countCompleted}]]*/0;
-        const cntPending   = /*[[${countPending}]]*/ 0;
-        const cntShipping  = /*[[${countShipping}]]*/0;
+        const cntPending = /*[[${countPending}]]*/ 0;
+        const cntShipping = /*[[${countShipping}]]*/0;
         const cntCancelled = /*[[${countCancelled}]]*/0;
         /*]]>*/
 
@@ -606,7 +686,7 @@
             options: {
                 responsive: true,
                 plugins: { legend: { display: false } },
-                scales: { y: { beginAtZero: true, ticks: { callback: v => (v/1000000).toFixed(1)+'M' } } }
+                scales: { y: { beginAtZero: true, ticks: { callback: v => (v / 1000000).toFixed(1) + 'M' } } }
             }
         });
 
@@ -614,11 +694,13 @@
         new Chart(document.getElementById('orderStatusChart'), {
             type: 'doughnut',
             data: {
-                labels: ['Hoàn thành','Chờ xác nhận','Đang giao','Đã hủy'],
-                datasets: [{ data: [cntCompleted,cntPending,cntShipping,cntCancelled],
-                    backgroundColor: ['#198754','#ffc107','#0dcaf0','#dc3545'], borderWidth: 0 }]
+                labels: ['Hoàn thành', 'Chờ xác nhận', 'Đang giao', 'Đã hủy'],
+                datasets: [{
+                    data: [cntCompleted, cntPending, cntShipping, cntCancelled],
+                    backgroundColor: ['#198754', '#ffc107', '#0dcaf0', '#dc3545'], borderWidth: 0
+                }]
             },
-            options: { responsive: true, plugins: { legend: { position: 'bottom', labels: { font:{size:11} } } } }
+            options: { responsive: true, plugins: { legend: { position: 'bottom', labels: { font: { size: 11 } } } } }
         });
 
         // Top danh mục
@@ -626,13 +708,15 @@
             type: 'bar',
             data: {
                 labels: catLabels,
-                datasets: [{ label:'Số lượng bán', data: catData,
-                    backgroundColor: ['rgba(102,126,234,.85)','rgba(118,75,162,.85)',
-                        'rgba(237,100,166,.85)','rgba(255,154,158,.85)',
-                        'rgba(75,192,192,.85)','rgba(153,102,255,.85)'],
-                    borderRadius: 8 }]
+                datasets: [{
+                    label: 'Số lượng bán', data: catData,
+                    backgroundColor: ['rgba(102,126,234,.85)', 'rgba(118,75,162,.85)',
+                        'rgba(237,100,166,.85)', 'rgba(255,154,158,.85)',
+                        'rgba(75,192,192,.85)', 'rgba(153,102,255,.85)'],
+                    borderRadius: 8
+                }]
             },
-            options: { responsive: true, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}} }
+            options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
         });
 
         // Xu hướng đơn hàng
@@ -640,25 +724,30 @@
             type: 'bar',
             data: {
                 labels: chartLabels,
-                datasets: [{ label:'Số đơn hàng', data: chartOrders,
-                    backgroundColor: 'rgba(25,135,84,.75)', borderRadius: 6 }]
+                datasets: [{
+                    label: 'Số đơn hàng', data: chartOrders,
+                    backgroundColor: 'rgba(25,135,84,.75)', borderRadius: 6
+                }]
             },
-            options: { responsive: true, plugins:{legend:{display:false}},
-                scales:{y:{beginAtZero:true, ticks:{stepSize:1}}} }
+            options: {
+                responsive: true, plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+            }
         });
     </script>
 
     <script src="/js/admin-avt.js"></script>
     <script src="/js/sidebar.js"></script>
     <script>
-    // Xóa fromDate/toDate khi click vào period buttons
-    document.querySelectorAll('.period-tabs button[name="period"]').forEach(btn => {
-        btn.addEventListener('click', function() {
-            document.getElementById('fromDate').value = '';
-            document.getElementById('toDate').value = '';
+        // Xóa fromDate/toDate khi click vào period buttons
+        document.querySelectorAll('.period-tabs button[name="period"]').forEach(btn => {
+            btn.addEventListener('click', function () {
+                document.getElementById('fromDate').value = '';
+                document.getElementById('toDate').value = '';
+            });
         });
-    });
-</script>
+    </script>
 
 </body>
+
 </html>

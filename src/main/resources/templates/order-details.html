@@ -33,6 +33,7 @@
         .status-4 { background: #28a745; color: #fff; }
         .status-5 { background: #f8d7da; color: #721c24; }
         .status-6 { background: #fff3cd; color: #856404; border: 1.5px dashed #ffc107; }
+        .status-7 { background: #0d6efd; color: #fff; }
 
         .order-item {
             display: flex; align-items: center; gap: 14px;
@@ -50,7 +51,6 @@
             padding: 4px 12px; font-size: 0.78rem; font-weight: 600; border: 1px solid #c3e6cb;
         }
 
-        /* Địa chỉ — hàng riêng */
         .order-address {
             padding: 10px 20px;
             background: #fafafa;
@@ -59,7 +59,6 @@
             color: #6c757d;
         }
 
-        /* Footer: chỉ chứa nút + phí ship + tổng */
         .order-footer {
             background: #fafafa;
             padding: 12px 20px;
@@ -146,16 +145,56 @@
         }
         .btn-review-order:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(40,167,69,0.3); }
 
-        .custom-modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.45); backdrop-filter: blur(3px); z-index: 9998; display: none; align-items: center; justify-content: center; }
+        /* ===== CUSTOM MODAL (confirm / cancel / refund) ===== */
+        .custom-modal-backdrop {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.45);
+            backdrop-filter: blur(3px); z-index: 9998;
+            display: none; align-items: center; justify-content: center;
+        }
         .custom-modal-backdrop.show { display: flex; }
-        .custom-modal-box { background: #fff; border-radius: 20px; padding: 32px 28px 24px; max-width: 400px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.18); text-align: center; animation: popIn 0.22s ease; }
+
+        .custom-modal-box {
+            background: #fff; border-radius: 20px; padding: 32px 28px 24px;
+            max-width: 460px; width: 90%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.18);
+            text-align: center; animation: popIn 0.22s ease;
+        }
+        /* Refund modal cần rộng hơn vì có form bank */
+        .custom-modal-box.wide { max-width: 520px; text-align: left; }
+
         .custom-modal-icon { width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; font-size: 1.8rem; }
         .modal-icon-danger  { background: #fff0f0; color: #dc3545; }
         .modal-icon-success { background: #f0fff4; color: #28a745; }
         .modal-icon-warning { background: #fffbea; color: #e6a817; }
         .custom-modal-title { font-weight: 700; font-size: 1.1rem; color: #1a1a2e; margin-bottom: 8px; }
-        .custom-modal-desc  { color: #6c757d; font-size: 0.9rem; margin-bottom: 24px; }
+        .custom-modal-desc  { color: #6c757d; font-size: 0.9rem; margin-bottom: 20px; }
 
+        /* Bank info section trong refund modal */
+        .bank-info-section {
+            background: #f0f8ff;
+            border: 1.5px solid #bee3f8;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        .bank-info-section .section-title {
+            font-weight: 700; font-size: 0.88rem; color: #0c5460;
+            margin-bottom: 12px;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .bank-input {
+            border-radius: 8px; border: 1.5px solid #bee3f8;
+            padding: 8px 12px; font-family: 'Quicksand', sans-serif;
+            font-size: 0.88rem; width: 100%; outline: none;
+            transition: border-color 0.2s;
+        }
+        .bank-input:focus { border-color: #0d6efd; box-shadow: 0 0 0 3px rgba(13,110,253,0.1); }
+        .bank-input.error { border-color: #dc3545; }
+
+        /* Reason select */
+        .reason-section { margin-bottom: 16px; }
+
+        /* Toast */
         .toast-container-custom { position: fixed; top: 24px; right: 24px; z-index: 10000; display: flex; flex-direction: column; gap: 10px; }
         .toast-custom { display: flex; align-items: center; gap: 12px; padding: 14px 18px; border-radius: 14px; box-shadow: 0 8px 28px rgba(0,0,0,0.14); font-weight: 600; font-size: 0.9rem; min-width: 280px; max-width: 380px; animation: toastIn 0.3s ease; }
         @keyframes toastIn { from { transform: translateX(100px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
@@ -267,6 +306,7 @@
                 <span th:case="4" class="order-status status-4"><i class="fa-solid fa-circle-check me-1"></i>Hoàn thành</span>
                 <span th:case="5" class="order-status status-5"><i class="fa-solid fa-xmark me-1"></i>Đã hủy</span>
                 <span th:case="6" class="order-status status-6"><i class="fa-solid fa-rotate-left me-1"></i>Yêu cầu hoàn tiền</span>
+                <span th:case="7" class="order-status status-7"><i class="fa-solid fa-circle-dollar-to-slot me-1"></i>Đã hoàn tiền</span>
                 <span th:case="*" class="order-status status-0">Không xác định</span>
             </span>
         </div>
@@ -293,10 +333,18 @@
             </div>
         </div>
 
-        <!-- Địa chỉ — hàng riêng, không ảnh hưởng footer -->
+        <!-- Địa chỉ -->
         <div class="order-address">
             <i class="fa-solid fa-location-dot me-1 text-success"></i>
             <span th:text="${order.address != null ? order.address : 'Chưa có địa chỉ'}">Địa chỉ</span>
+        </div>
+
+        <!-- Thông tin ngân hàng hoàn tiền (chỉ hiện khi status=6 hoặc 7, có bankAccount) -->
+        <div th:if="${(order.status == 6 or order.status == 7) and order.bankAccount != null}"
+             class="order-address" style="background:#f0f8ff; border-top:1px solid #bee3f8;">
+            <i class="fa-solid fa-building-columns me-1 text-primary"></i>
+            <span class="fw-semibold text-primary small">TK hoàn tiền: </span>
+            <span class="small" th:text="${order.bankAccount}"></span>
         </div>
 
         <!-- Footer: nút hành động | phí ship + tổng -->
@@ -327,26 +375,38 @@
 
                 <!-- Hoàn tiền / trả hàng (status=3) -->
                 <th:block th:if="${order.status == 3}">
+                    <!-- VNPay → Yêu cầu hoàn tiền (cần nhập tài khoản ngân hàng) -->
                     <button th:if="${order.paymentMethod == 1}" type="button"
-                            class="btn btn-outline-warning btn-sm rounded-pill fw-bold"
+                            class="btn btn-outline-primary btn-sm rounded-pill fw-bold"
                             th:onclick="'openRefundModal(' + ${order.id} + ', \'refund\')'">
                         <i class="fa-solid fa-rotate-left me-1"></i>Yêu cầu hoàn tiền
                     </button>
+                    <!-- COD → Yêu cầu trả hàng (không cần tài khoản) -->
                     <button th:if="${order.paymentMethod == 0}" type="button"
                             class="btn btn-outline-warning btn-sm rounded-pill fw-bold"
                             th:onclick="'openRefundModal(' + ${order.id} + ', \'return\')'">
                         <i class="fa-solid fa-box-open me-1"></i>Yêu cầu trả hàng
                     </button>
+
+                    <!-- Hidden form cho request-refund -->
                     <form th:id="'form-refund-' + ${order.id}"
                           th:action="@{/user/order-details/request-refund/{id}(id=${order.id})}"
                           method="post" style="display:none;">
-                        <input type="hidden" name="reason" value="">
+                        <input type="hidden" name="reason"     value="">
+                        <input type="hidden" name="bankName"   value="">
+                        <input type="hidden" name="bankNumber" value="">
+                        <input type="hidden" name="bankHolder" value="">
                     </form>
                 </th:block>
 
                 <!-- Đang chờ hoàn tiền (status=6) -->
                 <span th:if="${order.status == 6}" class="text-warning small fw-semibold fst-italic">
                     <i class="fa-solid fa-clock me-1"></i>Đang chờ xử lý hoàn tiền...
+                </span>
+
+                <!-- Đã hoàn tiền (status=7) -->
+                <span th:if="${order.status == 7}" class="text-primary small fw-semibold">
+                    <i class="fa-solid fa-circle-check me-1"></i>Đã được hoàn tiền / hoàn hàng
                 </span>
 
                 <!-- Hủy đơn (status=0,1) -->
@@ -362,7 +422,7 @@
 
             </div>
 
-            <!-- Phí ship + Tổng — luôn bên phải, không bị địa chỉ đẩy -->
+            <!-- Phí ship + Tổng -->
             <div class="d-flex flex-column align-items-end gap-1">
                 <div class="text-muted small">
                     <i class="fa-solid fa-truck me-1 text-success"></i>
@@ -433,7 +493,7 @@
     </div>
 </div>
 
-<!-- Hidden form để submit từng review -->
+<!-- Hidden form để submit batch review -->
 <form id="batchReviewForm" action="/user/review/batch-submit" method="post" style="display:none;">
     <div id="batchReviewInputs"></div>
 </form>
@@ -464,14 +524,24 @@
     </div>
 </div>
 
-<!-- Modal hoàn tiền / trả hàng -->
+<!-- ===== Modal hoàn tiền / trả hàng (redesigned) ===== -->
 <div class="custom-modal-backdrop" id="modalRefund">
-    <div class="custom-modal-box" style="max-width:440px;">
-        <div class="custom-modal-icon modal-icon-warning"><i class="fa-solid fa-rotate-left" id="refundModalIcon"></i></div>
-        <div class="custom-modal-title" id="refundModalTitle">Yêu cầu hoàn tiền?</div>
-        <div class="custom-modal-desc" id="refundModalDesc">Vui lòng cho chúng tôi biết lý do.</div>
-        <div class="text-start mb-4">
-            <label class="form-label fw-semibold small mb-1">Lý do <span class="text-danger">*</span></label>
+    <div class="custom-modal-box wide">
+
+        <!-- Header -->
+        <div class="text-center mb-4">
+            <div class="custom-modal-icon modal-icon-warning mx-auto">
+                <i class="fa-solid fa-rotate-left" id="refundModalIcon"></i>
+            </div>
+            <div class="custom-modal-title" id="refundModalTitle">Yêu cầu hoàn tiền</div>
+            <div class="custom-modal-desc" id="refundModalDesc">Vui lòng điền thông tin bên dưới</div>
+        </div>
+
+        <!-- Lý do -->
+        <div class="reason-section">
+            <label class="form-label fw-semibold small mb-1">
+                Lý do <span class="text-danger">*</span>
+            </label>
             <select class="form-select form-select-sm rounded-3" id="refundReasonSelect">
                 <option value="">-- Chọn lý do --</option>
                 <option value="Chưa nhận được hàng">Chưa nhận được hàng</option>
@@ -482,9 +552,72 @@
             </select>
             <div class="text-danger small mt-1 d-none" id="refundReasonError">Vui lòng chọn lý do!</div>
         </div>
-        <div class="d-flex gap-3 justify-content-center">
+
+        <!-- Thông tin tài khoản ngân hàng (chỉ hiện khi VNPay) -->
+        <div class="bank-info-section d-none" id="bankInfoSection">
+            <div class="section-title">
+                <i class="fa-solid fa-building-columns text-primary"></i>
+                Tài khoản nhận hoàn tiền
+                <span class="badge bg-info text-dark ms-1" style="font-size:0.72rem;">VNPay</span>
+            </div>
+            <div class="row g-2">
+                <div class="col-12">
+                    <label class="form-label fw-semibold small mb-1">
+                        Ngân hàng <span class="text-danger">*</span>
+                    </label>
+                    <select class="bank-input" id="bankName">
+                        <option value="">-- Chọn ngân hàng --</option>
+                        <option>Vietcombank</option>
+                        <option>Techcombank</option>
+                        <option>MB Bank</option>
+                        <option>VietinBank</option>
+                        <option>BIDV</option>
+                        <option>Agribank</option>
+                        <option>ACB</option>
+                        <option>TPBank</option>
+                        <option>VPBank</option>
+                        <option>Sacombank</option>
+                        <option>HDBank</option>
+                        <option>SeABank</option>
+                        <option>OCB</option>
+                        <option>SHB</option>
+                        <option>MSB</option>
+                        <option>Khác</option>
+                    </select>
+                    <div class="text-danger small mt-1 d-none" id="bankNameError">Vui lòng chọn ngân hàng!</div>
+                </div>
+                <div class="col-12">
+                    <label class="form-label fw-semibold small mb-1">
+                        Số tài khoản <span class="text-danger">*</span>
+                    </label>
+                    <input type="text" class="bank-input" id="bankNumber"
+                           placeholder="Nhập số tài khoản..."
+                           maxlength="30" inputmode="numeric">
+                    <div class="text-danger small mt-1 d-none" id="bankNumberError">Vui lòng nhập số tài khoản!</div>
+                </div>
+                <div class="col-12">
+                    <label class="form-label fw-semibold small mb-1">
+                        Tên chủ tài khoản <span class="text-danger">*</span>
+                    </label>
+                    <input type="text" class="bank-input" id="bankHolder"
+                           placeholder="Nhập tên chủ tài khoản (in hoa)..."
+                           maxlength="100"
+                           oninput="this.value = this.value.toUpperCase()">
+                    <div class="text-danger small mt-1 d-none" id="bankHolderError">Vui lòng nhập tên chủ tài khoản!</div>
+                </div>
+            </div>
+            <div class="mt-2 p-2 rounded-3" style="background:#e8f4fd;font-size:0.78rem;color:#055160;">
+                <i class="fa-solid fa-info-circle me-1"></i>
+                Chúng tôi sẽ hoàn tiền vào tài khoản này trong <strong>3-5 ngày làm việc</strong> sau khi xác nhận yêu cầu.
+            </div>
+        </div>
+
+        <!-- Buttons -->
+        <div class="d-flex gap-3 justify-content-end mt-3">
             <button class="btn btn-light rounded-pill px-4 fw-bold" onclick="closeRefundModal()">Quay lại</button>
-            <button class="btn btn-warning rounded-pill px-4 fw-bold text-dark" onclick="submitRefundModal()"><i class="fa-solid fa-paper-plane me-1"></i>Gửi yêu cầu</button>
+            <button class="btn btn-warning rounded-pill px-4 fw-bold text-dark" onclick="submitRefundModal()">
+                <i class="fa-solid fa-paper-plane me-1"></i>Gửi yêu cầu
+            </button>
         </div>
     </div>
 </div>
@@ -492,9 +625,9 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 // =============================================
-// CONFIRM / CANCEL / REFUND MODALS
+// CONFIRM / CANCEL MODALS
 // =============================================
-let pendingOrderId = null, pendingRefundId = null;
+let pendingOrderId = null, pendingRefundId = null, pendingRefundType = null;
 
 function openModal(type, orderId) {
     pendingOrderId = orderId;
@@ -508,31 +641,117 @@ function submitModal(type) {
     if (!pendingOrderId) return;
     document.getElementById((type === 'confirm' ? 'form-confirm-' : 'form-cancel-') + pendingOrderId).submit();
 }
+
+// =============================================
+// REFUND MODAL
+// =============================================
 function openRefundModal(orderId, type) {
-    pendingRefundId = orderId;
-    const isRefund = type === 'refund';
-    document.getElementById('refundModalTitle').textContent = isRefund ? 'Yêu cầu hoàn tiền?' : 'Yêu cầu trả hàng?';
-    document.getElementById('refundModalDesc').innerHTML = isRefund
-        ? 'Vui lòng cho chúng tôi biết lý do.<br><small class="text-muted">Chúng tôi sẽ liên hệ lại trong <strong>24 giờ</strong>.</small>'
-        : 'Vui lòng cho chúng tôi biết lý do thu hồi hàng.<br><small class="text-muted">Chúng tôi sẽ liên hệ lại trong <strong>24 giờ</strong>.</small>';
+    pendingRefundId   = orderId;
+    pendingRefundType = type;
+
+    const isRefund = (type === 'refund'); // VNPay
+    const isReturn = (type === 'return'); // COD
+
+    document.getElementById('refundModalTitle').textContent =
+        isRefund ? 'Yêu cầu hoàn tiền' : 'Yêu cầu trả hàng';
+    document.getElementById('refundModalDesc').textContent =
+        isRefund
+            ? 'Vui lòng điền thông tin bên dưới. Chúng tôi sẽ liên hệ trong 24 giờ.'
+            : 'Vui lòng cho chúng tôi biết lý do trả hàng.';
+
+    // Chỉ hiện ô ngân hàng khi VNPay
+    const bankSection = document.getElementById('bankInfoSection');
+    if (isRefund) {
+        bankSection.classList.remove('d-none');
+    } else {
+        bankSection.classList.add('d-none');
+    }
+
+    // Reset form
     document.getElementById('refundReasonSelect').value = '';
     document.getElementById('refundReasonError').classList.add('d-none');
+    ['bankName','bankNumber','bankHolder'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) { el.value = ''; el.classList.remove('error'); }
+        const errEl = document.getElementById(id + 'Error');
+        if (errEl) errEl.classList.add('d-none');
+    });
+
     document.getElementById('modalRefund').classList.add('show');
 }
+
 function closeRefundModal() {
     document.getElementById('modalRefund').classList.remove('show');
     pendingRefundId = null;
+    pendingRefundType = null;
 }
+
 function submitRefundModal() {
+    let hasError = false;
+
+    // Validate lý do
     const select = document.getElementById('refundReasonSelect');
-    if (!select.value) { document.getElementById('refundReasonError').classList.remove('d-none'); return; }
-    if (!pendingRefundId) return;
+    if (!select.value) {
+        document.getElementById('refundReasonError').classList.remove('d-none');
+        hasError = true;
+    } else {
+        document.getElementById('refundReasonError').classList.add('d-none');
+    }
+
+    // Validate ngân hàng (chỉ khi VNPay)
+    if (pendingRefundType === 'refund') {
+        const bankNameEl   = document.getElementById('bankName');
+        const bankNumberEl = document.getElementById('bankNumber');
+        const bankHolderEl = document.getElementById('bankHolder');
+
+        if (!bankNameEl.value) {
+            document.getElementById('bankNameError').classList.remove('d-none');
+            bankNameEl.classList.add('error');
+            hasError = true;
+        } else {
+            document.getElementById('bankNameError').classList.add('d-none');
+            bankNameEl.classList.remove('error');
+        }
+
+        if (!bankNumberEl.value.trim()) {
+            document.getElementById('bankNumberError').classList.remove('d-none');
+            bankNumberEl.classList.add('error');
+            hasError = true;
+        } else {
+            document.getElementById('bankNumberError').classList.add('d-none');
+            bankNumberEl.classList.remove('error');
+        }
+
+        if (!bankHolderEl.value.trim()) {
+            document.getElementById('bankHolderError').classList.remove('d-none');
+            bankHolderEl.classList.add('error');
+            hasError = true;
+        } else {
+            document.getElementById('bankHolderError').classList.add('d-none');
+            bankHolderEl.classList.remove('error');
+        }
+    }
+
+    if (hasError) return;
+
     const form = document.getElementById('form-refund-' + pendingRefundId);
-    form.querySelector('input[name="reason"]').value = select.value;
+    form.querySelector('input[name="reason"]').value     = select.value;
+    form.querySelector('input[name="bankName"]').value   = (document.getElementById('bankName')?.value   || '');
+    form.querySelector('input[name="bankNumber"]').value = (document.getElementById('bankNumber')?.value || '');
+    form.querySelector('input[name="bankHolder"]').value = (document.getElementById('bankHolder')?.value || '');
     form.submit();
 }
+
+// Đóng modal khi click ngoài
 document.querySelectorAll('.custom-modal-backdrop').forEach(el => {
-    el.addEventListener('click', e => { if (e.target === el) { el.classList.remove('show'); pendingOrderId = null; } });
+    el.addEventListener('click', e => {
+        if (e.target === el) {
+            el.classList.remove('show');
+            pendingOrderId = null;
+            pendingRefundId = null;
+            pendingRefundType = null;
+        }
+    });
 });
 
 // =============================================
@@ -622,7 +841,7 @@ function selectStar(odId, val) {
     document.getElementById('star-label-' + odId).textContent = starLabels[val];
     document.getElementById('star-err-' + odId).classList.add('d-none');
 }
-function hoverStar(odId, val) { updateStarUI(odId, val); }
+function hoverStar(odId, val)  { updateStarUI(odId, val); }
 function unhoverStar(odId)     { updateStarUI(odId, ratings[odId] || 0); }
 
 function updateStarUI(odId, val) {
@@ -647,7 +866,7 @@ function submitAllReviews() {
     let hasError = false;
 
     items.forEach(item => {
-        const odId = item.orderDetailId;
+        const odId    = item.orderDetailId;
         const rating  = ratings[odId] || 0;
         const content = (document.getElementById('content-' + odId)?.value || '').trim();
 
@@ -690,7 +909,7 @@ function showToast(message, type) {
     const toast = document.createElement('div');
     toast.className = 'toast-custom toast-' + type;
     toast.innerHTML = `
-        <span class="toast-icon">${type === 'success' ? '✅' : '❌'}</span>
+        <span>${type === 'success' ? '✅' : '❌'}</span>
         <span>${message}</span>
         <button class="toast-close" onclick="this.parentElement.remove()">✕</button>
     `;

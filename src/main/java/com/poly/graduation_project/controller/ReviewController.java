@@ -41,7 +41,6 @@ public class ReviewController {
     @GetMapping("/user/review/write/{orderDetailId}")
     public String showWriteReviewForm(@PathVariable Integer orderDetailId, Model model, HttpSession session) {
         User currentUser = (User) session.getAttribute("currentUser");
-
         OrderDetail orderDetail = orderDetailRepository.findById(orderDetailId).orElse(null);
         if (orderDetail == null)
             return "redirect:/user/order-details";
@@ -203,7 +202,8 @@ public class ReviewController {
     public String adminReviews(
             @RequestParam(value = "rating", required = false) Integer rating,
             Model model) {
-
+        User currentUser = (User) sessionService.getAttribute("currentUser");
+        model.addAttribute("currentUser", currentUser);
         List<Review> reviews;
         if (rating != null && rating >= 1 && rating <= 5) {
             reviews = reviewRepository.findByRatingOrderByCreateAtDesc(rating);

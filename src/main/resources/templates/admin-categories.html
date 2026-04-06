@@ -17,7 +17,7 @@
         .category-table-wrapper {
             background: #fff;
             border-radius: 16px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
             overflow: hidden;
         }
 
@@ -150,7 +150,7 @@
         .search-bar-wrapper {
             background: #fff;
             border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
             padding: 14px 18px;
             margin-bottom: 16px;
             display: flex;
@@ -188,7 +188,7 @@
 
         .search-input-group input:focus {
             border-color: #28a745;
-            box-shadow: 0 0 0 3px rgba(40,167,69,0.1);
+            box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.1);
         }
 
         .search-result-info {
@@ -298,16 +298,17 @@
                 <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
                     <i class="fa-solid fa-plus me-2"></i>Thêm danh mục
                 </button>
-                <div class="admin-profile" data-bs-toggle="modal" data-bs-target="#profileModal">
-                    <img src="https://ui-avatars.com/api/?name=Admin&background=28a745&color=fff" alt="Admin"
-                        class="admin-avatar">
-                    <div class="admin-info">
-                        <h6>Admin Nguyễn</h6>
-                        <small><i class="fa-solid fa-circle text-success" style="font-size: 0.5rem;"></i> Đang hoạt
-                            động</small>
-                    </div>
-                    <i class="fa-solid fa-chevron-down ms-2"></i>
-                </div>
+
+                <div class="admin-profile" onclick="window.location.href='/user/profile'" style="cursor:pointer;">
+    <img th:src="${currentUser != null && currentUser.image != null ? currentUser.image : 
+                  'https://ui-avatars.com/api/?name=' + (currentUser != null ? currentUser.fullname : 'Admin') + '&background=28a745&color=fff'}" 
+         alt="Admin" class="admin-avatar">
+    <div class="admin-info">
+        <h6 th:text="${currentUser != null ? currentUser.fullname : 'Admin'}">Admin</h6>
+        <small><i class="fa-solid fa-circle text-success" style="font-size:.5rem;"></i> Đang hoạt động</small>
+    </div>
+    <i class="fa-solid fa-chevron-down ms-2"></i>
+</div>
             </div>
         </div>
 
@@ -342,9 +343,7 @@
                     </tr>
                 </thead>
                 <tbody id="categoryTableBody">
-                    <tr th:each="cat, iter : ${categories}"
-                        class="cat-row"
-                        th:data-name="${cat.name.toLowerCase()}">
+                    <tr th:each="cat, iter : ${categories}" class="cat-row" th:data-name="${cat.name.toLowerCase()}">
                         <td class="text-muted fw-semibold row-index"></td>
                         <td>
                             <div class="cat-name-cell">
@@ -369,20 +368,13 @@
                             </span>
                         </td>
                         <td class="text-center">
-                            <button class="btn btn-sm btn-outline-primary btn-action me-1"
-                                th:data-id="${cat.id}"
-                                th:data-name="${cat.name}"
-                                th:data-icon="${cat.icon}"
-                                th:data-color="${cat.color}"
-                                th:data-active="${cat.active}"
-                                onclick="openEditModal(this)"
-                                title="Sửa">
+                            <button class="btn btn-sm btn-outline-primary btn-action me-1" th:data-id="${cat.id}"
+                                th:data-name="${cat.name}" th:data-icon="${cat.icon}" th:data-color="${cat.color}"
+                                th:data-active="${cat.active}" onclick="openEditModal(this)" title="Sửa">
                                 <i class="fa-solid fa-pen"></i>
                             </button>
-                            <a href="javascript:void(0)"
-                                th:onclick="'confirmDelete(' + ${cat.id} + ')'"
-                                class="btn btn-sm btn-outline-danger btn-action"
-                                title="Xóa">
+                            <a href="javascript:void(0)" th:onclick="'confirmDelete(' + ${cat.id} + ')'"
+                                class="btn btn-sm btn-outline-danger btn-action" title="Xóa">
                                 <i class="fa-solid fa-trash"></i>
                             </a>
                         </td>
@@ -434,27 +426,48 @@
                         <div class="mb-3">
                             <label class="form-label fw-semibold">Chọn biểu tượng *</label>
                             <div class="d-flex flex-wrap gap-2" id="iconGrid">
-                                <div class="icon-option p-2 rounded" onclick="selectIcon(this, 'fa-solid fa-book')"><i class="fa-solid fa-book fa-fw"></i></div>
-                                <div class="icon-option p-2 rounded" onclick="selectIcon(this, 'fa-solid fa-book-open')"><i class="fa-solid fa-book-open fa-fw"></i></div>
-                                <div class="icon-option p-2 rounded active" onclick="selectIcon(this, 'fa-solid fa-graduation-cap')"><i class="fa-solid fa-graduation-cap fa-fw"></i></div>
-                                <div class="icon-option p-2 rounded" onclick="selectIcon(this, 'fa-solid fa-lightbulb')"><i class="fa-solid fa-lightbulb fa-fw"></i></div>
-                                <div class="icon-option p-2 rounded" onclick="selectIcon(this, 'fa-solid fa-brain')"><i class="fa-solid fa-brain fa-fw"></i></div>
-                                <div class="icon-option p-2 rounded" onclick="selectIcon(this, 'fa-solid fa-heart')"><i class="fa-solid fa-heart fa-fw"></i></div>
-                                <div class="icon-option p-2 rounded" onclick="selectIcon(this, 'fa-solid fa-child')"><i class="fa-solid fa-child fa-fw"></i></div>
-                                <div class="icon-option p-2 rounded" onclick="selectIcon(this, 'fa-solid fa-chart-line')"><i class="fa-solid fa-chart-line fa-fw"></i></div>
-                                <div class="icon-option p-2 rounded" onclick="selectIcon(this, 'fa-solid fa-utensils')"><i class="fa-solid fa-utensils fa-fw"></i></div>
+                                <div class="icon-option p-2 rounded" onclick="selectIcon(this, 'fa-solid fa-book')"><i
+                                        class="fa-solid fa-book fa-fw"></i></div>
+                                <div class="icon-option p-2 rounded"
+                                    onclick="selectIcon(this, 'fa-solid fa-book-open')"><i
+                                        class="fa-solid fa-book-open fa-fw"></i></div>
+                                <div class="icon-option p-2 rounded active"
+                                    onclick="selectIcon(this, 'fa-solid fa-graduation-cap')"><i
+                                        class="fa-solid fa-graduation-cap fa-fw"></i></div>
+                                <div class="icon-option p-2 rounded"
+                                    onclick="selectIcon(this, 'fa-solid fa-lightbulb')"><i
+                                        class="fa-solid fa-lightbulb fa-fw"></i></div>
+                                <div class="icon-option p-2 rounded" onclick="selectIcon(this, 'fa-solid fa-brain')"><i
+                                        class="fa-solid fa-brain fa-fw"></i></div>
+                                <div class="icon-option p-2 rounded" onclick="selectIcon(this, 'fa-solid fa-heart')"><i
+                                        class="fa-solid fa-heart fa-fw"></i></div>
+                                <div class="icon-option p-2 rounded" onclick="selectIcon(this, 'fa-solid fa-child')"><i
+                                        class="fa-solid fa-child fa-fw"></i></div>
+                                <div class="icon-option p-2 rounded"
+                                    onclick="selectIcon(this, 'fa-solid fa-chart-line')"><i
+                                        class="fa-solid fa-chart-line fa-fw"></i></div>
+                                <div class="icon-option p-2 rounded" onclick="selectIcon(this, 'fa-solid fa-utensils')">
+                                    <i class="fa-solid fa-utensils fa-fw"></i></div>
                             </div>
                         </div>
                         <div class="mb-3">
                             <label class="form-label fw-semibold">Chọn màu gradient *</label>
                             <div class="color-grid">
-                                <div class="color-option selected" style="background: linear-gradient(135deg, #667eea, #764ba2);" onclick="selectColor(this, 'linear-gradient(135deg, #667eea, #764ba2)')"></div>
-                                <div class="color-option" style="background: linear-gradient(135deg, #f093fb, #f5576c);" onclick="selectColor(this, 'linear-gradient(135deg, #f093fb, #f5576c)')"></div>
-                                <div class="color-option" style="background: linear-gradient(135deg, #4facfe, #00f2fe);" onclick="selectColor(this, 'linear-gradient(135deg, #4facfe, #00f2fe)')"></div>
-                                <div class="color-option" style="background: linear-gradient(135deg, #43e97b, #38f9d7);" onclick="selectColor(this, 'linear-gradient(135deg, #43e97b, #38f9d7)')"></div>
-                                <div class="color-option" style="background: linear-gradient(135deg, #fa709a, #fee140);" onclick="selectColor(this, 'linear-gradient(135deg, #fa709a, #fee140)')"></div>
-                                <div class="color-option" style="background: linear-gradient(135deg, #30cfd0, #330867);" onclick="selectColor(this, 'linear-gradient(135deg, #30cfd0, #330867)')"></div>
-                                <div class="color-option" style="background: linear-gradient(135deg, #a8edea, #fed6e3);" onclick="selectColor(this, 'linear-gradient(135deg, #a8edea, #fed6e3)')"></div>
+                                <div class="color-option selected"
+                                    style="background: linear-gradient(135deg, #667eea, #764ba2);"
+                                    onclick="selectColor(this, 'linear-gradient(135deg, #667eea, #764ba2)')"></div>
+                                <div class="color-option" style="background: linear-gradient(135deg, #f093fb, #f5576c);"
+                                    onclick="selectColor(this, 'linear-gradient(135deg, #f093fb, #f5576c)')"></div>
+                                <div class="color-option" style="background: linear-gradient(135deg, #4facfe, #00f2fe);"
+                                    onclick="selectColor(this, 'linear-gradient(135deg, #4facfe, #00f2fe)')"></div>
+                                <div class="color-option" style="background: linear-gradient(135deg, #43e97b, #38f9d7);"
+                                    onclick="selectColor(this, 'linear-gradient(135deg, #43e97b, #38f9d7)')"></div>
+                                <div class="color-option" style="background: linear-gradient(135deg, #fa709a, #fee140);"
+                                    onclick="selectColor(this, 'linear-gradient(135deg, #fa709a, #fee140)')"></div>
+                                <div class="color-option" style="background: linear-gradient(135deg, #30cfd0, #330867);"
+                                    onclick="selectColor(this, 'linear-gradient(135deg, #30cfd0, #330867)')"></div>
+                                <div class="color-option" style="background: linear-gradient(135deg, #a8edea, #fed6e3);"
+                                    onclick="selectColor(this, 'linear-gradient(135deg, #a8edea, #fed6e3)')"></div>
                             </div>
                         </div>
                         <div class="mb-3">
@@ -498,11 +511,15 @@
                         <div class="text-center mb-4">
                             <div class="position-relative d-inline-block">
                                 <img src="https://ui-avatars.com/api/?name=Admin&background=28a745&color=fff&size=150"
-                                    class="rounded-circle" width="150" height="150" id="profileAvatarPreview" alt="Avatar">
-                                <label for="avatarUpload" class="position-absolute bottom-0 end-0 btn btn-success btn-sm rounded-circle" style="width: 40px; height: 40px;">
+                                    class="rounded-circle" width="150" height="150" id="profileAvatarPreview"
+                                    alt="Avatar">
+                                <label for="avatarUpload"
+                                    class="position-absolute bottom-0 end-0 btn btn-success btn-sm rounded-circle"
+                                    style="width: 40px; height: 40px;">
                                     <i class="fa-solid fa-camera"></i>
                                 </label>
-                                <input type="file" id="avatarUpload" class="d-none" accept="image/*" onchange="previewAvatar(event)">
+                                <input type="file" id="avatarUpload" class="d-none" accept="image/*"
+                                    onchange="previewAvatar(event)">
                             </div>
                         </div>
                         <div class="mb-3">
@@ -749,13 +766,14 @@
         }
 
         function getPageNumbers(current, total) {
-            if (total <= 7) return Array.from({length: total}, (_, i) => i + 1);
-            if (current <= 4) return [1,2,3,4,5,'...',total];
-            if (current >= total - 3) return [1,'...',total-4,total-3,total-2,total-1,total];
-            return [1,'...',current-1,current,current+1,'...',total];
+            if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+            if (current <= 4) return [1, 2, 3, 4, 5, '...', total];
+            if (current >= total - 3) return [1, '...', total - 4, total - 3, total - 2, total - 1, total];
+            return [1, '...', current - 1, current, current + 1, '...', total];
         }
 
         document.addEventListener('DOMContentLoaded', () => { renderTable(); });
     </script>
 </body>
+
 </html>

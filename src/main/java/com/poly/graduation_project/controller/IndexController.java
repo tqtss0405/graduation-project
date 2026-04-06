@@ -62,11 +62,14 @@ public class IndexController {
     public String home(Model model, HttpSession session) {
         User currentUser = (User) session.getAttribute("currentUser");
 
-        // Lấy 8 sản phẩm mới nhất đang active, sau đó sort: còn hàng lên trước
+        // Lấy 8 sản phẩm mới nhất đang active VÀ thuộc danh mục active
         List<Product> products = productRepository.findTop8ByActiveTrueOrderByIdDesc()
                 .stream()
+                // Lọc thêm: danh mục phải active (hoặc không có danh mục)
+                .filter(p -> p.getCategory() == null || Boolean.TRUE.equals(p.getCategory().getActive()))
                 .sorted(Comparator.comparingInt((Product p) ->
                         (p.getStockQuantity() != null && p.getStockQuantity() > 0) ? 0 : 1))
+                .limit(8)
                 .collect(Collectors.toList());
 
         List<CartDetail> cartItems = cartDetailRepository.findByUser(currentUser);
@@ -78,9 +81,14 @@ public class IndexController {
                     .forEach(fav -> favouriteProductIds.add(fav.getProduct().getId()));
         }
 
+        // Chỉ hiển thị danh mục đang active ở trang chủ
+        List<Category> activeCategories = categoryRepository.findAll().stream()
+                .filter(c -> Boolean.TRUE.equals(c.getActive()))
+                .collect(Collectors.toList());
+
         model.addAttribute("totalQuantity", totalQuantity);
         model.addAttribute("products", products);
-        model.addAttribute("categories", categoryRepository.findAll());
+        model.addAttribute("categories", activeCategories);
         model.addAttribute("favouriteProductIds", favouriteProductIds);
         return "index";
     }
@@ -107,14 +115,17 @@ public class IndexController {
         // --- Parse preset khoảng giá ---
         if (!priceRange.isEmpty()) {
             switch (priceRange) {
-                case "0-100000":    minPrice = BigDecimal.ZERO;             maxPrice = new BigDecimal("100000");  break;
-                case "100000-200000": minPrice = new BigDecimal("100000"); maxPrice = new BigDecimal("200000");  break;
-                case "200000-500000": minPrice = new BigDecimal("200000"); maxPrice = new BigDecimal("500000");  break;
-                case "500000+":     minPrice = new BigDecimal("500000");    maxPrice = null;                      break;
+                case "0-100000":      minPrice = BigDecimal.ZERO;           maxPrice = new BigDecimal("100000");  break;
+                case "100000-200000": minPrice = new BigDecimal("100000");  maxPrice = new BigDecimal("200000");  break;
+                case "200000-500000": minPrice = new BigDecimal("200000");  maxPrice = new BigDecimal("500000");  break;
+                case "500000+":       minPrice = new BigDecimal("500000");  maxPrice = null;                      break;
             }
         }
 
-        List<Product> all = productRepository.findByActiveTrue();
+        // Lấy tất cả sản phẩm active VÀ thuộc danh mục active
+        List<Product> all = productRepository.findByActiveTrue().stream()
+                .filter(p -> p.getCategory() == null || Boolean.TRUE.equals(p.getCategory().getActive()))
+                .collect(Collectors.toList());
 
         // --- Lọc keyword ---
         final String kw = removeAccent(keyword.trim());
@@ -150,7 +161,7 @@ public class IndexController {
             default:           all.sort(Comparator.comparing(Product::getId).reversed()); break;
         }
 
-        // --- Ưu tiên sản phẩm CÒN HÀNG lên trước (stable sort giữ thứ tự trong nhóm) ---
+        // --- Ưu tiên sản phẩm CÒN HÀNG lên trước ---
         all.sort(Comparator.comparingInt(p ->
                 (p.getStockQuantity() != null && p.getStockQuantity() > 0) ? 0 : 1));
 
@@ -163,8 +174,11 @@ public class IndexController {
         int toIdx = Math.min(fromIdx + PRODUCTS_PER_PAGE, totalProducts);
         List<Product> pagedProducts = totalProducts > 0 ? all.subList(fromIdx, toIdx) : all;
 
-        // --- Phân trang danh mục sidebar ---
-        List<Category> allCats = categoryRepository.findAll();
+        // --- Phân trang danh mục sidebar (chỉ lấy danh mục ACTIVE) ---
+        List<Category> allCats = categoryRepository.findAll().stream()
+                .filter(c -> Boolean.TRUE.equals(c.getActive()))
+                .collect(Collectors.toList());
+
         int totalCats = allCats.size();
         int totalCatPages = Math.max(1, (int) Math.ceil((double) totalCats / CATS_PER_PAGE));
         if (catPage < 1) catPage = 1;
@@ -205,14 +219,24 @@ public class IndexController {
     public String productDetail(@PathVariable("slug") String slug, Model model, HttpSession session) {
         User currentUser = (User) session.getAttribute("currentUser");
         Product product = productRepository.findBySlug(slug);
-        if (product == null) return "redirect:/products";
+
+        // Redirect nếu sản phẩm không tồn tại, bị ẩn, hoặc danh mục bị ẩn
+        if (product == null
+                || !Boolean.TRUE.equals(product.getActive())
+                || (product.getCategory() != null && !Boolean.TRUE.equals(product.getCategory().getActive()))) {
+            return "redirect:/products";
+        }
 
         List<CartDetail> cartItems = cartDetailRepository.findByUser(currentUser);
         int totalQuantity = cartItems.stream().mapToInt(CartDetail::getQuantity).sum();
         model.addAttribute("totalQuantity", totalQuantity);
 
+        // Sản phẩm liên quan cũng phải lọc danh mục active
         List<Product> related = productRepository
-                .findTop4ByCategoryAndIdNotAndActiveTrue(product.getCategory(), product.getId());
+                .findTop4ByCategoryAndIdNotAndActiveTrue(product.getCategory(), product.getId())
+                .stream()
+                .filter(p -> p.getCategory() == null || Boolean.TRUE.equals(p.getCategory().getActive()))
+                .collect(Collectors.toList());
 
         List<Review> reviews   = reviewRepository.findByProductId(product.getId());
         long reviewCount       = reviewRepository.countByProductId(product.getId());
@@ -223,12 +247,12 @@ public class IndexController {
             isFavourite = favouriteRepository.existsByUserAndProduct(currentUser, product);
         }
 
-        model.addAttribute("product",       product);
+        model.addAttribute("product",         product);
         model.addAttribute("relatedProducts", related);
-        model.addAttribute("reviews",       reviews);
-        model.addAttribute("reviewCount",   reviewCount);
-        model.addAttribute("avgRating",     avgRating != null ? Math.round(avgRating * 10.0) / 10.0 : 0.0);
-        model.addAttribute("isFavourite",   isFavourite);
+        model.addAttribute("reviews",         reviews);
+        model.addAttribute("reviewCount",     reviewCount);
+        model.addAttribute("avgRating",       avgRating != null ? Math.round(avgRating * 10.0) / 10.0 : 0.0);
+        model.addAttribute("isFavourite",     isFavourite);
 
         Integer reviewableOrderDetailId = null;
         if (currentUser != null) {
@@ -289,8 +313,8 @@ public class IndexController {
                 hasUnreviewedMap.put(order.getId(), hasUnreviewed);
             }
         }
-        model.addAttribute("orders",          orders);
-        model.addAttribute("reviewedMap",     reviewedMap);
+        model.addAttribute("orders",           orders);
+        model.addAttribute("reviewedMap",      reviewedMap);
         model.addAttribute("hasUnreviewedMap", hasUnreviewedMap);
         return "order-details";
     }

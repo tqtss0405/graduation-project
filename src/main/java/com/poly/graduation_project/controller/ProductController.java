@@ -4,7 +4,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.Normalizer;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,6 +28,8 @@ import com.poly.graduation_project.repository.CategoryRepository;
 import com.poly.graduation_project.repository.ImageRepository;
 import com.poly.graduation_project.repository.OrderDetailRepository;
 import com.poly.graduation_project.repository.ProductRepository;
+import com.poly.graduation_project.service.SessionService;
+import com.poly.graduation_project.model.User;
 
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.validation.Valid;
@@ -50,15 +55,37 @@ public class ProductController {
 
     @Autowired
     private OrderDetailRepository orderDetailRepo;
+    @Autowired
+    private SessionService sessionService;
 
     // ====================================================
     // GET: Trang quản lý sản phẩm
     // ====================================================
     @GetMapping("/admin/products")
-    public String listProducts(Model model) {
-        model.addAttribute("products", productRepo.findAll());
+    public String listProducts(Model model, @RequestParam(value = "keyword", required = false) String keyword) {
+        List<Product> all = productRepo.findAll(); // Admin xem tất cả, kể cả ẩn
+        User currentUser = (User) sessionService.getAttribute("currentUser");
+        model.addAttribute("currentUser", currentUser);
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            final String kw = removeAccent(keyword.trim());
+            String[] words = kw.split("\\s+");
+            all = all.stream().filter(p -> {
+                String name = removeAccent(p.getName());
+                return java.util.Arrays.stream(words).allMatch(name::contains);
+            }).collect(Collectors.toList());
+        }
+
+        model.addAttribute("products", all);
         model.addAttribute("categories", categoryRepo.findAll());
+        model.addAttribute("keyword", keyword);
         return "admin-products";
+    }
+
+    public static String removeAccent(String s) {
+        if (s == null)
+            return "";
+        String temp = Normalizer.normalize(s, Normalizer.Form.NFD);
+        return temp.replaceAll("\\p{InCombiningDiacriticalMarks}+", "").toLowerCase();
     }
 
     // ====================================================
@@ -71,17 +98,6 @@ public class ProductController {
         try {
             // Bắt lỗi @NotBlank trước
             if (result.hasErrors()) {
-                String blankError = result.getFieldErrors().stream()
-                        .filter(e -> e.getCode() != null && e.getCode().equals("NotBlank"))
-                        .map(FieldError::getDefaultMessage)
-                        .findFirst()
-                        .orElse(null);
-
-                if (blankError != null) {
-                    ra.addFlashAttribute("errorMessage", blankError);
-                    return "redirect:/admin/products";
-                }
-
                 String firstError = result.getFieldErrors().get(0).getDefaultMessage();
                 ra.addFlashAttribute("errorMessage", firstError);
                 return "redirect:/admin/products";

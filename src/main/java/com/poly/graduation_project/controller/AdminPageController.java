@@ -6,7 +6,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import com.poly.graduation_project.repository.CategoryRepository;
+import com.poly.graduation_project.service.SessionService;
 import com.poly.graduation_project.service.UserService;
+import com.poly.graduation_project.model.User;
 
 @Controller
 @RequestMapping("/admin")
@@ -17,10 +19,13 @@ public class AdminPageController {
 
     @Autowired
     private UserService userService;
-   
+    @Autowired
+private SessionService sessionService;
     // Danh sách khách hàng
     @GetMapping("/customers")
     public String customers(Model model) {
+         User currentUser = (User) sessionService.getAttribute("currentUser");
+    model.addAttribute("currentUser", currentUser);
         model.addAttribute("customers", userService.getAllCustomers());
         return "admin-customers";
     }

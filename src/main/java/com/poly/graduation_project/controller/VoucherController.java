@@ -1,10 +1,11 @@
 package com.poly.graduation_project.controller;
 
-import java.time.LocalDateTime; 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -19,40 +20,46 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.poly.graduation_project.dto.VoucherDTO;
 import com.poly.graduation_project.model.Voucher;
+import com.poly.graduation_project.service.SessionService;
 import com.poly.graduation_project.service.VoucherService;
+import com.poly.graduation_project.model.User;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+
 
 @Controller
 @RequiredArgsConstructor
 public class VoucherController {
 
     private final VoucherService voucherService;
-
+@Autowired
+private SessionService sessionService;
     // Hiển thị danh sách
-   @GetMapping("/admin/vouchers")
-public String vouchers(Model model) {
-    List<Voucher> all = voucherService.getAll();
-    LocalDateTime now = LocalDateTime.now();
+    @GetMapping("/admin/vouchers")
+    public String vouchers(Model model) {
+        User currentUser = (User) sessionService.getAttribute("currentUser");
+    model.addAttribute("currentUser", currentUser);
+        List<Voucher> all = voucherService.getAll();
+        LocalDateTime now = LocalDateTime.now();
 
-    long total    = all.size();
-    long active   = all.stream().filter(v -> Boolean.TRUE.equals(v.getActive())).count();
-    long expired  = all.stream().filter(v -> v.getEndAt() != null && v.getEndAt().isBefore(now)).count();
-    long upcoming = all.stream().filter(v -> v.getStartedAt() != null && v.getStartedAt().isAfter(now)).count();
+        long total = all.size();
+        long active = all.stream().filter(v -> Boolean.TRUE.equals(v.getActive())).count();
+        long expired = all.stream().filter(v -> v.getEndAt() != null && v.getEndAt().isBefore(now)).count();
+        long upcoming = all.stream().filter(v -> v.getStartedAt() != null && v.getStartedAt().isAfter(now)).count();
 
-    // Đếm số lần đã dùng cho từng voucher
-    Map<Integer, Long> usedCountMap = voucherService.getUsedCountMap(all);
+        // Đếm số lần đã dùng cho từng voucher
+        Map<Integer, Long> usedCountMap = voucherService.getUsedCountMap(all);
 
-    model.addAttribute("vouchers", all);
-    model.addAttribute("usedCountMap", usedCountMap);
-    model.addAttribute("totalVouchers",   total);
-    model.addAttribute("activeVouchers",  active);
-    model.addAttribute("expiredVouchers", expired);
-    model.addAttribute("upcomingVouchers",upcoming);
-    model.addAttribute("voucherDTO", new VoucherDTO());
-    return "admin-vouchers";
-}
+        model.addAttribute("vouchers", all);
+        model.addAttribute("usedCountMap", usedCountMap);
+        model.addAttribute("totalVouchers", total);
+        model.addAttribute("activeVouchers", active);
+        model.addAttribute("expiredVouchers", expired);
+        model.addAttribute("upcomingVouchers", upcoming);
+        model.addAttribute("voucherDTO", new VoucherDTO());
+        return "admin-vouchers";
+    }
 
     // Tạo mới
     @PostMapping("/admin/vouchers/save")
@@ -65,19 +72,19 @@ public String vouchers(Model model) {
             result.rejectValue("endAt", "date.invalid", "Ngày hết hạn phải sau ngày bắt đầu");
         }
 
-      if (result.hasErrors()) {
-    boolean hasBlank = result.getFieldErrors().stream()
-            .anyMatch(e -> e.getCode().equals("NotBlank") || e.getCode().equals("NotNull"));
+        if (result.hasErrors()) {
+            boolean hasBlank = result.getFieldErrors().stream()
+                    .anyMatch(e -> e.getCode().equals("NotBlank") || e.getCode().equals("NotNull"));
 
-    String errorMsg = hasBlank
-            ? "Vui lòng nhập đầy đủ thông tin"
-            : result.getFieldErrors().stream()
-                    .map(FieldError::getDefaultMessage)
-                    .collect(Collectors.joining(" • "));
+            String errorMsg = hasBlank
+                    ? "Vui lòng nhập đầy đủ thông tin"
+                    : result.getFieldErrors().stream()
+                            .map(FieldError::getDefaultMessage)
+                            .collect(Collectors.joining(" • "));
 
-    ra.addFlashAttribute("errorMsg", errorMsg);
-    return "redirect:/admin/vouchers";
-}
+            ra.addFlashAttribute("errorMsg", errorMsg);
+            return "redirect:/admin/vouchers";
+        }
 
         try {
             voucherService.create(dto);
@@ -117,19 +124,19 @@ public String vouchers(Model model) {
             result.rejectValue("endAt", "date.invalid", "Ngày hết hạn phải sau ngày bắt đầu");
         }
 
-    if (result.hasErrors()) {
-    boolean hasBlank = result.getFieldErrors().stream()
-            .anyMatch(e -> e.getCode().equals("NotBlank") || e.getCode().equals("NotNull"));
+        if (result.hasErrors()) {
+            boolean hasBlank = result.getFieldErrors().stream()
+                    .anyMatch(e -> e.getCode().equals("NotBlank") || e.getCode().equals("NotNull"));
 
-    String errorMsg = hasBlank
-            ? "Vui lòng nhập đầy đủ thông tin"
-            : result.getFieldErrors().stream()
-                    .map(FieldError::getDefaultMessage)
-                    .collect(Collectors.joining(" • "));
+            String errorMsg = hasBlank
+                    ? "Vui lòng nhập đầy đủ thông tin"
+                    : result.getFieldErrors().stream()
+                            .map(FieldError::getDefaultMessage)
+                            .collect(Collectors.joining(" • "));
 
-    ra.addFlashAttribute("errorMsg", errorMsg);
-    return "redirect:/admin/vouchers";
-}
+            ra.addFlashAttribute("errorMsg", errorMsg);
+            return "redirect:/admin/vouchers";
+        }
 
         try {
             voucherService.update(id, dto);

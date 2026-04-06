@@ -28,19 +28,38 @@
         }
         .status-tab:hover { background: #e9ecef; color: #333; }
 
-        /* Active states — mỗi tab có màu riêng */
-        .status-tab.active-all      { background: #198754; color: #fff; border-color: #198754; }
-        .status-tab.active-pending  { background: #ffc107; color: #212529; border-color: #ffc107; }
-        .status-tab.active-confirmed{ background: #0d6efd; color: #fff; border-color: #0d6efd; }
-        .status-tab.active-shipping { background: #0dcaf0; color: #212529; border-color: #0dcaf0; }
-        .status-tab.active-delivered{ background: #6f42c1; color: #fff; border-color: #6f42c1; }
-        .status-tab.active-completed{ background: #198754; color: #fff; border-color: #198754; }
-        .status-tab.active-cancelled{ background: #dc3545; color: #fff; border-color: #dc3545; }
-        .status-tab.active-refund   { background: #dc3545; color: #fff; border-color: #dc3545; }
+        .status-tab.active-all       { background: #198754; color: #fff; border-color: #198754; }
+        .status-tab.active-pending   { background: #ffc107; color: #212529; border-color: #ffc107; }
+        .status-tab.active-confirmed { background: #0d6efd; color: #fff; border-color: #0d6efd; }
+        .status-tab.active-shipping  { background: #0dcaf0; color: #212529; border-color: #0dcaf0; }
+        .status-tab.active-delivered { background: #6f42c1; color: #fff; border-color: #6f42c1; }
+        .status-tab.active-completed { background: #198754; color: #fff; border-color: #198754; }
+        .status-tab.active-cancelled { background: #dc3545; color: #fff; border-color: #dc3545; }
+        .status-tab.active-refund    { background: #fd7e14; color: #fff; border-color: #fd7e14; }
+        .status-tab.active-refunded  { background: #0d6efd; color: #fff; border-color: #0d6efd; }
 
-        /* Tab hoàn tiền luôn nổi bật khi chưa active */
-        .status-tab.refund-tab { color: #dc3545; border-color: #f5c6cb; background: #fff5f5; }
-        .status-tab.refund-tab:hover { background: #fce8e8; }
+        /* Tab hoàn tiền chờ xử lý nổi bật */
+        .status-tab.refund-tab    { color: #fd7e14; border-color: #ffe0c0; background: #fff8f0; }
+        .status-tab.refund-tab:hover { background: #ffeedd; }
+        .status-tab.refunded-tab  { color: #0d6efd; border-color: #b8d4ff; background: #f0f5ff; }
+        .status-tab.refunded-tab:hover { background: #e0eaff; }
+
+        /* ===== Bank info block ===== */
+        .bank-info-block {
+            background: #e8f4fd;
+            border: 1.5px solid #bee3f8;
+            border-radius: 10px;
+            padding: 12px 16px;
+            margin-top: 10px;
+        }
+        .bank-info-block .bank-label {
+            font-size: 0.78rem; font-weight: 700; color: #055160;
+            text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;
+        }
+        .bank-info-row { display: flex; align-items: center; gap: 8px; font-size: 0.88rem; margin-bottom: 4px; }
+        .bank-info-row:last-child { margin-bottom: 0; }
+        .bank-info-row .lbl { color: #6c757d; min-width: 90px; }
+        .bank-info-row .val { font-weight: 700; color: #1a1a2e; }
 
         /* ===== PAGINATION ===== */
         .orders-footer {
@@ -73,7 +92,6 @@
         .page-btn.active { background: #28a745; border-color: #28a745; color: #fff; }
         .page-btn.disabled { opacity: 0.4; pointer-events: none; }
 
-        /* Badge trong tab */
         .status-tab .tab-badge {
             display: inline-block;
             min-width: 18px; height: 18px;
@@ -90,10 +108,11 @@
         .status-tab.active-delivered .tab-badge,
         .status-tab.active-completed .tab-badge,
         .status-tab.active-cancelled .tab-badge,
-        .status-tab.active-refund .tab-badge { background: rgba(255,255,255,0.3); }
+        .status-tab.active-refund .tab-badge,
+        .status-tab.active-refunded .tab-badge { background: rgba(255,255,255,0.3); }
 
-        /* Badge đỏ cho pending & refund khi chưa active */
-        .tab-badge-danger { background: #dc3545 !important; color: #fff !important; }
+        .tab-badge-danger  { background: #dc3545 !important; color: #fff !important; }
+        .tab-badge-warning { background: #fd7e14 !important; color: #fff !important; }
     </style>
 </head>
 <body>
@@ -118,6 +137,16 @@
                 <h4 class="fw-bold m-0">Quản lý Đơn Hàng</h4>
                 <small class="text-muted">Quản lý toàn bộ đơn hàng trong hệ thống</small>
             </div>
+           <div class="admin-profile" onclick="window.location.href='/user/profile'" style="cursor:pointer;">
+    <img th:src="${currentUser != null && currentUser.image != null ? currentUser.image : 
+                  'https://ui-avatars.com/api/?name=' + (currentUser != null ? currentUser.fullname : 'Admin') + '&background=28a745&color=fff'}" 
+         alt="Admin" class="admin-avatar">
+    <div class="admin-info">
+        <h6 th:text="${currentUser != null ? currentUser.fullname : 'Admin'}">Admin</h6>
+        <small><i class="fa-solid fa-circle text-success" style="font-size:.5rem;"></i> Đang hoạt động</small>
+    </div>
+    <i class="fa-solid fa-chevron-down ms-2"></i>
+</div>
         </div>
 
         <!-- Thông báo -->
@@ -179,11 +208,19 @@
                     <span class="tab-badge" th:text="${countCancelled}">0</span>
                 </a>
 
+                <!-- Tab Yêu cầu hoàn tiền (status=6) — màu cam, badge đỏ khi có đơn chờ -->
                 <a th:href="@{/admin/orders(status=6,keyword=${keyword},fromDate=${fromDate},toDate=${toDate})}"
                    th:class="${selectedStatus == 6} ? 'status-tab active-refund' : 'status-tab refund-tab'">
-                    <i class="fa-solid fa-rotate-left"></i> Hoàn tiền
-                    <span th:class="${selectedStatus != 6 and countRefund > 0} ? 'tab-badge tab-badge-danger' : 'tab-badge'"
+                    <i class="fa-solid fa-rotate-left"></i> Y/c hoàn tiền
+                    <span th:class="${selectedStatus != 6 and countRefund > 0} ? 'tab-badge tab-badge-warning' : 'tab-badge'"
                           th:text="${countRefund}">0</span>
+                </a>
+
+                <!-- Tab Đã hoàn tiền (status=7) — màu xanh dương -->
+                <a th:href="@{/admin/orders(status=7,keyword=${keyword},fromDate=${fromDate},toDate=${toDate})}"
+                   th:class="${selectedStatus == 7} ? 'status-tab active-refunded' : 'status-tab refunded-tab'">
+                    <i class="fa-solid fa-circle-dollar-to-slot"></i> Đã hoàn tiền
+                    <span class="tab-badge" th:text="${countRefunded}">0</span>
                 </a>
 
             </div>
@@ -192,7 +229,6 @@
         <!-- ===== TÌM KIẾM + LỌC NGÀY ===== -->
         <div class="bg-white p-3 rounded-3 shadow-sm mb-3">
             <form th:action="@{/admin/orders}" method="get" class="row g-2 align-items-end">
-                <!-- Giữ lại tab đang chọn -->
                 <input type="hidden" name="status" th:if="${selectedStatus != null}" th:value="${selectedStatus}">
 
                 <div class="col-md-4">
@@ -232,14 +268,20 @@
             </form>
         </div>
 
-        <!-- Ghi chú -->
+        <!-- Ghi chú theo tab -->
         <div th:if="${selectedStatus == 3}" class="alert alert-info py-2 mb-3">
             <i class="fa-solid fa-clock me-2"></i>
             Đơn "Đã giao" sẽ <strong>tự động Hoàn thành sau 7 ngày</strong> nếu khách không xác nhận.
         </div>
         <div th:if="${selectedStatus == 6}" class="alert alert-warning py-2 mb-3">
             <i class="fa-solid fa-triangle-exclamation me-2"></i>
-            Khách đã <strong>yêu cầu hoàn tiền / trả hàng</strong>. Xem lý do ở cột Ghi chú rồi xử lý.
+            Khách đã <strong>yêu cầu hoàn tiền / trả hàng</strong>. Xem chi tiết (tài khoản ngân hàng, lý do) rồi xử lý.
+            <br><small>· <strong>Hoàn tiền thành công</strong> → chuyển sang trạng thái "Đã hoàn tiền" (status 7)</small>
+            <br><small>· <strong>Từ chối</strong> → chuyển về "Hoàn thành" (status 4) — khách giữ hàng, không hoàn kho</small>
+        </div>
+        <div th:if="${selectedStatus == 7}" class="alert alert-info py-2 mb-3">
+            <i class="fa-solid fa-circle-check me-2"></i>
+            Các đơn đã được <strong>hoàn tiền / hoàn hàng thành công</strong>.
         </div>
 
         <!-- ===== BẢNG ===== -->
@@ -281,19 +323,23 @@
                                 <span th:case="3" class="badge" style="background:#6f42c1;color:#fff">Đã giao</span>
                                 <span th:case="4" class="badge bg-success">Hoàn thành</span>
                                 <span th:case="5" class="badge bg-danger">Đã hủy</span>
-                                <span th:case="6" class="badge bg-danger">
+                                <span th:case="6" class="badge" style="background:#fd7e14;color:#fff">
                                     <i class="fa-solid fa-rotate-left me-1"></i>Y/c hoàn tiền
+                                </span>
+                                <span th:case="7" class="badge bg-primary">
+                                    <i class="fa-solid fa-circle-dollar-to-slot me-1"></i>Đã hoàn tiền
                                 </span>
                             </span>
                         </td>
                         <td>
                             <div class="d-flex gap-1 flex-wrap">
 
-                                <!-- Tất cả / Đã giao / Hoàn thành / Đã hủy: chỉ Xem -->
+                                <!-- Tab: Tất cả / Đã giao / Hoàn thành / Đã hủy / Đã hoàn tiền → chỉ Xem -->
                                 <th:block th:if="${selectedStatus == null
                                                    or selectedStatus == 3
                                                    or selectedStatus == 4
-                                                   or selectedStatus == 5}">
+                                                   or selectedStatus == 5
+                                                   or selectedStatus == 7}">
                                     <button class="btn btn-sm btn-outline-secondary"
                                         th:data-id="${order.id}"
                                         th:data-customer="${order.user != null ? order.user.fullname : 'N/A'}"
@@ -305,6 +351,7 @@
                                         th:data-payment-status="${order.paymentStatus}"
                                         th:data-status="${order.status}"
                                         th:data-note="${order.note}"
+                                        th:data-bank="${order.bankAccount}"
                                         th:data-date="${#temporals.format(order.createAt, 'dd/MM/yyyy HH:mm')}"
                                         onclick="viewOrderFromBtn(this)">
                                         <i class="fa-solid fa-eye"></i> Xem
@@ -350,6 +397,7 @@
 
                                 <!-- Yêu cầu hoàn tiền (6) -->
                                 <th:block th:if="${selectedStatus == 6}">
+                                    <!-- Nút Xem để thấy thông tin ngân hàng -->
                                     <button class="btn btn-sm btn-outline-secondary"
                                         th:data-id="${order.id}"
                                         th:data-customer="${order.user != null ? order.user.fullname : 'N/A'}"
@@ -361,21 +409,26 @@
                                         th:data-payment-status="${order.paymentStatus}"
                                         th:data-status="${order.status}"
                                         th:data-note="${order.note}"
+                                        th:data-bank="${order.bankAccount}"
                                         th:data-date="${#temporals.format(order.createAt, 'dd/MM/yyyy HH:mm')}"
                                         onclick="viewOrderFromBtn(this)">
                                         <i class="fa-solid fa-eye"></i> Xem
                                     </button>
+
+                                    <!-- Hoàn tiền thành công → status 7 -->
                                     <form th:action="@{/admin/orders/update-status/{id}(id=${order.id})}" method="post" class="d-inline"
-                                          th:onsubmit="'return confirm(\'Chấp thuận đơn #' + ${order.id} + '?\');'">
-                                        <input type="hidden" name="status" value="5">
-                                        <button type="submit" class="btn btn-sm btn-danger">
-                                            <i class="fa-solid fa-check"></i> Chấp thuận
+                                          th:onsubmit="'return confirm(\'Xác nhận đã hoàn tiền cho đơn #' + ${order.id} + '?\');'">
+                                        <input type="hidden" name="status" value="7">
+                                        <button type="submit" class="btn btn-sm btn-primary">
+                                            <i class="fa-solid fa-circle-dollar-to-slot"></i> Hoàn tiền
                                         </button>
                                     </form>
+
+                                    <!-- Từ chối → status 4 (Hoàn thành) — khách giữ hàng, không hoàn kho -->
                                     <form th:action="@{/admin/orders/update-status/{id}(id=${order.id})}" method="post" class="d-inline"
-                                          th:onsubmit="'return confirm(\'Từ chối đơn #' + ${order.id} + '?\');'">
+                                          th:onsubmit="'return confirm(\'Từ chối hoàn tiền đơn #' + ${order.id} + '? Đơn sẽ chuyển về Hoàn thành.\');'">
                                         <input type="hidden" name="status" value="4">
-                                        <button type="submit" class="btn btn-sm btn-outline-success">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">
                                             <i class="fa-solid fa-xmark"></i> Từ chối
                                         </button>
                                     </form>
@@ -448,6 +501,17 @@
                         </div>
                     </div>
 
+                    <!-- Thông tin tài khoản ngân hàng (chỉ hiện khi có) -->
+                    <div id="modalBankSection" class="d-none mt-3">
+                        <div class="bank-info-block">
+                            <div class="bank-label">
+                                <i class="fa-solid fa-building-columns me-2"></i>
+                                Tài khoản nhận hoàn tiền (VNPay)
+                            </div>
+                            <div id="modalBankRows"></div>
+                        </div>
+                    </div>
+
                     <!-- Bảng sản phẩm -->
                     <div class="mt-4">
                         <h6 class="fw-bold mb-3">
@@ -512,11 +576,32 @@
                 '3': '<span class="badge" style="background:#6f42c1;color:#fff">Đã giao</span>',
                 '4': '<span class="badge bg-success">Hoàn thành</span>',
                 '5': '<span class="badge bg-danger">Đã hủy</span>',
-                '6': '<span class="badge bg-danger"><i class="fa-solid fa-rotate-left me-1"></i>Y/c hoàn tiền</span>',
+                '6': '<span class="badge" style="background:#fd7e14;color:#fff"><i class="fa-solid fa-rotate-left me-1"></i>Y/c hoàn tiền</span>',
+                '7': '<span class="badge bg-primary"><i class="fa-solid fa-circle-dollar-to-slot me-1"></i>Đã hoàn tiền</span>',
             };
             document.getElementById('modalStatus').innerHTML = statusLabels[d.status] || '';
 
-            // Reset bảng sản phẩm
+            // ===== Thông tin ngân hàng =====
+            const bankSection = document.getElementById('modalBankSection');
+            const bankRows    = document.getElementById('modalBankRows');
+            const bankRaw     = (d.bank || '').trim();
+
+            if (bankRaw && bankRaw !== 'null') {
+                // Format: "Tên ngân hàng | Số tài khoản | Tên chủ TK"
+                const parts = bankRaw.split('|').map(s => s.trim());
+                const labels = ['Ngân hàng', 'Số tài khoản', 'Chủ tài khoản'];
+                bankRows.innerHTML = parts.map((val, i) => `
+                    <div class="bank-info-row">
+                        <span class="lbl">${labels[i] || ('Thông tin ' + (i+1))}:</span>
+                        <span class="val">${val}</span>
+                    </div>
+                `).join('');
+                bankSection.classList.remove('d-none');
+            } else {
+                bankSection.classList.add('d-none');
+            }
+
+            // ===== Sản phẩm =====
             document.getElementById('orderItemsLoading').classList.remove('d-none');
             document.getElementById('orderItemsTable').classList.add('d-none');
             document.getElementById('orderItemsEmpty').classList.add('d-none');
@@ -566,26 +651,29 @@
             new bootstrap.Modal(document.getElementById('orderModal')).show();
         }
     </script>
-    <!-- ===== PAGINATION JS (giống trang reviews) ===== -->
-    <script>
-        // Dữ liệu từ Thymeleaf
-        const TOTAL_ITEMS   = /*[[${totalItems}]]*/ 0;
-        const CURRENT_PAGE  = /*[[${currentPage}]]*/ 1;
-        const TOTAL_PAGES   = /*[[${totalPages}]]*/ 1;
-        const BASE_STATUS   = /*[[${selectedStatus}]]*/ null;
-        const BASE_KEYWORD  = /*[[${keyword}]]*/ '';
-        const BASE_FROM     = /*[[${fromDate}]]*/ '';
-        const BASE_TO       = /*[[${toDate}]]*/ '';
 
-        function buildUrl(page) {
-            const params = new URLSearchParams();
-            if (BASE_STATUS !== null && BASE_STATUS !== 'null') params.set('status', BASE_STATUS);
-            if (BASE_KEYWORD) params.set('keyword', BASE_KEYWORD);
-            if (BASE_FROM)    params.set('fromDate', BASE_FROM);
-            if (BASE_TO)      params.set('toDate', BASE_TO);
-            params.set('page', page);
-            return '/admin/orders?' + params.toString();
-        }
+    <!-- ===== PAGINATION JS ===== -->
+    <script th:inline="javascript">
+        const TOTAL_ITEMS  = /*[[${totalItems}]]*/ 0;
+const CURRENT_PAGE = /*[[${currentPage}]]*/ 1;
+const TOTAL_PAGES  = /*[[${totalPages}]]*/ 1;
+const BASE_STATUS  = /*[[${selectedStatus}]]*/ null;
+const BASE_KEYWORD = /*[[${keyword != null ? keyword : ''}]]*/ '';
+const BASE_FROM    = /*[[${fromDate != null ? fromDate : ''}]]*/ '';
+const BASE_TO      = /*[[${toDate != null ? toDate : ''}]]*/ '';
+
+function buildUrl(page) {
+    const params = new URLSearchParams();
+    // Kiểm tra null cả string lẫn thật
+    if (BASE_STATUS !== null && BASE_STATUS !== 'null' && BASE_STATUS !== '') {
+        params.set('status', BASE_STATUS);
+    }
+    if (BASE_KEYWORD && BASE_KEYWORD !== 'null') params.set('keyword', BASE_KEYWORD);
+    if (BASE_FROM    && BASE_FROM    !== 'null') params.set('fromDate', BASE_FROM);
+    if (BASE_TO      && BASE_TO      !== 'null') params.set('toDate',   BASE_TO);
+    params.set('page', page);
+    return '/admin/orders?' + params.toString();
+}
 
         function makeBtn(label, disabled, active, href) {
             const btn = document.createElement('a');
@@ -608,7 +696,6 @@
             const info    = document.getElementById('footerInfo');
             if (!footer || !wrapper || !info) return;
 
-            // Footer info
             info.innerHTML = `Tổng cộng <strong>${TOTAL_ITEMS}</strong> đơn hàng &nbsp;·&nbsp; Trang <strong>${CURRENT_PAGE}</strong>/${TOTAL_PAGES}`;
 
             if (TOTAL_PAGES <= 1) {
@@ -617,11 +704,8 @@
             }
 
             wrapper.innerHTML = '';
-
-            // Nút <
             wrapper.appendChild(makeBtn('‹', CURRENT_PAGE === 1, false, buildUrl(CURRENT_PAGE - 1)));
 
-            // Số trang
             getPageNumbers(CURRENT_PAGE, TOTAL_PAGES).forEach(p => {
                 if (p === '...') {
                     const dots = document.createElement('span');
@@ -633,7 +717,6 @@
                 }
             });
 
-            // Nút >
             wrapper.appendChild(makeBtn('›', CURRENT_PAGE === TOTAL_PAGES, false, buildUrl(CURRENT_PAGE + 1)));
         }
 

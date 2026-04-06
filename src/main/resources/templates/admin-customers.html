@@ -92,14 +92,16 @@
                 <h4 class="fw-bold m-0">Quản lý Khách Hàng</h4>
                 <small class="text-muted">Quản lý toàn bộ khách hàng trong hệ thống</small>
             </div>
-            <div class="admin-profile" data-bs-toggle="modal" data-bs-target="#profileModal">
-                <img src="https://ui-avatars.com/api/?name=Admin&background=28a745&color=fff" alt="Admin" class="admin-avatar">
-                <div class="admin-info">
-                    <h6>Admin Nguyễn</h6>
-                    <small><i class="fa-solid fa-circle text-success" style="font-size:0.5rem;"></i> Đang hoạt động</small>
-                </div>
-                <i class="fa-solid fa-chevron-down ms-2"></i>
-            </div>
+            <div class="admin-profile" onclick="window.location.href='/user/profile'" style="cursor:pointer;">
+    <img th:src="${currentUser != null && currentUser.image != null ? currentUser.image : 
+                  'https://ui-avatars.com/api/?name=' + (currentUser != null ? currentUser.fullname : 'Admin') + '&background=28a745&color=fff'}" 
+         alt="Admin" class="admin-avatar">
+    <div class="admin-info">
+        <h6 th:text="${currentUser != null ? currentUser.fullname : 'Admin'}">Admin</h6>
+        <small><i class="fa-solid fa-circle text-success" style="font-size:.5rem;"></i> Đang hoạt động</small>
+    </div>
+    <i class="fa-solid fa-chevron-down ms-2"></i>
+</div>
         </div>
 
         <!-- Search bar -->

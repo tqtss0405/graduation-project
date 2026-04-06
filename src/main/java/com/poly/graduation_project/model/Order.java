@@ -45,6 +45,9 @@ public class Order {
     @Column(precision = 12, scale = 2)
     private BigDecimal totalDiscount;
 
+    @Column(columnDefinition = "nvarchar(500)")
+    private String bankAccount;
+
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;

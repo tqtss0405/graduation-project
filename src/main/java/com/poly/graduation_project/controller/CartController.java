@@ -31,57 +31,70 @@ public class CartController {
     private ProductRepository productRepository;
 
     // ============================================================
+    // Helper: Kiểm tra sản phẩm có thể mua được không
+    // (active + danh mục active + còn hàng)
+    // ============================================================
+    private boolean isAvailable(Product p) {
+        if (p == null) return false;
+        if (!Boolean.TRUE.equals(p.getActive())) return false;
+        if (p.getStockQuantity() == null || p.getStockQuantity() <= 0) return false;
+        // Nếu danh mục bị ẩn → coi như không thể mua
+        if (p.getCategory() != null && !Boolean.TRUE.equals(p.getCategory().getActive())) return false;
+        return true;
+    }
+
+    // ============================================================
     // GET: Trang giỏ hàng
     // ============================================================
-   @GetMapping("/user/cart")
-public String cartPage(org.springframework.ui.Model model, HttpSession session) {
-    User currentUser = (User) session.getAttribute("currentUser");
-    List<CartDetail> cartItems = cartDetailRepository.findByUser(currentUser);
+    @GetMapping("/user/cart")
+    public String cartPage(org.springframework.ui.Model model, HttpSession session) {
+        User currentUser = (User) session.getAttribute("currentUser");
+        List<CartDetail> cartItems = cartDetailRepository.findByUser(currentUser);
 
-    // Sắp xếp: còn hàng lên trên, hết hàng xuống dưới
-    List<CartDetail> sortedItems = cartItems.stream()
-            .sorted((a, b) -> {
-                boolean aOk = Boolean.TRUE.equals(a.getProduct().getActive())
-                        && a.getProduct().getStockQuantity() > 0;
-                boolean bOk = Boolean.TRUE.equals(b.getProduct().getActive())
-                        && b.getProduct().getStockQuantity() > 0;
-                return Boolean.compare(bOk, aOk); // ok lên trước
-            })
-            .collect(Collectors.toList());
+        // Sắp xếp: có thể mua lên trên, không thể mua xuống dưới
+        List<CartDetail> sortedItems = cartItems.stream()
+                .sorted((a, b) -> {
+                    boolean aOk = isAvailable(a.getProduct());
+                    boolean bOk = isAvailable(b.getProduct());
+                    return Boolean.compare(bOk, aOk);
+                })
+                .collect(Collectors.toList());
 
-    boolean hasActiveItems = sortedItems.stream()
-            .anyMatch(ci -> Boolean.TRUE.equals(ci.getProduct().getActive())
-                    && ci.getProduct().getStockQuantity() > 0);
+        // Có ít nhất 1 sản phẩm có thể mua
+        boolean hasActiveItems = sortedItems.stream()
+                .anyMatch(ci -> isAvailable(ci.getProduct()));
 
-    boolean hasOutOfStock = sortedItems.stream()
-            .anyMatch(ci -> !Boolean.TRUE.equals(ci.getProduct().getActive())
-                    || ci.getProduct().getStockQuantity() <= 0
-                    || ci.getProduct().getStockQuantity() < ci.getQuantity());
+        // Có ít nhất 1 sản phẩm không thể mua (hết hàng / ẩn / danh mục ẩn)
+        boolean hasOutOfStock = sortedItems.stream()
+                .anyMatch(ci -> !isAvailable(ci.getProduct())
+                        || (ci.getProduct() != null
+                            && ci.getProduct().getStockQuantity() != null
+                            && ci.getProduct().getStockQuantity() < ci.getQuantity()));
 
-    java.math.BigDecimal subtotal = sortedItems.stream()
-            .filter(ci -> Boolean.TRUE.equals(ci.getProduct().getActive())
-                    && ci.getProduct().getStockQuantity() > 0)
-            .map(ci -> ci.getProduct().getPrice()
-                    .multiply(java.math.BigDecimal.valueOf(ci.getQuantity())))
-            .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add);
+        // Chỉ tính tiền cho sản phẩm có thể mua
+        java.math.BigDecimal subtotal = sortedItems.stream()
+                .filter(ci -> isAvailable(ci.getProduct()))
+                .map(ci -> ci.getProduct().getPrice()
+                        .multiply(java.math.BigDecimal.valueOf(ci.getQuantity())))
+                .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add);
 
-    java.math.BigDecimal shippingFee = subtotal.compareTo(java.math.BigDecimal.ZERO) == 0
-            ? java.math.BigDecimal.ZERO
-            : subtotal.compareTo(new java.math.BigDecimal("150000")) >= 0
-                    ? java.math.BigDecimal.ZERO
-                    : new java.math.BigDecimal("30000");
+        java.math.BigDecimal shippingFee = subtotal.compareTo(java.math.BigDecimal.ZERO) == 0
+                ? java.math.BigDecimal.ZERO
+                : subtotal.compareTo(new java.math.BigDecimal("150000")) >= 0
+                        ? java.math.BigDecimal.ZERO
+                        : new java.math.BigDecimal("30000");
 
-    int totalQuantity = sortedItems.stream().mapToInt(CartDetail::getQuantity).sum();
+        int totalQuantity = sortedItems.stream().mapToInt(CartDetail::getQuantity).sum();
 
-    model.addAttribute("cartItems", sortedItems);
-    model.addAttribute("hasActiveItems", hasActiveItems);
-    model.addAttribute("hasOutOfStock", hasOutOfStock);
-    model.addAttribute("subtotal", subtotal);
-    model.addAttribute("shippingFee", shippingFee);
-    model.addAttribute("total", subtotal.add(shippingFee));
-    model.addAttribute("totalQuantity", totalQuantity);
-    return "cart";
-}
+        model.addAttribute("cartItems",      sortedItems);
+        model.addAttribute("hasActiveItems", hasActiveItems);
+        model.addAttribute("hasOutOfStock",  hasOutOfStock);
+        model.addAttribute("subtotal",       subtotal);
+        model.addAttribute("shippingFee",    shippingFee);
+        model.addAttribute("total",          subtotal.add(shippingFee));
+        model.addAttribute("totalQuantity",  totalQuantity);
+        return "cart";
+    }
 
     // ============================================================
     // POST: Thêm sản phẩm vào giỏ hàng
@@ -104,16 +117,21 @@ public String cartPage(org.springframework.ui.Model model, HttpSession session) 
         }
 
         Product product = productRepository.findById(productId).orElse(null);
-        if (product == null || !Boolean.TRUE.equals(product.getActive())) {
-            response.put("success", false);
-            response.put("message", "Sản phẩm không tồn tại!");
-            return ResponseEntity.ok(response);
-        }
 
-        // Kiểm tra tồn kho
-        if (product.getStockQuantity() <= 0) {
+        // Kiểm tra sản phẩm có thể mua không (bao gồm cả danh mục)
+        if (!isAvailable(product)) {
+            String msg = "Sản phẩm không thể mua lúc này!";
+            if (product != null) {
+                if (!Boolean.TRUE.equals(product.getActive())) {
+                    msg = "Sản phẩm không tồn tại!";
+                } else if (product.getCategory() != null && !Boolean.TRUE.equals(product.getCategory().getActive())) {
+                    msg = "Sản phẩm thuộc danh mục đã ngừng kinh doanh!";
+                } else {
+                    msg = "Sản phẩm đã hết hàng!";
+                }
+            }
             response.put("success", false);
-            response.put("message", "Sản phẩm đã hết hàng!");
+            response.put("message", msg);
             return ResponseEntity.ok(response);
         }
 
@@ -124,7 +142,6 @@ public String cartPage(org.springframework.ui.Model model, HttpSession session) 
 
         if (cartDetail != null) {
             int newQty = cartDetail.getQuantity() + quantity;
-            // Không vượt tồn kho
             newQty = Math.min(newQty, product.getStockQuantity());
             cartDetail.setQuantity(newQty);
         } else {
@@ -135,7 +152,6 @@ public String cartPage(org.springframework.ui.Model model, HttpSession session) 
         }
         cartDetailRepository.save(cartDetail);
 
-        // Đếm tổng số lượng để cập nhật badge
         int totalQty = cartDetailRepository.countTotalQuantityByUser(currentUser);
 
         response.put("success", true);
@@ -168,38 +184,44 @@ public String cartPage(org.springframework.ui.Model model, HttpSession session) 
             return ResponseEntity.ok(response);
         }
 
+        // Không cho update số lượng nếu sản phẩm không còn khả dụng
+        if (!isAvailable(cartDetail.getProduct())) {
+            response.put("success", false);
+            response.put("message", "Sản phẩm không còn khả dụng!");
+            return ResponseEntity.ok(response);
+        }
+
         int stock = cartDetail.getProduct().getStockQuantity();
-        if (quantity < 1)
-            quantity = 1;
-        if (quantity > stock)
-            quantity = stock;
+        if (quantity < 1) quantity = 1;
+        if (quantity > stock) quantity = stock;
 
         cartDetail.setQuantity(quantity);
         cartDetailRepository.save(cartDetail);
 
-        // Tính lại giá của dòng này
         java.math.BigDecimal lineTotal = cartDetail.getProduct().getPrice()
                 .multiply(java.math.BigDecimal.valueOf(quantity));
 
-        // Tính lại tổng giỏ
+        // Tính lại tổng (chỉ tính sản phẩm có thể mua)
         List<CartDetail> allItems = cartDetailRepository.findByUser(currentUser);
         java.math.BigDecimal subtotal = allItems.stream()
+                .filter(ci -> isAvailable(ci.getProduct()))
                 .map(ci -> ci.getProduct().getPrice()
                         .multiply(java.math.BigDecimal.valueOf(ci.getQuantity())))
                 .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add);
+
         java.math.BigDecimal shippingFee = subtotal.compareTo(new java.math.BigDecimal("150000")) >= 0
                 ? java.math.BigDecimal.ZERO
                 : new java.math.BigDecimal("30000");
 
         int totalQty = cartDetailRepository.countTotalQuantityByUser(currentUser);
 
-        response.put("success", true);
-        response.put("lineTotal", lineTotal);
-        response.put("subtotal", subtotal);
+        response.put("success",     true);
+        response.put("lineTotal",   lineTotal);
+        response.put("subtotal",    subtotal);
         response.put("shippingFee", shippingFee);
-        response.put("total", subtotal.add(shippingFee));
-        response.put("cartCount", totalQty);
-        response.put("quantity", quantity);
+        response.put("total",       subtotal.add(shippingFee));
+        response.put("cartCount",   totalQty);
+        response.put("quantity",    quantity);
         return ResponseEntity.ok(response);
     }
 
@@ -225,27 +247,31 @@ public String cartPage(org.springframework.ui.Model model, HttpSession session) 
         }
 
         List<CartDetail> allItems = cartDetailRepository.findByUser(currentUser);
+
+        // Tính lại tổng (chỉ tính sản phẩm có thể mua)
         java.math.BigDecimal subtotal = allItems.stream()
+                .filter(ci -> isAvailable(ci.getProduct()))
                 .map(ci -> ci.getProduct().getPrice()
                         .multiply(java.math.BigDecimal.valueOf(ci.getQuantity())))
                 .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add);
+
         java.math.BigDecimal shippingFee = subtotal.compareTo(new java.math.BigDecimal("150000")) >= 0
                 ? java.math.BigDecimal.ZERO
                 : new java.math.BigDecimal("30000");
 
         int totalQty = cartDetailRepository.countTotalQuantityByUser(currentUser);
 
-        response.put("success", true);
-        response.put("subtotal", subtotal);
+        response.put("success",     true);
+        response.put("subtotal",    subtotal);
         response.put("shippingFee", shippingFee);
-        response.put("total", subtotal.add(shippingFee));
-        response.put("cartCount", totalQty);
-        response.put("isEmpty", allItems.isEmpty());
+        response.put("total",       subtotal.add(shippingFee));
+        response.put("cartCount",   totalQty);
+        response.put("isEmpty",     allItems.isEmpty());
         return ResponseEntity.ok(response);
     }
 
     // ============================================================
-    // GET (AJAX): Đếm số lượng trong giỏ (dùng để cập nhật badge navbar)
+    // GET (AJAX): Đếm số lượng trong giỏ
     // ============================================================
     @GetMapping("/user/cart/count")
     @ResponseBody
