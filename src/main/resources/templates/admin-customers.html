@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,76 +14,202 @@
         .table-wrapper {
             background: #fff;
             border-radius: 16px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
             overflow: hidden;
         }
-        .data-table { margin-bottom: 0; }
-        .data-table thead tr { background: #f8f9fa; }
-        .data-table thead th {
-            font-weight: 700; font-size: 0.78rem;
-            text-transform: uppercase; letter-spacing: 0.06em;
-            color: #6c757d; border-bottom: 2px solid #e9ecef;
-            padding: 14px 18px; white-space: nowrap;
+
+        .data-table {
+            margin-bottom: 0;
         }
-        .data-table tbody tr { transition: background 0.15s; }
-        .data-table tbody tr:hover { background: #f6fdf8; }
-        .data-table tbody td { padding: 13px 18px; vertical-align: middle; border-color: #f0f0f0; font-size: 0.93rem; }
+
+        .data-table thead tr {
+            background: #f8f9fa;
+        }
+
+        .data-table thead th {
+            font-weight: 700;
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #6c757d;
+            border-bottom: 2px solid #e9ecef;
+            padding: 14px 18px;
+            white-space: nowrap;
+        }
+
+        .data-table tbody tr {
+            transition: background 0.15s;
+        }
+
+        .data-table tbody tr:hover {
+            background: #f6fdf8;
+        }
+
+        .data-table tbody td {
+            padding: 13px 18px;
+            vertical-align: middle;
+            border-color: #f0f0f0;
+            font-size: 0.93rem;
+        }
 
         .search-bar-wrapper {
-            background: #fff; border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-            padding: 14px 18px; margin-bottom: 16px;
-            display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            padding: 14px 18px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
         }
-        .search-input-group { position: relative; flex: 1; min-width: 200px; max-width: 380px; }
+
+        .search-input-group {
+            position: relative;
+            flex: 1;
+            min-width: 200px;
+            max-width: 380px;
+        }
+
         .search-input-group .fa-magnifying-glass {
-            position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
-            color: #adb5bd; font-size: 0.88rem;
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #adb5bd;
+            font-size: 0.88rem;
         }
+
         .search-input-group input {
-            padding-left: 38px; border-radius: 10px; border: 1.5px solid #e9ecef;
-            font-size: 0.9rem; height: 40px; width: 100%; outline: none;
-            font-family: 'Quicksand', sans-serif; transition: border-color 0.2s;
+            padding-left: 38px;
+            border-radius: 10px;
+            border: 1.5px solid #e9ecef;
+            font-size: 0.9rem;
+            height: 40px;
+            width: 100%;
+            outline: none;
+            font-family: 'Quicksand', sans-serif;
+            transition: border-color 0.2s;
         }
-        .search-input-group input:focus { border-color: #28a745; box-shadow: 0 0 0 3px rgba(40,167,69,0.1); }
-        .search-result-info { font-size: 0.83rem; color: #6c757d; white-space: nowrap; }
+
+        .search-input-group input:focus {
+            border-color: #28a745;
+            box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.1);
+        }
+
+        .search-result-info {
+            font-size: 0.83rem;
+            color: #6c757d;
+            white-space: nowrap;
+        }
 
         .table-footer {
-            padding: 12px 18px; background: #f8f9fa; border-top: 1px solid #e9ecef;
-            font-size: 0.83rem; color: #6c757d;
-            display: flex; align-items: center; justify-content: space-between;
-            flex-wrap: wrap; gap: 10px;
+            padding: 12px 18px;
+            background: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+            font-size: 0.83rem;
+            color: #6c757d;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
         }
-        .pagination-wrapper { display: flex; align-items: center; gap: 4px; }
+
+        .pagination-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
         .page-btn {
-            min-width: 34px; height: 34px; padding: 0 8px; border-radius: 8px;
-            border: 1.5px solid #e9ecef; background: #fff; color: #495057;
-            font-size: 0.85rem; font-weight: 600; cursor: pointer;
-            display: flex; align-items: center; justify-content: center; transition: all 0.15s;
+            min-width: 34px;
+            height: 34px;
+            padding: 0 8px;
+            border-radius: 8px;
+            border: 1.5px solid #e9ecef;
+            background: #fff;
+            color: #495057;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s;
         }
-        .page-btn:hover:not(:disabled) { border-color: #28a745; color: #28a745; background: #f6fdf8; }
-        .page-btn.active { background: #28a745; border-color: #28a745; color: #fff; }
-        .page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
-        .empty-state { padding: 60px 0; text-align: center; color: #adb5bd; }
+        .page-btn:hover:not(:disabled) {
+            border-color: #28a745;
+            color: #28a745;
+            background: #f6fdf8;
+        }
 
-        .customer-avatar { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; }
-        .status-badge-active { background: #e8f8f1; color: #1a7a4a; border-radius: 20px; padding: 3px 12px; font-size: 0.78rem; font-weight: 600; }
-        .status-badge-blocked { background: #fef2f2; color: #c0392b; border-radius: 20px; padding: 3px 12px; font-size: 0.78rem; font-weight: 600; }
+        .page-btn.active {
+            background: #28a745;
+            border-color: #28a745;
+            color: #fff;
+        }
+
+        .page-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .empty-state {
+            padding: 60px 0;
+            text-align: center;
+            color: #adb5bd;
+        }
+
+        .customer-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .status-badge-active {
+            background: #e8f8f1;
+            color: #1a7a4a;
+            border-radius: 20px;
+            padding: 3px 12px;
+            font-size: 0.78rem;
+            font-weight: 600;
+        }
+
+        .status-badge-blocked {
+            background: #fef2f2;
+            color: #c0392b;
+            border-radius: 20px;
+            padding: 3px 12px;
+            font-size: 0.78rem;
+            font-weight: 600;
+        }
     </style>
 </head>
+
 <body>
     <nav class="sidebar">
-        <div class="sidebar-brand">BEO<span style="color:white">BOOKS</span></div>
+        <div class="sidebar-brand"><a class="text-decoration-none" href="/home"><span
+                    style="color:#27ae60">BEO</span><span style="color:white">BOOKS</span></a></div>
         <ul class="nav flex-column mt-3">
-            <li class="nav-item"><a href="/admin/dashboard" class="nav-link"><i class="fa-solid fa-gauge"></i> Tổng quan</a></li>
-            <li class="nav-item"><a href="/admin/products" class="nav-link"><i class="fa-solid fa-book"></i> Quản lý sách</a></li>
-            <li class="nav-item"><a href="/admin/orders" class="nav-link"><i class="fa-solid fa-cart-shopping"></i> Đơn hàng</a></li>
-            <li class="nav-item"><a href="/admin/customers" class="nav-link active"><i class="fa-solid fa-users"></i> Khách hàng</a></li>
-            <li class="nav-item"><a href="/admin/categories" class="nav-link"><i class="fa-solid fa-layer-group"></i> Danh mục</a></li>
-            <li class="nav-item"><a href="/admin/vouchers" class="nav-link"><i class="fa-solid fa-ticket"></i> Mã giảm giá</a></li>
-            <li class="nav-item"><a href="/admin/reviews" class="nav-link"><i class="fa-solid fa-star"></i> Đánh giá</a></li>
-            <li class="nav-item mt-5"><a href="/logout" class="nav-link text-danger"><i class="fa-solid fa-right-from-bracket"></i> Thoát</a></li>
+            <li class="nav-item"><a href="/admin/dashboard" class="nav-link"><i class="fa-solid fa-gauge"></i> Tổng
+                    quan</a></li>
+            <li class="nav-item"><a href="/admin/products" class="nav-link"><i class="fa-solid fa-book"></i> Quản lý
+                    sách</a></li>
+            <li class="nav-item"><a href="/admin/orders" class="nav-link"><i class="fa-solid fa-cart-shopping"></i> Đơn
+                    hàng</a></li>
+            <li class="nav-item"><a href="/admin/customers" class="nav-link active"><i class="fa-solid fa-users"></i>
+                    Khách hàng</a></li>
+            <li class="nav-item"><a href="/admin/categories" class="nav-link"><i class="fa-solid fa-layer-group"></i>
+                    Danh mục</a></li>
+            <li class="nav-item"><a href="/admin/vouchers" class="nav-link"><i class="fa-solid fa-ticket"></i> Mã giảm
+                    giá</a></li>
+            <li class="nav-item"><a href="/admin/reviews" class="nav-link"><i class="fa-solid fa-star"></i> Đánh giá</a>
+            </li>
+            <li class="nav-item mt-5"><a href="/logout" class="nav-link text-danger"><i
+                        class="fa-solid fa-right-from-bracket"></i> Thoát</a></li>
         </ul>
     </nav>
 
@@ -93,15 +220,16 @@
                 <small class="text-muted">Quản lý toàn bộ khách hàng trong hệ thống</small>
             </div>
             <div class="admin-profile" onclick="window.location.href='/user/profile'" style="cursor:pointer;">
-    <img th:src="${currentUser != null && currentUser.image != null ? currentUser.image : 
-                  'https://ui-avatars.com/api/?name=' + (currentUser != null ? currentUser.fullname : 'Admin') + '&background=28a745&color=fff'}" 
-         alt="Admin" class="admin-avatar">
-    <div class="admin-info">
-        <h6 th:text="${currentUser != null ? currentUser.fullname : 'Admin'}">Admin</h6>
-        <small><i class="fa-solid fa-circle text-success" style="font-size:.5rem;"></i> Đang hoạt động</small>
-    </div>
-    <i class="fa-solid fa-chevron-down ms-2"></i>
-</div>
+                <img th:src="${currentUser != null && currentUser.image != null ? currentUser.image : 
+                  'https://ui-avatars.com/api/?name=' + (currentUser != null ? currentUser.fullname : 'Admin') + '&background=28a745&color=fff'}"
+                    alt="Admin" class="admin-avatar">
+                <div class="admin-info">
+                    <h6 th:text="${currentUser != null ? currentUser.fullname : 'Admin'}">Admin</h6>
+                    <small><i class="fa-solid fa-circle text-success" style="font-size:.5rem;"></i> Đang hoạt
+                        động</small>
+                </div>
+                <i class="fa-solid fa-chevron-down ms-2"></i>
+            </div>
         </div>
 
         <!-- Search bar -->
@@ -128,8 +256,7 @@
                     </tr>
                 </thead>
                 <tbody id="tableBody">
-                    <tr th:each="customer, iter : ${customers}"
-                        class="data-row"
+                    <tr th:each="customer, iter : ${customers}" class="data-row"
                         th:data-search="${customer.fullname.toLowerCase() + ' ' + customer.email.toLowerCase() + (customer.phone != null ? ' ' + customer.phone : '')}">
                         <td class="text-muted fw-semibold row-index"></td>
                         <td>
@@ -142,16 +269,20 @@
                         <td class="text-muted" th:text="${customer.email}">email@gmail.com</td>
                         <td class="text-muted" th:text="${customer.phone != null ? customer.phone : '—'}">—</td>
                         <td>
-                            <span style="background:#eef2ff;color:#5a6acf;border-radius:20px;padding:3px 12px;font-size:0.82rem;font-weight:600;">
+                            <span
+                                style="background:#eef2ff;color:#5a6acf;border-radius:20px;padding:3px 12px;font-size:0.82rem;font-weight:600;">
                                 <span th:text="${#lists.size(customer.orders)}">0</span> đơn
                             </span>
                         </td>
                         <td>
-                            <span th:if="${customer.active}" class="status-badge-active"><i class="fa-solid fa-circle-check me-1"></i>Hoạt động</span>
-                            <span th:unless="${customer.active}" class="status-badge-blocked"><i class="fa-solid fa-ban me-1"></i>Bị chặn</span>
+                            <span th:if="${customer.active}" class="status-badge-active"><i
+                                    class="fa-solid fa-circle-check me-1"></i>Hoạt động</span>
+                            <span th:unless="${customer.active}" class="status-badge-blocked"><i
+                                    class="fa-solid fa-ban me-1"></i>Bị chặn</span>
                         </td>
                         <td class="text-center">
-                            <form th:action="@{/admin/customers/toggle-status/{id}(id=${customer.id})}" method="post" style="display:inline;">
+                            <form th:action="@{/admin/customers/toggle-status/{id}(id=${customer.id})}" method="post"
+                                style="display:inline;">
                                 <button type="submit" class="btn btn-sm"
                                     th:class="${customer.active} ? 'btn btn-sm btn-outline-danger' : 'btn btn-sm btn-outline-success'"
                                     style="border-radius:8px;">
@@ -190,20 +321,33 @@
                     <form id="profileForm">
                         <div class="text-center mb-4">
                             <div class="position-relative d-inline-block">
-                                <img src="https://ui-avatars.com/api/?name=Admin&background=28a745&color=fff&size=150" class="rounded-circle" width="150" height="150" alt="Avatar">
-                                <label for="avatarUpload" class="position-absolute bottom-0 end-0 btn btn-success btn-sm rounded-circle" style="width:40px;height:40px;"><i class="fa-solid fa-camera"></i></label>
-                                <input type="file" id="avatarUpload" class="d-none" accept="image/*" onchange="previewAvatar(event)">
+                                <img src="https://ui-avatars.com/api/?name=Admin&background=28a745&color=fff&size=150"
+                                    class="rounded-circle" width="150" height="150" alt="Avatar">
+                                <label for="avatarUpload"
+                                    class="position-absolute bottom-0 end-0 btn btn-success btn-sm rounded-circle"
+                                    style="width:40px;height:40px;"><i class="fa-solid fa-camera"></i></label>
+                                <input type="file" id="avatarUpload" class="d-none" accept="image/*"
+                                    onchange="previewAvatar(event)">
                             </div>
                         </div>
-                        <div class="mb-3"><label class="form-label fw-semibold">Họ và tên</label><input type="text" class="form-control" value="Admin Nguyễn"></div>
-                        <div class="mb-3"><label class="form-label fw-semibold">Email</label><input type="email" class="form-control" value="admin@beobooks.com" readonly></div>
-                        <div class="mb-3"><label class="form-label fw-semibold">Số điện thoại</label><input type="tel" class="form-control" value="0123456789"></div>
-                        <div class="mb-3"><label class="form-label fw-semibold">Giới tính</label><select class="form-select"><option>Nam</option><option>Nữ</option><option>Khác</option></select></div>
+                        <div class="mb-3"><label class="form-label fw-semibold">Họ và tên</label><input type="text"
+                                class="form-control" value="Admin Nguyễn"></div>
+                        <div class="mb-3"><label class="form-label fw-semibold">Email</label><input type="email"
+                                class="form-control" value="admin@beobooks.com" readonly></div>
+                        <div class="mb-3"><label class="form-label fw-semibold">Số điện thoại</label><input type="tel"
+                                class="form-control" value="0123456789"></div>
+                        <div class="mb-3"><label class="form-label fw-semibold">Giới tính</label><select
+                                class="form-select">
+                                <option>Nam</option>
+                                <option>Nữ</option>
+                                <option>Khác</option>
+                            </select></div>
                     </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="submit" form="profileForm" class="btn btn-success"><i class="fa-solid fa-save me-2"></i>Lưu thay đổi</button>
+                    <button type="submit" form="profileForm" class="btn btn-success"><i
+                            class="fa-solid fa-save me-2"></i>Lưu thay đổi</button>
                 </div>
             </div>
         </div>
@@ -271,13 +415,14 @@
         }
 
         function getPageNums(c, t) {
-            if (t <= 7) return Array.from({length: t}, (_, i) => i + 1);
-            if (c <= 4) return [1,2,3,4,5,'...',t];
-            if (c >= t - 3) return [1,'...',t-4,t-3,t-2,t-1,t];
-            return [1,'...',c-1,c,c+1,'...',t];
+            if (t <= 7) return Array.from({ length: t }, (_, i) => i + 1);
+            if (c <= 4) return [1, 2, 3, 4, 5, '...', t];
+            if (c >= t - 3) return [1, '...', t - 4, t - 3, t - 2, t - 1, t];
+            return [1, '...', c - 1, c, c + 1, '...', t];
         }
 
         document.addEventListener('DOMContentLoaded', () => { renderTable(); });
     </script>
 </body>
+
 </html>

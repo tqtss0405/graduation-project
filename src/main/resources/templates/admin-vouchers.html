@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,46 +10,201 @@
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/admin-style.css">
     <style>
-        .table-wrapper { background:#fff; border-radius:16px; box-shadow:0 2px 12px rgba(0,0,0,0.07); overflow:hidden; }
-        .data-table { margin-bottom:0; }
-        .data-table thead tr { background:#f8f9fa; }
-        .data-table thead th { font-weight:700; font-size:0.78rem; text-transform:uppercase; letter-spacing:0.06em; color:#6c757d; border-bottom:2px solid #e9ecef; padding:14px 18px; white-space:nowrap; }
-        .data-table tbody tr { transition:background 0.15s; }
-        .data-table tbody tr:hover { background:#f6fdf8; }
-        .data-table tbody td { padding:13px 18px; vertical-align:middle; border-color:#f0f0f0; font-size:0.93rem; }
+        .table-wrapper {
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+            overflow: hidden;
+        }
 
-        .search-bar-wrapper { background:#fff; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.06); padding:14px 18px; margin-bottom:16px; display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
-        .search-input-group { position:relative; flex:1; min-width:200px; max-width:380px; }
-        .search-input-group .fa-magnifying-glass { position:absolute; left:14px; top:50%; transform:translateY(-50%); color:#adb5bd; font-size:0.88rem; }
-        .search-input-group input { padding-left:38px; border-radius:10px; border:1.5px solid #e9ecef; font-size:0.9rem; height:40px; width:100%; outline:none; font-family:'Quicksand',sans-serif; transition:border-color 0.2s; }
-        .search-input-group input:focus { border-color:#28a745; box-shadow:0 0 0 3px rgba(40,167,69,0.1); }
-        .search-result-info { font-size:0.83rem; color:#6c757d; white-space:nowrap; }
+        .data-table {
+            margin-bottom: 0;
+        }
 
-        .table-footer { padding:12px 18px; background:#f8f9fa; border-top:1px solid #e9ecef; font-size:0.83rem; color:#6c757d; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; }
-        .pagination-wrapper { display:flex; align-items:center; gap:4px; }
-        .page-btn { min-width:34px; height:34px; padding:0 8px; border-radius:8px; border:1.5px solid #e9ecef; background:#fff; color:#495057; font-size:0.85rem; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.15s; }
-        .page-btn:hover:not(:disabled) { border-color:#28a745; color:#28a745; background:#f6fdf8; }
-        .page-btn.active { background:#28a745; border-color:#28a745; color:#fff; }
-        .page-btn:disabled { opacity:0.4; cursor:not-allowed; }
-        .empty-state { padding:60px 0; text-align:center; color:#adb5bd; }
+        .data-table thead tr {
+            background: #f8f9fa;
+        }
 
-        .coupon-code { font-family:monospace; background:#f0f4ff; color:#3d5af1; padding:3px 10px; border-radius:6px; font-weight:700; font-size:0.88rem; }
-        .discount-badge { background:#fff3cd; color:#856404; border-radius:20px; padding:3px 10px; font-size:0.82rem; font-weight:700; border:1px solid #ffc107; }
+        .data-table thead th {
+            font-weight: 700;
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #6c757d;
+            border-bottom: 2px solid #e9ecef;
+            padding: 14px 18px;
+            white-space: nowrap;
+        }
+
+        .data-table tbody tr {
+            transition: background 0.15s;
+        }
+
+        .data-table tbody tr:hover {
+            background: #f6fdf8;
+        }
+
+        .data-table tbody td {
+            padding: 13px 18px;
+            vertical-align: middle;
+            border-color: #f0f0f0;
+            font-size: 0.93rem;
+        }
+
+        .search-bar-wrapper {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            padding: 14px 18px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .search-input-group {
+            position: relative;
+            flex: 1;
+            min-width: 200px;
+            max-width: 380px;
+        }
+
+        .search-input-group .fa-magnifying-glass {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #adb5bd;
+            font-size: 0.88rem;
+        }
+
+        .search-input-group input {
+            padding-left: 38px;
+            border-radius: 10px;
+            border: 1.5px solid #e9ecef;
+            font-size: 0.9rem;
+            height: 40px;
+            width: 100%;
+            outline: none;
+            font-family: 'Quicksand', sans-serif;
+            transition: border-color 0.2s;
+        }
+
+        .search-input-group input:focus {
+            border-color: #28a745;
+            box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.1);
+        }
+
+        .search-result-info {
+            font-size: 0.83rem;
+            color: #6c757d;
+            white-space: nowrap;
+        }
+
+        .table-footer {
+            padding: 12px 18px;
+            background: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+            font-size: 0.83rem;
+            color: #6c757d;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .pagination-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .page-btn {
+            min-width: 34px;
+            height: 34px;
+            padding: 0 8px;
+            border-radius: 8px;
+            border: 1.5px solid #e9ecef;
+            background: #fff;
+            color: #495057;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s;
+        }
+
+        .page-btn:hover:not(:disabled) {
+            border-color: #28a745;
+            color: #28a745;
+            background: #f6fdf8;
+        }
+
+        .page-btn.active {
+            background: #28a745;
+            border-color: #28a745;
+            color: #fff;
+        }
+
+        .page-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .empty-state {
+            padding: 60px 0;
+            text-align: center;
+            color: #adb5bd;
+        }
+
+        .coupon-code {
+            font-family: monospace;
+            background: #f0f4ff;
+            color: #3d5af1;
+            padding: 3px 10px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 0.88rem;
+        }
+
+        .discount-badge {
+            background: #fff3cd;
+            color: #856404;
+            border-radius: 20px;
+            padding: 3px 10px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            border: 1px solid #ffc107;
+        }
     </style>
 </head>
+
 <body>
     <div id="toast-container"></div>
     <nav class="sidebar">
-        <div class="sidebar-brand">BEO<span style="color:white">BOOKS</span></div>
+        <div class="sidebar-brand"><a class="text-decoration-none" href="/home"><span
+                    style="color:#27ae60">BEO</span><span style="color:white">BOOKS</span></a></div>
         <ul class="nav flex-column mt-3">
-            <li class="nav-item"><a href="/admin/dashboard" class="nav-link"><i class="fa-solid fa-gauge"></i> Tổng quan</a></li>
-            <li class="nav-item"><a href="/admin/products" class="nav-link"><i class="fa-solid fa-book"></i> Quản lý sách</a></li>
-            <li class="nav-item"><a href="/admin/orders" class="nav-link"><i class="fa-solid fa-cart-shopping"></i> Đơn hàng</a></li>
-            <li class="nav-item"><a href="/admin/customers" class="nav-link"><i class="fa-solid fa-users"></i> Khách hàng</a></li>
-            <li class="nav-item"><a href="/admin/categories" class="nav-link"><i class="fa-solid fa-layer-group"></i> Danh mục</a></li>
-            <li class="nav-item"><a href="/admin/vouchers" class="nav-link active"><i class="fa-solid fa-ticket"></i> Mã giảm giá</a></li>
-            <li class="nav-item"><a href="/admin/reviews" class="nav-link"><i class="fa-solid fa-star"></i> Đánh giá</a></li>
-            <li class="nav-item mt-5"><a href="/logout" class="nav-link text-danger"><i class="fa-solid fa-right-from-bracket"></i> Thoát</a></li>
+            <li class="nav-item"><a href="/admin/dashboard" class="nav-link"><i class="fa-solid fa-gauge"></i> Tổng
+                    quan</a></li>
+            <li class="nav-item"><a href="/admin/products" class="nav-link"><i class="fa-solid fa-book"></i> Quản lý
+                    sách</a></li>
+            <li class="nav-item"><a href="/admin/orders" class="nav-link"><i class="fa-solid fa-cart-shopping"></i> Đơn
+                    hàng</a></li>
+            <li class="nav-item"><a href="/admin/customers" class="nav-link"><i class="fa-solid fa-users"></i> Khách
+                    hàng</a></li>
+            <li class="nav-item"><a href="/admin/categories" class="nav-link"><i class="fa-solid fa-layer-group"></i>
+                    Danh mục</a></li>
+            <li class="nav-item"><a href="/admin/vouchers" class="nav-link active"><i class="fa-solid fa-ticket"></i> Mã
+                    giảm giá</a></li>
+            <li class="nav-item"><a href="/admin/reviews" class="nav-link"><i class="fa-solid fa-star"></i> Đánh giá</a>
+            </li>
+            <li class="nav-item mt-5"><a href="/logout" class="nav-link text-danger"><i
+                        class="fa-solid fa-right-from-bracket"></i> Thoát</a></li>
         </ul>
     </nav>
 
@@ -63,15 +219,16 @@
                     <i class="fa-solid fa-plus me-2"></i>Tạo mã giảm giá
                 </button>
                 <div class="admin-profile" onclick="window.location.href='/user/profile'" style="cursor:pointer;">
-    <img th:src="${currentUser != null && currentUser.image != null ? currentUser.image : 
-                  'https://ui-avatars.com/api/?name=' + (currentUser != null ? currentUser.fullname : 'Admin') + '&background=28a745&color=fff'}" 
-         alt="Admin" class="admin-avatar">
-    <div class="admin-info">
-        <h6 th:text="${currentUser != null ? currentUser.fullname : 'Admin'}">Admin</h6>
-        <small><i class="fa-solid fa-circle text-success" style="font-size:.5rem;"></i> Đang hoạt động</small>
-    </div>
-    <i class="fa-solid fa-chevron-down ms-2"></i>
-</div>
+                    <img th:src="${currentUser != null && currentUser.image != null ? currentUser.image : 
+                  'https://ui-avatars.com/api/?name=' + (currentUser != null ? currentUser.fullname : 'Admin') + '&background=28a745&color=fff'}"
+                        alt="Admin" class="admin-avatar">
+                    <div class="admin-info">
+                        <h6 th:text="${currentUser != null ? currentUser.fullname : 'Admin'}">Admin</h6>
+                        <small><i class="fa-solid fa-circle text-success" style="font-size:.5rem;"></i> Đang hoạt
+                            động</small>
+                    </div>
+                    <i class="fa-solid fa-chevron-down ms-2"></i>
+                </div>
             </div>
         </div>
 
@@ -84,10 +241,42 @@
 
         <!-- Stats -->
         <div class="row g-4 mb-4">
-            <div class="col-md-3"><div class="stat-card"><div class="d-flex justify-content-between align-items-center"><div><small class="opacity-75">Tổng mã</small><h2 class="fw-bold mb-0" th:text="${totalVouchers}">0</h2></div><i class="fa-solid fa-ticket fa-3x opacity-25"></i></div></div></div>
-            <div class="col-md-3"><div class="stat-card green"><div class="d-flex justify-content-between align-items-center"><div><small class="opacity-75">Đang hoạt động</small><h2 class="fw-bold mb-0" th:text="${activeVouchers}">0</h2></div><i class="fa-solid fa-check-circle fa-3x opacity-25"></i></div></div></div>
-            <div class="col-md-3"><div class="stat-card orange"><div class="d-flex justify-content-between align-items-center"><div><small class="opacity-75">Đã hết hạn</small><h2 class="fw-bold mb-0" th:text="${expiredVouchers}">0</h2></div><i class="fa-solid fa-clock fa-3x opacity-25"></i></div></div></div>
-            <div class="col-md-3"><div class="stat-card blue"><div class="d-flex justify-content-between align-items-center"><div><small class="opacity-75">Sắp diễn ra</small><h2 class="fw-bold mb-0" th:text="${upcomingVouchers}">0</h2></div><i class="fa-solid fa-calendar fa-3x opacity-25"></i></div></div></div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div><small class="opacity-75">Tổng mã</small>
+                            <h2 class="fw-bold mb-0" th:text="${totalVouchers}">0</h2>
+                        </div><i class="fa-solid fa-ticket fa-3x opacity-25"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card green">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div><small class="opacity-75">Đang hoạt động</small>
+                            <h2 class="fw-bold mb-0" th:text="${activeVouchers}">0</h2>
+                        </div><i class="fa-solid fa-check-circle fa-3x opacity-25"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card orange">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div><small class="opacity-75">Đã hết hạn</small>
+                            <h2 class="fw-bold mb-0" th:text="${expiredVouchers}">0</h2>
+                        </div><i class="fa-solid fa-clock fa-3x opacity-25"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card blue">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div><small class="opacity-75">Sắp diễn ra</small>
+                            <h2 class="fw-bold mb-0" th:text="${upcomingVouchers}">0</h2>
+                        </div><i class="fa-solid fa-calendar fa-3x opacity-25"></i>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Search bar -->
@@ -117,21 +306,26 @@
                     </tr>
                 </thead>
                 <tbody id="tableBody">
-                    <tr th:each="v : ${vouchers}"
-                        class="data-row"
+                    <tr th:each="v : ${vouchers}" class="data-row"
                         th:data-search="${v.name.toLowerCase() + ' ' + v.code.toLowerCase()}">
                         <td class="fw-bold text-muted" th:text="${v.id}"></td>
-                        <td><div class="fw-semibold" th:text="${v.name}"></div></td>
+                        <td>
+                            <div class="fw-semibold" th:text="${v.name}"></div>
+                        </td>
                         <td>
                             <span class="coupon-code" th:text="${v.code}"></span>
-                            <button class="btn btn-sm btn-light ms-2" th:data-code="${v.code}" onclick="copyCoupon(this.dataset.code)" title="Copy"><i class="fa-solid fa-copy"></i></button>
+                            <button class="btn btn-sm btn-light ms-2" th:data-code="${v.code}"
+                                onclick="copyCoupon(this.dataset.code)" title="Copy"><i
+                                    class="fa-solid fa-copy"></i></button>
                         </td>
                         <td><span class="discount-badge" th:text="'-' + ${v.discount} + '%'"></span></td>
                         <td><strong th:text="${v.quantity == 0} ? '∞' : ${v.quantity}"></strong></td>
                         <td>
-                            <div th:text="${usedCountMap[v.id]} + ' / ' + (${v.quantity == 0} ? '∞' : ${v.quantity})"></div>
+                            <div th:text="${usedCountMap[v.id]} + ' / ' + (${v.quantity == 0} ? '∞' : ${v.quantity})">
+                            </div>
                             <div th:if="${v.quantity > 0}" class="progress mt-1" style="height:5px;">
-                                <div class="progress-bar bg-success" th:style="'width:' + (${usedCountMap[v.id]} * 100 / ${v.quantity}) + '%'"></div>
+                                <div class="progress-bar bg-success"
+                                    th:style="'width:' + (${usedCountMap[v.id]} * 100 / ${v.quantity}) + '%'"></div>
                             </div>
                             <small th:if="${v.quantity == 0}" class="text-muted">Không giới hạn</small>
                         </td>
@@ -139,14 +333,23 @@
                         <td th:text="${v.endAt} ? ${#temporals.format(v.endAt, 'dd/MM/yyyy')} : '—'"></td>
                         <td>
                             <span th:if="${!v.active}" class="status-expired">Đã tắt</span>
-                            <span th:if="${v.active and v.endAt != null and v.endAt.isBefore(#temporals.createNow())}" class="status-expired">Đã hết hạn</span>
-                            <span th:if="${v.active and (v.endAt == null or v.endAt.isAfter(#temporals.createNow())) and (v.startedAt == null or v.startedAt.isAfter(#temporals.createNow()))}" class="status-upcoming">Sắp diễn ra</span>
-                            <span th:if="${v.active and (v.endAt == null or v.endAt.isAfter(#temporals.createNow())) and (v.startedAt == null or v.startedAt.isBefore(#temporals.createNow()))}" class="status-active">Đang hoạt động</span>
+                            <span th:if="${v.active and v.endAt != null and v.endAt.isBefore(#temporals.createNow())}"
+                                class="status-expired">Đã hết hạn</span>
+                            <span
+                                th:if="${v.active and (v.endAt == null or v.endAt.isAfter(#temporals.createNow())) and (v.startedAt == null or v.startedAt.isAfter(#temporals.createNow()))}"
+                                class="status-upcoming">Sắp diễn ra</span>
+                            <span
+                                th:if="${v.active and (v.endAt == null or v.endAt.isAfter(#temporals.createNow())) and (v.startedAt == null or v.startedAt.isBefore(#temporals.createNow()))}"
+                                class="status-active">Đang hoạt động</span>
                         </td>
                         <td class="text-center">
-                            <button class="btn btn-sm btn-outline-primary" style="border-radius:8px;" th:data-id="${v.id}" onclick="openEditModal(this.dataset.id)" title="Sửa"><i class="fa-solid fa-pen"></i></button>
-                            <form th:action="@{/admin/vouchers/delete/{id}(id=${v.id})}" method="post" style="display:inline;" th:id="'del-form-' + ${v.id}">
-                                <button type="button" class="btn btn-sm btn-outline-danger ms-1" style="border-radius:8px;" title="Xóa" th:data-id="${v.id}" th:data-code="${v.code}"
+                            <button class="btn btn-sm btn-outline-primary" style="border-radius:8px;"
+                                th:data-id="${v.id}" onclick="openEditModal(this.dataset.id)" title="Sửa"><i
+                                    class="fa-solid fa-pen"></i></button>
+                            <form th:action="@{/admin/vouchers/delete/{id}(id=${v.id})}" method="post"
+                                style="display:inline;" th:id="'del-form-' + ${v.id}">
+                                <button type="button" class="btn btn-sm btn-outline-danger ms-1"
+                                    style="border-radius:8px;" title="Xóa" th:data-id="${v.id}" th:data-code="${v.code}"
                                     onclick="showConfirm('Xóa mã ' + this.dataset.code + '?', () => document.getElementById('del-form-' + this.dataset.id).submit())">
                                     <i class="fa-solid fa-trash"></i>
                                 </button>
@@ -179,19 +382,41 @@
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="addCouponForm" th:action="@{/admin/vouchers/save}" th:object="${voucherDTO}" method="post" class="row g-3">
-                        <div class="col-md-12"><label class="form-label fw-semibold">Tên chương trình *</label><input type="text" th:field="*{name}" class="form-control" placeholder="VD: Khuyến mãi Tết 2025"></div>
-                        <div class="col-md-6"><label class="form-label fw-semibold">Mã giảm giá *</label><div class="input-group"><input type="text" th:field="*{code}" id="couponCode" class="form-control text-uppercase" placeholder="VD: TET2025"><button class="btn btn-outline-secondary" type="button" onclick="generateCode()"><i class="fa-solid fa-wand-magic-sparkles"></i> Tạo tự động</button></div><small class="text-muted">Chữ hoa, không dấu, không khoảng trắng, tối đa 10 ký tự</small></div>
-                        <div class="col-md-6"><label class="form-label fw-semibold">Giảm giá (%) *</label><div class="input-group"><input type="number" th:field="*{discount}" class="form-control" min="1" max="100" placeholder="Nhập % giảm"><span class="input-group-text">%</span></div></div>
-                        <div class="col-md-6"><label class="form-label fw-semibold">Số lượng mã *</label><input type="number" th:field="*{quantity}" class="form-control" min="0" placeholder="0 = Không giới hạn"></div>
-                        <div class="col-md-6"><label class="form-label fw-semibold">Ngày bắt đầu *</label><input type="datetime-local" name="startedAt" class="form-control"></div>
-                        <div class="col-md-6"><label class="form-label fw-semibold">Ngày hết hạn *</label><input type="datetime-local" name="endAt" class="form-control"></div>
-                        <div class="col-12"><div class="form-check"><input class="form-check-input" type="checkbox" th:field="*{active}" id="activeStatus"><label class="form-check-label" for="activeStatus">Kích hoạt ngay sau khi tạo</label></div></div>
+                    <form id="addCouponForm" th:action="@{/admin/vouchers/save}" th:object="${voucherDTO}" method="post"
+                        class="row g-3">
+                        <div class="col-md-12"><label class="form-label fw-semibold">Tên chương trình *</label><input
+                                type="text" th:field="*{name}" class="form-control"
+                                placeholder="VD: Khuyến mãi Tết 2025"></div>
+                        <div class="col-md-6"><label class="form-label fw-semibold">Mã giảm giá *</label>
+                            <div class="input-group"><input type="text" th:field="*{code}" id="couponCode"
+                                    class="form-control text-uppercase" placeholder="VD: TET2025"><button
+                                    class="btn btn-outline-secondary" type="button" onclick="generateCode()"><i
+                                        class="fa-solid fa-wand-magic-sparkles"></i> Tạo tự động</button></div><small
+                                class="text-muted">Chữ hoa, không dấu, không khoảng trắng, tối đa 10 ký tự</small>
+                        </div>
+                        <div class="col-md-6"><label class="form-label fw-semibold">Giảm giá (%) *</label>
+                            <div class="input-group"><input type="number" th:field="*{discount}" class="form-control"
+                                    min="1" max="100" placeholder="Nhập % giảm"><span class="input-group-text">%</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6"><label class="form-label fw-semibold">Số lượng mã *</label><input
+                                type="number" th:field="*{quantity}" class="form-control" min="0"
+                                placeholder="0 = Không giới hạn"></div>
+                        <div class="col-md-6"><label class="form-label fw-semibold">Ngày bắt đầu *</label><input
+                                type="datetime-local" name="startedAt" class="form-control"></div>
+                        <div class="col-md-6"><label class="form-label fw-semibold">Ngày hết hạn *</label><input
+                                type="datetime-local" name="endAt" class="form-control"></div>
+                        <div class="col-12">
+                            <div class="form-check"><input class="form-check-input" type="checkbox" th:field="*{active}"
+                                    id="activeStatus"><label class="form-check-label" for="activeStatus">Kích hoạt ngay
+                                    sau khi tạo</label></div>
+                        </div>
                     </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="submit" form="addCouponForm" class="btn btn-success"><i class="fa-solid fa-check me-2"></i>Tạo mã giảm giá</button>
+                    <button type="submit" form="addCouponForm" class="btn btn-success"><i
+                            class="fa-solid fa-check me-2"></i>Tạo mã giảm giá</button>
                 </div>
             </div>
         </div>
@@ -208,18 +433,34 @@
                 <div class="modal-body">
                     <form id="editCouponForm" method="post" class="row g-3">
                         <input type="hidden" id="editId">
-                        <div class="col-md-12"><label class="form-label fw-semibold">Tên chương trình *</label><input type="text" id="editName" name="name" class="form-control" required></div>
-                        <div class="col-md-6"><label class="form-label fw-semibold">Mã giảm giá *</label><input type="text" id="editCode" name="code" class="form-control text-uppercase" maxlength="10" required></div>
-                        <div class="col-md-6"><label class="form-label fw-semibold">Giảm giá (%) *</label><div class="input-group"><input type="number" id="editDiscount" name="discount" class="form-control" min="1" max="100" required><span class="input-group-text">%</span></div></div>
-                        <div class="col-md-6"><label class="form-label fw-semibold">Số lượng *</label><input type="number" id="editQuantity" name="quantity" class="form-control" min="0" required></div>
-                        <div class="col-md-6"><label class="form-label fw-semibold">Ngày bắt đầu *</label><input type="datetime-local" id="editStartedAt" name="startedAt" class="form-control"></div>
-                        <div class="col-md-6"><label class="form-label fw-semibold">Ngày hết hạn *</label><input type="datetime-local" id="editEndAt" name="endAt" class="form-control"></div>
-                        <div class="col-12"><div class="form-check"><input class="form-check-input" type="checkbox" id="editActive" name="active"><label class="form-check-label" for="editActive">Đang kích hoạt</label></div></div>
+                        <div class="col-md-12"><label class="form-label fw-semibold">Tên chương trình *</label><input
+                                type="text" id="editName" name="name" class="form-control" required></div>
+                        <div class="col-md-6"><label class="form-label fw-semibold">Mã giảm giá *</label><input
+                                type="text" id="editCode" name="code" class="form-control text-uppercase" maxlength="10"
+                                required></div>
+                        <div class="col-md-6"><label class="form-label fw-semibold">Giảm giá (%) *</label>
+                            <div class="input-group"><input type="number" id="editDiscount" name="discount"
+                                    class="form-control" min="1" max="100" required><span
+                                    class="input-group-text">%</span></div>
+                        </div>
+                        <div class="col-md-6"><label class="form-label fw-semibold">Số lượng *</label><input
+                                type="number" id="editQuantity" name="quantity" class="form-control" min="0" required>
+                        </div>
+                        <div class="col-md-6"><label class="form-label fw-semibold">Ngày bắt đầu *</label><input
+                                type="datetime-local" id="editStartedAt" name="startedAt" class="form-control"></div>
+                        <div class="col-md-6"><label class="form-label fw-semibold">Ngày hết hạn *</label><input
+                                type="datetime-local" id="editEndAt" name="endAt" class="form-control"></div>
+                        <div class="col-12">
+                            <div class="form-check"><input class="form-check-input" type="checkbox" id="editActive"
+                                    name="active"><label class="form-check-label" for="editActive">Đang kích
+                                    hoạt</label></div>
+                        </div>
                     </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="submit" form="editCouponForm" class="btn btn-primary"><i class="fa-solid fa-save me-2"></i>Lưu thay đổi</button>
+                    <button type="submit" form="editCouponForm" class="btn btn-primary"><i
+                            class="fa-solid fa-save me-2"></i>Lưu thay đổi</button>
                 </div>
             </div>
         </div>
@@ -235,16 +476,34 @@
                 </div>
                 <div class="modal-body">
                     <form id="profileForm">
-                        <div class="text-center mb-4"><div class="position-relative d-inline-block"><img src="https://ui-avatars.com/api/?name=Admin&background=28a745&color=fff&size=150" class="rounded-circle" width="150" height="150" alt="Avatar"><label for="avatarUpload" class="position-absolute bottom-0 end-0 btn btn-success btn-sm rounded-circle" style="width:40px;height:40px;"><i class="fa-solid fa-camera"></i></label><input type="file" id="avatarUpload" class="d-none" accept="image/*" onchange="previewAvatar(event)"></div></div>
-                        <div class="mb-3"><label class="form-label fw-semibold">Họ và tên</label><input type="text" class="form-control" value="Admin Nguyễn"></div>
-                        <div class="mb-3"><label class="form-label fw-semibold">Email</label><input type="email" class="form-control" value="admin@beobooks.com" readonly></div>
-                        <div class="mb-3"><label class="form-label fw-semibold">Số điện thoại</label><input type="tel" class="form-control" value="0123456789"></div>
-                        <div class="mb-3"><label class="form-label fw-semibold">Giới tính</label><select class="form-select"><option>Nam</option><option>Nữ</option><option>Khác</option></select></div>
+                        <div class="text-center mb-4">
+                            <div class="position-relative d-inline-block"><img
+                                    src="https://ui-avatars.com/api/?name=Admin&background=28a745&color=fff&size=150"
+                                    class="rounded-circle" width="150" height="150" alt="Avatar"><label
+                                    for="avatarUpload"
+                                    class="position-absolute bottom-0 end-0 btn btn-success btn-sm rounded-circle"
+                                    style="width:40px;height:40px;"><i class="fa-solid fa-camera"></i></label><input
+                                    type="file" id="avatarUpload" class="d-none" accept="image/*"
+                                    onchange="previewAvatar(event)"></div>
+                        </div>
+                        <div class="mb-3"><label class="form-label fw-semibold">Họ và tên</label><input type="text"
+                                class="form-control" value="Admin Nguyễn"></div>
+                        <div class="mb-3"><label class="form-label fw-semibold">Email</label><input type="email"
+                                class="form-control" value="admin@beobooks.com" readonly></div>
+                        <div class="mb-3"><label class="form-label fw-semibold">Số điện thoại</label><input type="tel"
+                                class="form-control" value="0123456789"></div>
+                        <div class="mb-3"><label class="form-label fw-semibold">Giới tính</label><select
+                                class="form-select">
+                                <option>Nam</option>
+                                <option>Nữ</option>
+                                <option>Khác</option>
+                            </select></div>
                     </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="submit" form="profileForm" class="btn btn-success"><i class="fa-solid fa-save me-2"></i>Lưu thay đổi</button>
+                    <button type="submit" form="profileForm" class="btn btn-success"><i
+                            class="fa-solid fa-save me-2"></i>Lưu thay đổi</button>
                 </div>
             </div>
         </div>
@@ -255,43 +514,44 @@
     <script src="/js/sidebar.js"></script>
     <script>
         // Toast engine
-        const TOAST_ICONS = {success:'fa-circle-check',error:'fa-circle-xmark',info:'fa-circle-info',warning:'fa-triangle-exclamation'};
-        const TOAST_TITLES = {success:'Thành công',error:'Lỗi',info:'Thông báo',warning:'Cảnh báo'};
-        function showToast(type='info',title='',message='',duration=4000){const c=document.getElementById('toast-container');const id='toast-'+Date.now();const el=document.createElement('div');el.className=`toast-item ${type}`;el.id=id;el.innerHTML=`<div class="toast-icon"><i class="fa-solid ${TOAST_ICONS[type]}"></i></div><div class="toast-body"><div class="toast-title">${title||TOAST_TITLES[type]}</div>${message?`<div class="toast-msg">${message}</div>`:''}</div><button class="toast-close" onclick="closeToast('${id}')"><i class="fa-solid fa-xmark"></i></button><div class="toast-progress" style="animation-duration:${duration}ms"></div>`;c.appendChild(el);setTimeout(()=>closeToast(id),duration);}
-        function closeToast(id){const el=document.getElementById(id);if(!el)return;el.classList.add('hiding');setTimeout(()=>el.remove(),320);}
+        const TOAST_ICONS = { success: 'fa-circle-check', error: 'fa-circle-xmark', info: 'fa-circle-info', warning: 'fa-triangle-exclamation' };
+        const TOAST_TITLES = { success: 'Thành công', error: 'Lỗi', info: 'Thông báo', warning: 'Cảnh báo' };
+        function showToast(type = 'info', title = '', message = '', duration = 4000) { const c = document.getElementById('toast-container'); const id = 'toast-' + Date.now(); const el = document.createElement('div'); el.className = `toast-item ${type}`; el.id = id; el.innerHTML = `<div class="toast-icon"><i class="fa-solid ${TOAST_ICONS[type]}"></i></div><div class="toast-body"><div class="toast-title">${title || TOAST_TITLES[type]}</div>${message ? `<div class="toast-msg">${message}</div>` : ''}</div><button class="toast-close" onclick="closeToast('${id}')"><i class="fa-solid fa-xmark"></i></button><div class="toast-progress" style="animation-duration:${duration}ms"></div>`; c.appendChild(el); setTimeout(() => closeToast(id), duration); }
+        function closeToast(id) { const el = document.getElementById(id); if (!el) return; el.classList.add('hiding'); setTimeout(() => el.remove(), 320); }
 
-        function showConfirm(message,onConfirm){const overlay=document.createElement('div');overlay.style.cssText='position:fixed;inset:0;background:rgba(15,23,42,0.45);backdrop-filter:blur(4px);z-index:10000;display:flex;align-items:center;justify-content:center;';overlay.innerHTML=`<div style="background:#fff;border-radius:18px;padding:32px 28px;max-width:360px;width:90%;box-shadow:0 24px 64px rgba(0,0,0,0.18);text-align:center;"><div style="width:56px;height:56px;border-radius:50%;background:#fee2e2;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;"><i class="fa-solid fa-trash" style="color:#ef4444;font-size:22px;"></i></div><div style="font-weight:700;font-size:1rem;color:#1e293b;margin-bottom:8px;">Xác nhận xóa</div><div style="font-size:0.85rem;color:#64748b;margin-bottom:24px;">${message}</div><div style="display:flex;gap:10px;"><button id="dlg-cancel" style="flex:1;padding:11px 0;border-radius:10px;border:1.5px solid #e2e8f0;background:#f8fafc;color:#475569;font-weight:600;cursor:pointer;">Hủy</button><button id="dlg-ok" style="flex:1;padding:11px 0;border-radius:10px;border:none;background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;font-weight:700;cursor:pointer;">Xóa</button></div></div>`;document.body.appendChild(overlay);overlay.querySelector('#dlg-cancel').onclick=()=>overlay.remove();overlay.querySelector('#dlg-ok').onclick=()=>{overlay.remove();onConfirm();};overlay.onclick=(e)=>{if(e.target===overlay)overlay.remove();};}
+        function showConfirm(message, onConfirm) { const overlay = document.createElement('div'); overlay.style.cssText = 'position:fixed;inset:0;background:rgba(15,23,42,0.45);backdrop-filter:blur(4px);z-index:10000;display:flex;align-items:center;justify-content:center;'; overlay.innerHTML = `<div style="background:#fff;border-radius:18px;padding:32px 28px;max-width:360px;width:90%;box-shadow:0 24px 64px rgba(0,0,0,0.18);text-align:center;"><div style="width:56px;height:56px;border-radius:50%;background:#fee2e2;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;"><i class="fa-solid fa-trash" style="color:#ef4444;font-size:22px;"></i></div><div style="font-weight:700;font-size:1rem;color:#1e293b;margin-bottom:8px;">Xác nhận xóa</div><div style="font-size:0.85rem;color:#64748b;margin-bottom:24px;">${message}</div><div style="display:flex;gap:10px;"><button id="dlg-cancel" style="flex:1;padding:11px 0;border-radius:10px;border:1.5px solid #e2e8f0;background:#f8fafc;color:#475569;font-weight:600;cursor:pointer;">Hủy</button><button id="dlg-ok" style="flex:1;padding:11px 0;border-radius:10px;border:none;background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;font-weight:700;cursor:pointer;">Xóa</button></div></div>`; document.body.appendChild(overlay); overlay.querySelector('#dlg-cancel').onclick = () => overlay.remove(); overlay.querySelector('#dlg-ok').onclick = () => { overlay.remove(); onConfirm(); }; overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); }; }
 
-        function copyCoupon(code){navigator.clipboard.writeText(code).then(()=>showToast('info','Đã sao chép!',`Mã <strong>${code}</strong> đã được copy.`,2500));}
-        function generateCode(){const chars='ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';let code='';for(let i=0;i<8;i++)code+=chars.charAt(Math.floor(Math.random()*chars.length));document.getElementById('couponCode').value=code;}
-        function openEditModal(id){fetch('/admin/vouchers/edit/'+id).then(r=>r.json()).then(data=>{document.getElementById('editId').value=data.id;document.getElementById('editName').value=data.name;document.getElementById('editCode').value=data.code;document.getElementById('editDiscount').value=data.discount;document.getElementById('editQuantity').value=data.quantity;document.getElementById('editStartedAt').value=data.startedAt?data.startedAt.substring(0,16):'';document.getElementById('editEndAt').value=data.endAt?data.endAt.substring(0,16):'';document.getElementById('editActive').checked=data.active;document.getElementById('editCouponForm').action='/admin/vouchers/update/'+id;new bootstrap.Modal(document.getElementById('editCouponModal')).show();}).catch(()=>showToast('error','Lỗi','Không thể tải thông tin voucher.'));}
-        document.getElementById('couponCode')?.addEventListener('input',function(e){e.target.value=e.target.value.toUpperCase().replace(/[^A-Z0-9]/g,'');});
+        function copyCoupon(code) { navigator.clipboard.writeText(code).then(() => showToast('info', 'Đã sao chép!', `Mã <strong>${code}</strong> đã được copy.`, 2500)); }
+        function generateCode() { const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'; let code = ''; for (let i = 0; i < 8; i++)code += chars.charAt(Math.floor(Math.random() * chars.length)); document.getElementById('couponCode').value = code; }
+        function openEditModal(id) { fetch('/admin/vouchers/edit/' + id).then(r => r.json()).then(data => { document.getElementById('editId').value = data.id; document.getElementById('editName').value = data.name; document.getElementById('editCode').value = data.code; document.getElementById('editDiscount').value = data.discount; document.getElementById('editQuantity').value = data.quantity; document.getElementById('editStartedAt').value = data.startedAt ? data.startedAt.substring(0, 16) : ''; document.getElementById('editEndAt').value = data.endAt ? data.endAt.substring(0, 16) : ''; document.getElementById('editActive').checked = data.active; document.getElementById('editCouponForm').action = '/admin/vouchers/update/' + id; new bootstrap.Modal(document.getElementById('editCouponModal')).show(); }).catch(() => showToast('error', 'Lỗi', 'Không thể tải thông tin voucher.')); }
+        document.getElementById('couponCode')?.addEventListener('input', function (e) { e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ''); });
 
         // ===== SEARCH + PAGINATION =====
         const PAGE_SIZE = 10;
         let currentPage = 1, filteredRows = [];
-        function getAllRows(){return Array.from(document.querySelectorAll('.data-row'));}
-        function onSearch(){currentPage=1;renderTable();}
-        function renderTable(){
-            const keyword=(document.getElementById('searchInput').value||'').toLowerCase().trim();
-            const allRows=getAllRows();
-            filteredRows=allRows.filter(r=>(r.getAttribute('data-search')||'').includes(keyword));
-            const total=filteredRows.length;
-            const totalPages=Math.max(1,Math.ceil(total/PAGE_SIZE));
-            if(currentPage>totalPages)currentPage=totalPages;
-            const start=(currentPage-1)*PAGE_SIZE;
-            allRows.forEach(r=>r.style.display='none');
-            filteredRows.slice(start,start+PAGE_SIZE).forEach(r=>r.style.display='');
-            let jsEmpty=document.getElementById('jsEmptyRow');
-            if(total===0){if(!jsEmpty){jsEmpty=document.createElement('tr');jsEmpty.id='jsEmptyRow';jsEmpty.innerHTML=`<td colspan="10"><div class="empty-state"><i class="fa-solid fa-magnifying-glass fa-3x mb-3 opacity-50"></i><h5>Không tìm thấy mã giảm giá</h5></div></td>`;document.getElementById('tableBody').appendChild(jsEmpty);}jsEmpty.style.display='';}else if(jsEmpty)jsEmpty.style.display='none';
-            document.getElementById('footerInfo').innerHTML=keyword?`Tìm thấy <strong>${total}</strong> mã &nbsp;·&nbsp; Trang <strong>${currentPage}</strong>/${totalPages}`:`Tổng cộng <strong>${total}</strong> mã &nbsp;·&nbsp; Trang <strong>${currentPage}</strong>/${totalPages}`;
-            document.getElementById('searchInfo').textContent=keyword?`${total} kết quả cho "${keyword}"`:`${total} mã giảm giá`;
+        function getAllRows() { return Array.from(document.querySelectorAll('.data-row')); }
+        function onSearch() { currentPage = 1; renderTable(); }
+        function renderTable() {
+            const keyword = (document.getElementById('searchInput').value || '').toLowerCase().trim();
+            const allRows = getAllRows();
+            filteredRows = allRows.filter(r => (r.getAttribute('data-search') || '').includes(keyword));
+            const total = filteredRows.length;
+            const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+            if (currentPage > totalPages) currentPage = totalPages;
+            const start = (currentPage - 1) * PAGE_SIZE;
+            allRows.forEach(r => r.style.display = 'none');
+            filteredRows.slice(start, start + PAGE_SIZE).forEach(r => r.style.display = '');
+            let jsEmpty = document.getElementById('jsEmptyRow');
+            if (total === 0) { if (!jsEmpty) { jsEmpty = document.createElement('tr'); jsEmpty.id = 'jsEmptyRow'; jsEmpty.innerHTML = `<td colspan="10"><div class="empty-state"><i class="fa-solid fa-magnifying-glass fa-3x mb-3 opacity-50"></i><h5>Không tìm thấy mã giảm giá</h5></div></td>`; document.getElementById('tableBody').appendChild(jsEmpty); } jsEmpty.style.display = ''; } else if (jsEmpty) jsEmpty.style.display = 'none';
+            document.getElementById('footerInfo').innerHTML = keyword ? `Tìm thấy <strong>${total}</strong> mã &nbsp;·&nbsp; Trang <strong>${currentPage}</strong>/${totalPages}` : `Tổng cộng <strong>${total}</strong> mã &nbsp;·&nbsp; Trang <strong>${currentPage}</strong>/${totalPages}`;
+            document.getElementById('searchInfo').textContent = keyword ? `${total} kết quả cho "${keyword}"` : `${total} mã giảm giá`;
             renderPagination(totalPages);
         }
-        function renderPagination(totalPages){const wrapper=document.getElementById('paginationWrapper');wrapper.innerHTML='';if(totalPages<=1)return;wrapper.appendChild(makeBtn('‹',currentPage===1,()=>{currentPage--;renderTable();}));getPageNums(currentPage,totalPages).forEach(p=>{if(p==='...'){const d=document.createElement('span');d.textContent='…';d.style.cssText='padding:0 4px;color:#adb5bd;align-self:center;';wrapper.appendChild(d);}else{const b=makeBtn(p,false,()=>{currentPage=p;renderTable();});if(p===currentPage)b.classList.add('active');wrapper.appendChild(b);}});wrapper.appendChild(makeBtn('›',currentPage===totalPages,()=>{currentPage++;renderTable();}));}
-        function makeBtn(label,disabled,onClick){const b=document.createElement('button');b.className='page-btn';b.innerHTML=label;b.disabled=disabled;if(!disabled)b.addEventListener('click',onClick);return b;}
-        function getPageNums(c,t){if(t<=7)return Array.from({length:t},(_,i)=>i+1);if(c<=4)return[1,2,3,4,5,'...',t];if(c>=t-3)return[1,'...',t-4,t-3,t-2,t-1,t];return[1,'...',c-1,c,c+1,'...',t];}
-        document.addEventListener('DOMContentLoaded',()=>{renderTable();});
+        function renderPagination(totalPages) { const wrapper = document.getElementById('paginationWrapper'); wrapper.innerHTML = ''; if (totalPages <= 1) return; wrapper.appendChild(makeBtn('‹', currentPage === 1, () => { currentPage--; renderTable(); })); getPageNums(currentPage, totalPages).forEach(p => { if (p === '...') { const d = document.createElement('span'); d.textContent = '…'; d.style.cssText = 'padding:0 4px;color:#adb5bd;align-self:center;'; wrapper.appendChild(d); } else { const b = makeBtn(p, false, () => { currentPage = p; renderTable(); }); if (p === currentPage) b.classList.add('active'); wrapper.appendChild(b); } }); wrapper.appendChild(makeBtn('›', currentPage === totalPages, () => { currentPage++; renderTable(); })); }
+        function makeBtn(label, disabled, onClick) { const b = document.createElement('button'); b.className = 'page-btn'; b.innerHTML = label; b.disabled = disabled; if (!disabled) b.addEventListener('click', onClick); return b; }
+        function getPageNums(c, t) { if (t <= 7) return Array.from({ length: t }, (_, i) => i + 1); if (c <= 4) return [1, 2, 3, 4, 5, '...', t]; if (c >= t - 3) return [1, '...', t - 4, t - 3, t - 2, t - 1, t]; return [1, '...', c - 1, c, c + 1, '...', t]; }
+        document.addEventListener('DOMContentLoaded', () => { renderTable(); });
     </script>
 </body>
+
 </html>

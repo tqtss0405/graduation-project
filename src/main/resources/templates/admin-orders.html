@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,10 +11,16 @@
     <link rel="stylesheet" href="/css/admin-style.css">
     <style>
         /* ===== Tab trạng thái ===== */
-        .status-tabs { display: flex; flex-wrap: wrap; gap: 6px; }
+        .status-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
 
         .status-tab {
-            display: inline-flex; align-items: center; gap: 5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
             padding: 6px 14px;
             border-radius: 20px;
             font-size: 0.82rem;
@@ -26,23 +33,86 @@
             background: #f1f3f5;
             border-color: #dee2e6;
         }
-        .status-tab:hover { background: #e9ecef; color: #333; }
 
-        .status-tab.active-all       { background: #198754; color: #fff; border-color: #198754; }
-        .status-tab.active-pending   { background: #ffc107; color: #212529; border-color: #ffc107; }
-        .status-tab.active-confirmed { background: #0d6efd; color: #fff; border-color: #0d6efd; }
-        .status-tab.active-shipping  { background: #0dcaf0; color: #212529; border-color: #0dcaf0; }
-        .status-tab.active-delivered { background: #6f42c1; color: #fff; border-color: #6f42c1; }
-        .status-tab.active-completed { background: #198754; color: #fff; border-color: #198754; }
-        .status-tab.active-cancelled { background: #dc3545; color: #fff; border-color: #dc3545; }
-        .status-tab.active-refund    { background: #fd7e14; color: #fff; border-color: #fd7e14; }
-        .status-tab.active-refunded  { background: #0d6efd; color: #fff; border-color: #0d6efd; }
+        .status-tab:hover {
+            background: #e9ecef;
+            color: #333;
+        }
+
+        .status-tab.active-all {
+            background: #198754;
+            color: #fff;
+            border-color: #198754;
+        }
+
+        .status-tab.active-pending {
+            background: #ffc107;
+            color: #212529;
+            border-color: #ffc107;
+        }
+
+        .status-tab.active-confirmed {
+            background: #0d6efd;
+            color: #fff;
+            border-color: #0d6efd;
+        }
+
+        .status-tab.active-shipping {
+            background: #0dcaf0;
+            color: #212529;
+            border-color: #0dcaf0;
+        }
+
+        .status-tab.active-delivered {
+            background: #6f42c1;
+            color: #fff;
+            border-color: #6f42c1;
+        }
+
+        .status-tab.active-completed {
+            background: #198754;
+            color: #fff;
+            border-color: #198754;
+        }
+
+        .status-tab.active-cancelled {
+            background: #dc3545;
+            color: #fff;
+            border-color: #dc3545;
+        }
+
+        .status-tab.active-refund {
+            background: #fd7e14;
+            color: #fff;
+            border-color: #fd7e14;
+        }
+
+        .status-tab.active-refunded {
+            background: #0d6efd;
+            color: #fff;
+            border-color: #0d6efd;
+        }
 
         /* Tab hoàn tiền chờ xử lý nổi bật */
-        .status-tab.refund-tab    { color: #fd7e14; border-color: #ffe0c0; background: #fff8f0; }
-        .status-tab.refund-tab:hover { background: #ffeedd; }
-        .status-tab.refunded-tab  { color: #0d6efd; border-color: #b8d4ff; background: #f0f5ff; }
-        .status-tab.refunded-tab:hover { background: #e0eaff; }
+        .status-tab.refund-tab {
+            color: #fd7e14;
+            border-color: #ffe0c0;
+            background: #fff8f0;
+        }
+
+        .status-tab.refund-tab:hover {
+            background: #ffeedd;
+        }
+
+        .status-tab.refunded-tab {
+            color: #0d6efd;
+            border-color: #b8d4ff;
+            background: #f0f5ff;
+        }
+
+        .status-tab.refunded-tab:hover {
+            background: #e0eaff;
+        }
 
         /* ===== Bank info block ===== */
         .bank-info-block {
@@ -52,21 +122,44 @@
             padding: 12px 16px;
             margin-top: 10px;
         }
+
         .bank-info-block .bank-label {
-            font-size: 0.78rem; font-weight: 700; color: #055160;
-            text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: #055160;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
         }
-        .bank-info-row { display: flex; align-items: center; gap: 8px; font-size: 0.88rem; margin-bottom: 4px; }
-        .bank-info-row:last-child { margin-bottom: 0; }
-        .bank-info-row .lbl { color: #6c757d; min-width: 90px; }
-        .bank-info-row .val { font-weight: 700; color: #1a1a2e; }
+
+        .bank-info-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.88rem;
+            margin-bottom: 4px;
+        }
+
+        .bank-info-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .bank-info-row .lbl {
+            color: #6c757d;
+            min-width: 90px;
+        }
+
+        .bank-info-row .val {
+            font-weight: 700;
+            color: #1a1a2e;
+        }
 
         /* ===== PAGINATION ===== */
         .orders-footer {
             background: #fff;
             border-radius: 14px;
             padding: 13px 18px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
             margin-top: 16px;
             display: flex;
             align-items: center;
@@ -76,58 +169,105 @@
             font-size: 0.83rem;
             color: #6c757d;
         }
-        .pagination-wrapper { display: flex; align-items: center; gap: 4px; }
+
+        .pagination-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
         .page-btn {
-            min-width: 34px; height: 34px; padding: 0 8px;
+            min-width: 34px;
+            height: 34px;
+            padding: 0 8px;
             border-radius: 8px;
             border: 1.5px solid #e9ecef;
-            background: #fff; color: #495057;
-            font-size: 0.85rem; font-weight: 600;
+            background: #fff;
+            color: #495057;
+            font-size: 0.85rem;
+            font-weight: 600;
             cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             transition: all 0.15s;
             text-decoration: none;
         }
-        .page-btn:hover:not(.disabled) { border-color: #28a745; color: #28a745; background: #f6fdf8; }
-        .page-btn.active { background: #28a745; border-color: #28a745; color: #fff; }
-        .page-btn.disabled { opacity: 0.4; pointer-events: none; }
+
+        .page-btn:hover:not(.disabled) {
+            border-color: #28a745;
+            color: #28a745;
+            background: #f6fdf8;
+        }
+
+        .page-btn.active {
+            background: #28a745;
+            border-color: #28a745;
+            color: #fff;
+        }
+
+        .page-btn.disabled {
+            opacity: 0.4;
+            pointer-events: none;
+        }
 
         .status-tab .tab-badge {
             display: inline-block;
-            min-width: 18px; height: 18px;
+            min-width: 18px;
+            height: 18px;
             padding: 0 5px;
             border-radius: 9px;
             font-size: 0.72rem;
             line-height: 18px;
             text-align: center;
-            background: rgba(0,0,0,0.15);
+            background: rgba(0, 0, 0, 0.15);
             color: inherit;
         }
+
         .status-tab.active-all .tab-badge,
         .status-tab.active-confirmed .tab-badge,
         .status-tab.active-delivered .tab-badge,
         .status-tab.active-completed .tab-badge,
         .status-tab.active-cancelled .tab-badge,
         .status-tab.active-refund .tab-badge,
-        .status-tab.active-refunded .tab-badge { background: rgba(255,255,255,0.3); }
+        .status-tab.active-refunded .tab-badge {
+            background: rgba(255, 255, 255, 0.3);
+        }
 
-        .tab-badge-danger  { background: #dc3545 !important; color: #fff !important; }
-        .tab-badge-warning { background: #fd7e14 !important; color: #fff !important; }
+        .tab-badge-danger {
+            background: #dc3545 !important;
+            color: #fff !important;
+        }
+
+        .tab-badge-warning {
+            background: #fd7e14 !important;
+            color: #fff !important;
+        }
     </style>
 </head>
+
 <body>
 
     <nav class="sidebar">
-        <div class="sidebar-brand">BEO<span style="color:white">BOOKS</span></div>
+        <div class="sidebar-brand"><a class="text-decoration-none" href="/home"><span
+                    style="color:#27ae60">BEO</span><span style="color:white">BOOKS</span></a></div>
         <ul class="nav flex-column mt-3">
-            <li class="nav-item"><a href="/admin/dashboard" class="nav-link"><i class="fa-solid fa-gauge"></i> Tổng quan</a></li>
-            <li class="nav-item"><a href="/admin/products" class="nav-link"><i class="fa-solid fa-book"></i> Quản lý sách</a></li>
-            <li class="nav-item"><a href="/admin/orders" class="nav-link active"><i class="fa-solid fa-cart-shopping"></i> Đơn hàng</a></li>
-            <li class="nav-item"><a href="/admin/customers" class="nav-link"><i class="fa-solid fa-users"></i> Khách hàng</a></li>
-            <li class="nav-item"><a href="/admin/categories" class="nav-link"><i class="fa-solid fa-layer-group"></i> Danh mục</a></li>
-            <li class="nav-item"><a href="/admin/vouchers" class="nav-link"><i class="fa-solid fa-ticket"></i> Mã giảm giá</a></li>
-            <li class="nav-item"><a href="/admin/reviews" class="nav-link"><i class="fa-solid fa-star"></i> Đánh giá</a></li>
-            <li class="nav-item mt-5"><a href="/logout" class="nav-link text-danger"><i class="fa-solid fa-right-from-bracket"></i> Thoát</a></li>
+            <li class="nav-item"><a href="/admin/dashboard" class="nav-link"><i class="fa-solid fa-gauge"></i> Tổng
+                    quan</a></li>
+            <li class="nav-item"><a href="/admin/products" class="nav-link"><i class="fa-solid fa-book"></i> Quản lý
+                    sách</a></li>
+            <li class="nav-item"><a href="/admin/orders" class="nav-link active"><i
+                        class="fa-solid fa-cart-shopping"></i> Đơn hàng</a></li>
+            <li class="nav-item"><a href="/admin/customers" class="nav-link"><i class="fa-solid fa-users"></i> Khách
+                    hàng</a></li>
+            <li class="nav-item"><a href="/admin/categories" class="nav-link"><i class="fa-solid fa-layer-group"></i>
+                    Danh mục</a></li>
+            <li class="nav-item"><a href="/admin/vouchers" class="nav-link"><i class="fa-solid fa-ticket"></i> Mã giảm
+                    giá</a></li>
+            <li class="nav-item"><a href="/admin/reviews" class="nav-link"><i class="fa-solid fa-star"></i> Đánh giá</a>
+            </li>
+            <li class="nav-item mt-5"><a href="/logout" class="nav-link text-danger"><i
+                        class="fa-solid fa-right-from-bracket"></i> Thoát</a></li>
         </ul>
     </nav>
 
@@ -137,16 +277,17 @@
                 <h4 class="fw-bold m-0">Quản lý Đơn Hàng</h4>
                 <small class="text-muted">Quản lý toàn bộ đơn hàng trong hệ thống</small>
             </div>
-           <div class="admin-profile" onclick="window.location.href='/user/profile'" style="cursor:pointer;">
-    <img th:src="${currentUser != null && currentUser.image != null ? currentUser.image : 
-                  'https://ui-avatars.com/api/?name=' + (currentUser != null ? currentUser.fullname : 'Admin') + '&background=28a745&color=fff'}" 
-         alt="Admin" class="admin-avatar">
-    <div class="admin-info">
-        <h6 th:text="${currentUser != null ? currentUser.fullname : 'Admin'}">Admin</h6>
-        <small><i class="fa-solid fa-circle text-success" style="font-size:.5rem;"></i> Đang hoạt động</small>
-    </div>
-    <i class="fa-solid fa-chevron-down ms-2"></i>
-</div>
+            <div class="admin-profile" onclick="window.location.href='/user/profile'" style="cursor:pointer;">
+                <img th:src="${currentUser != null && currentUser.image != null ? currentUser.image : 
+                  'https://ui-avatars.com/api/?name=' + (currentUser != null ? currentUser.fullname : 'Admin') + '&background=28a745&color=fff'}"
+                    alt="Admin" class="admin-avatar">
+                <div class="admin-info">
+                    <h6 th:text="${currentUser != null ? currentUser.fullname : 'Admin'}">Admin</h6>
+                    <small><i class="fa-solid fa-circle text-success" style="font-size:.5rem;"></i> Đang hoạt
+                        động</small>
+                </div>
+                <i class="fa-solid fa-chevron-down ms-2"></i>
+            </div>
         </div>
 
         <!-- Thông báo -->
@@ -166,59 +307,61 @@
             <div class="status-tabs">
 
                 <a th:href="@{/admin/orders(keyword=${keyword},fromDate=${fromDate},toDate=${toDate})}"
-                   th:class="${selectedStatus == null} ? 'status-tab active-all' : 'status-tab'">
+                    th:class="${selectedStatus == null} ? 'status-tab active-all' : 'status-tab'">
                     Tất cả
                     <span class="tab-badge" th:text="${countAll}">0</span>
                 </a>
 
                 <a th:href="@{/admin/orders(status=0,keyword=${keyword},fromDate=${fromDate},toDate=${toDate})}"
-                   th:class="${selectedStatus == 0} ? 'status-tab active-pending' : 'status-tab'">
+                    th:class="${selectedStatus == 0} ? 'status-tab active-pending' : 'status-tab'">
                     Chờ xác nhận
-                    <span th:class="${selectedStatus != 0 and countPending > 0} ? 'tab-badge tab-badge-danger' : 'tab-badge'"
-                          th:text="${countPending}">0</span>
+                    <span
+                        th:class="${selectedStatus != 0 and countPending > 0} ? 'tab-badge tab-badge-danger' : 'tab-badge'"
+                        th:text="${countPending}">0</span>
                 </a>
 
                 <a th:href="@{/admin/orders(status=1,keyword=${keyword},fromDate=${fromDate},toDate=${toDate})}"
-                   th:class="${selectedStatus == 1} ? 'status-tab active-confirmed' : 'status-tab'">
+                    th:class="${selectedStatus == 1} ? 'status-tab active-confirmed' : 'status-tab'">
                     Đã xác nhận
                     <span class="tab-badge" th:text="${countConfirmed}">0</span>
                 </a>
 
                 <a th:href="@{/admin/orders(status=2,keyword=${keyword},fromDate=${fromDate},toDate=${toDate})}"
-                   th:class="${selectedStatus == 2} ? 'status-tab active-shipping' : 'status-tab'">
+                    th:class="${selectedStatus == 2} ? 'status-tab active-shipping' : 'status-tab'">
                     Đang giao
                     <span class="tab-badge" th:text="${countShipping}">0</span>
                 </a>
 
                 <a th:href="@{/admin/orders(status=3,keyword=${keyword},fromDate=${fromDate},toDate=${toDate})}"
-                   th:class="${selectedStatus == 3} ? 'status-tab active-delivered' : 'status-tab'">
+                    th:class="${selectedStatus == 3} ? 'status-tab active-delivered' : 'status-tab'">
                     Đã giao
                     <span class="tab-badge" th:text="${countDelivered}">0</span>
                 </a>
 
                 <a th:href="@{/admin/orders(status=4,keyword=${keyword},fromDate=${fromDate},toDate=${toDate})}"
-                   th:class="${selectedStatus == 4} ? 'status-tab active-completed' : 'status-tab'">
+                    th:class="${selectedStatus == 4} ? 'status-tab active-completed' : 'status-tab'">
                     Hoàn thành
                     <span class="tab-badge" th:text="${countCompleted}">0</span>
                 </a>
 
                 <a th:href="@{/admin/orders(status=5,keyword=${keyword},fromDate=${fromDate},toDate=${toDate})}"
-                   th:class="${selectedStatus == 5} ? 'status-tab active-cancelled' : 'status-tab'">
+                    th:class="${selectedStatus == 5} ? 'status-tab active-cancelled' : 'status-tab'">
                     Đã hủy
                     <span class="tab-badge" th:text="${countCancelled}">0</span>
                 </a>
 
                 <!-- Tab Yêu cầu hoàn tiền (status=6) — màu cam, badge đỏ khi có đơn chờ -->
                 <a th:href="@{/admin/orders(status=6,keyword=${keyword},fromDate=${fromDate},toDate=${toDate})}"
-                   th:class="${selectedStatus == 6} ? 'status-tab active-refund' : 'status-tab refund-tab'">
+                    th:class="${selectedStatus == 6} ? 'status-tab active-refund' : 'status-tab refund-tab'">
                     <i class="fa-solid fa-rotate-left"></i> Y/c hoàn tiền
-                    <span th:class="${selectedStatus != 6 and countRefund > 0} ? 'tab-badge tab-badge-warning' : 'tab-badge'"
-                          th:text="${countRefund}">0</span>
+                    <span
+                        th:class="${selectedStatus != 6 and countRefund > 0} ? 'tab-badge tab-badge-warning' : 'tab-badge'"
+                        th:text="${countRefund}">0</span>
                 </a>
 
                 <!-- Tab Đã hoàn tiền (status=7) — màu xanh dương -->
                 <a th:href="@{/admin/orders(status=7,keyword=${keyword},fromDate=${fromDate},toDate=${toDate})}"
-                   th:class="${selectedStatus == 7} ? 'status-tab active-refunded' : 'status-tab refunded-tab'">
+                    th:class="${selectedStatus == 7} ? 'status-tab active-refunded' : 'status-tab refunded-tab'">
                     <i class="fa-solid fa-circle-dollar-to-slot"></i> Đã hoàn tiền
                     <span class="tab-badge" th:text="${countRefunded}">0</span>
                 </a>
@@ -236,24 +379,21 @@
                         <i class="fa-solid fa-magnifying-glass me-1 text-muted"></i>Tìm theo tên / email
                     </label>
                     <input type="text" name="keyword" class="form-control form-control-sm"
-                           placeholder="Nhập tên hoặc email khách hàng..."
-                           th:value="${keyword}">
+                        placeholder="Nhập tên hoặc email khách hàng..." th:value="${keyword}">
                 </div>
 
                 <div class="col-md-3">
                     <label class="form-label small fw-semibold mb-1">
                         <i class="fa-solid fa-calendar me-1 text-muted"></i>Từ ngày
                     </label>
-                    <input type="date" name="fromDate" class="form-control form-control-sm"
-                           th:value="${fromDate}">
+                    <input type="date" name="fromDate" class="form-control form-control-sm" th:value="${fromDate}">
                 </div>
 
                 <div class="col-md-3">
                     <label class="form-label small fw-semibold mb-1">
                         <i class="fa-solid fa-calendar me-1 text-muted"></i>Đến ngày
                     </label>
-                    <input type="date" name="toDate" class="form-control form-control-sm"
-                           th:value="${toDate}">
+                    <input type="date" name="toDate" class="form-control form-control-sm" th:value="${toDate}">
                 </div>
 
                 <div class="col-md-2 d-flex gap-2">
@@ -261,7 +401,7 @@
                         <i class="fa-solid fa-filter me-1"></i>Lọc
                     </button>
                     <a th:href="@{/admin/orders(status=${selectedStatus})}" class="btn btn-outline-secondary btn-sm"
-                       title="Xóa bộ lọc">
+                        title="Xóa bộ lọc">
                         <i class="fa-solid fa-xmark"></i>
                     </a>
                 </div>
@@ -276,8 +416,8 @@
         <div th:if="${selectedStatus == 6}" class="alert alert-warning py-2 mb-3">
             <i class="fa-solid fa-triangle-exclamation me-2"></i>
             Khách đã <strong>yêu cầu hoàn tiền / trả hàng</strong>. Xem chi tiết (tài khoản ngân hàng, lý do) rồi xử lý.
-            <br><small>· <strong>Hoàn tiền thành công</strong> → chuyển sang trạng thái "Đã hoàn tiền" (status 7)</small>
-            <br><small>· <strong>Từ chối</strong> → chuyển về "Hoàn thành" (status 4) — khách giữ hàng, không hoàn kho</small>
+            <br><small>· <strong>Hoàn tiền thành công</strong> → chuyển sang trạng thái "Đã hoàn tiền"</small>
+            <br><small>· <strong>Từ chối</strong> → chuyển về "Hoàn thành" — khách giữ hàng, không hoàn kho</small>
         </div>
         <div th:if="${selectedStatus == 7}" class="alert alert-info py-2 mb-3">
             <i class="fa-solid fa-circle-check me-2"></i>
@@ -302,7 +442,8 @@
                     <tr th:each="order : ${orders}">
                         <td class="fw-bold text-primary" th:text="'#' + ${order.id}"></td>
                         <td>
-                            <div class="fw-semibold" th:text="${order.user != null ? order.user.fullname : 'N/A'}"></div>
+                            <div class="fw-semibold" th:text="${order.user != null ? order.user.fullname : 'N/A'}">
+                            </div>
                             <small class="text-muted" th:text="${order.user != null ? order.user.email : ''}"></small>
                         </td>
                         <td th:text="${#temporals.format(order.createAt, 'dd/MM/yyyy HH:mm')}"></td>
@@ -312,7 +453,8 @@
                             <span th:if="${order.paymentMethod == 0}" class="badge bg-secondary">COD</span>
                             <span th:if="${order.paymentMethod == 1}" class="badge bg-info text-dark">VNPay</span>
                             <br>
-                            <span th:if="${order.paymentStatus == 0}" class="badge bg-warning text-dark mt-1">Chưa TT</span>
+                            <span th:if="${order.paymentStatus == 0}" class="badge bg-warning text-dark mt-1">Chưa
+                                TT</span>
                             <span th:if="${order.paymentStatus == 1}" class="badge bg-success mt-1">Đã TT</span>
                         </td>
                         <td>
@@ -340,18 +482,14 @@
                                                    or selectedStatus == 4
                                                    or selectedStatus == 5
                                                    or selectedStatus == 7}">
-                                    <button class="btn btn-sm btn-outline-secondary"
-                                        th:data-id="${order.id}"
+                                    <button class="btn btn-sm btn-outline-secondary" th:data-id="${order.id}"
                                         th:data-customer="${order.user != null ? order.user.fullname : 'N/A'}"
                                         th:data-email="${order.user != null ? order.user.email : ''}"
                                         th:data-phone="${order.user != null ? order.user.phone : ''}"
-                                        th:data-address="${order.address}"
-                                        th:data-total="${order.total}"
+                                        th:data-address="${order.address}" th:data-total="${order.total}"
                                         th:data-method="${order.paymentMethod}"
-                                        th:data-payment-status="${order.paymentStatus}"
-                                        th:data-status="${order.status}"
-                                        th:data-note="${order.note}"
-                                        th:data-bank="${order.bankAccount}"
+                                        th:data-payment-status="${order.paymentStatus}" th:data-status="${order.status}"
+                                        th:data-note="${order.note}" th:data-bank="${order.bankAccount}"
                                         th:data-date="${#temporals.format(order.createAt, 'dd/MM/yyyy HH:mm')}"
                                         onclick="viewOrderFromBtn(this)">
                                         <i class="fa-solid fa-eye"></i> Xem
@@ -360,14 +498,16 @@
 
                                 <!-- Chờ xác nhận (0) -->
                                 <th:block th:if="${selectedStatus == 0}">
-                                    <form th:action="@{/admin/orders/update-status/{id}(id=${order.id})}" method="post" class="d-inline">
+                                    <form th:action="@{/admin/orders/update-status/{id}(id=${order.id})}" method="post"
+                                        class="d-inline">
                                         <input type="hidden" name="status" value="1">
                                         <button type="submit" class="btn btn-sm btn-success">
                                             <i class="fa-solid fa-check"></i> Xác nhận
                                         </button>
                                     </form>
-                                    <form th:action="@{/admin/orders/update-status/{id}(id=${order.id})}" method="post" class="d-inline"
-                                          th:onsubmit="'return confirm(\'Hủy đơn #' + ${order.id} + '?\');'">
+                                    <form th:action="@{/admin/orders/update-status/{id}(id=${order.id})}" method="post"
+                                        class="d-inline"
+                                        th:onsubmit="'return confirm(\'Hủy đơn #' + ${order.id} + '?\');'">
                                         <input type="hidden" name="status" value="5">
                                         <button type="submit" class="btn btn-sm btn-outline-danger">
                                             <i class="fa-solid fa-xmark"></i> Hủy
@@ -377,7 +517,8 @@
 
                                 <!-- Đã xác nhận (1) -->
                                 <th:block th:if="${selectedStatus == 1}">
-                                    <form th:action="@{/admin/orders/update-status/{id}(id=${order.id})}" method="post" class="d-inline">
+                                    <form th:action="@{/admin/orders/update-status/{id}(id=${order.id})}" method="post"
+                                        class="d-inline">
                                         <input type="hidden" name="status" value="2">
                                         <button type="submit" class="btn btn-sm btn-info text-dark">
                                             <i class="fa-solid fa-truck"></i> Giao hàng
@@ -387,7 +528,8 @@
 
                                 <!-- Đang giao (2) -->
                                 <th:block th:if="${selectedStatus == 2}">
-                                    <form th:action="@{/admin/orders/update-status/{id}(id=${order.id})}" method="post" class="d-inline">
+                                    <form th:action="@{/admin/orders/update-status/{id}(id=${order.id})}" method="post"
+                                        class="d-inline">
                                         <input type="hidden" name="status" value="3">
                                         <button type="submit" class="btn btn-sm btn-primary">
                                             <i class="fa-solid fa-box-open"></i> Đã giao
@@ -398,26 +540,23 @@
                                 <!-- Yêu cầu hoàn tiền (6) -->
                                 <th:block th:if="${selectedStatus == 6}">
                                     <!-- Nút Xem để thấy thông tin ngân hàng -->
-                                    <button class="btn btn-sm btn-outline-secondary"
-                                        th:data-id="${order.id}"
+                                    <button class="btn btn-sm btn-outline-secondary" th:data-id="${order.id}"
                                         th:data-customer="${order.user != null ? order.user.fullname : 'N/A'}"
                                         th:data-email="${order.user != null ? order.user.email : ''}"
                                         th:data-phone="${order.user != null ? order.user.phone : ''}"
-                                        th:data-address="${order.address}"
-                                        th:data-total="${order.total}"
+                                        th:data-address="${order.address}" th:data-total="${order.total}"
                                         th:data-method="${order.paymentMethod}"
-                                        th:data-payment-status="${order.paymentStatus}"
-                                        th:data-status="${order.status}"
-                                        th:data-note="${order.note}"
-                                        th:data-bank="${order.bankAccount}"
+                                        th:data-payment-status="${order.paymentStatus}" th:data-status="${order.status}"
+                                        th:data-note="${order.note}" th:data-bank="${order.bankAccount}"
                                         th:data-date="${#temporals.format(order.createAt, 'dd/MM/yyyy HH:mm')}"
                                         onclick="viewOrderFromBtn(this)">
                                         <i class="fa-solid fa-eye"></i> Xem
                                     </button>
 
                                     <!-- Hoàn tiền thành công → status 7 -->
-                                    <form th:action="@{/admin/orders/update-status/{id}(id=${order.id})}" method="post" class="d-inline"
-                                          th:onsubmit="'return confirm(\'Xác nhận đã hoàn tiền cho đơn #' + ${order.id} + '?\');'">
+                                    <form th:action="@{/admin/orders/update-status/{id}(id=${order.id})}" method="post"
+                                        class="d-inline"
+                                        th:onsubmit="'return confirm(\'Xác nhận đã hoàn tiền cho đơn #' + ${order.id} + '?\');'">
                                         <input type="hidden" name="status" value="7">
                                         <button type="submit" class="btn btn-sm btn-primary">
                                             <i class="fa-solid fa-circle-dollar-to-slot"></i> Hoàn tiền
@@ -425,8 +564,9 @@
                                     </form>
 
                                     <!-- Từ chối → status 4 (Hoàn thành) — khách giữ hàng, không hoàn kho -->
-                                    <form th:action="@{/admin/orders/update-status/{id}(id=${order.id})}" method="post" class="d-inline"
-                                          th:onsubmit="'return confirm(\'Từ chối hoàn tiền đơn #' + ${order.id} + '? Đơn sẽ chuyển về Hoàn thành.\');'">
+                                    <form th:action="@{/admin/orders/update-status/{id}(id=${order.id})}" method="post"
+                                        class="d-inline"
+                                        th:onsubmit="'return confirm(\'Từ chối hoàn tiền đơn #' + ${order.id} + '? Đơn sẽ chuyển về Hoàn thành.\');'">
                                         <input type="hidden" name="status" value="4">
                                         <button type="submit" class="btn btn-sm btn-outline-danger">
                                             <i class="fa-solid fa-xmark"></i> Từ chối
@@ -472,11 +612,26 @@
                                     <i class="fa-solid fa-user me-2"></i>Thông tin khách hàng
                                 </h6>
                                 <table class="table table-borderless table-sm mb-0">
-                                    <tr><th width="100">Tên:</th><td id="modalCustomer"></td></tr>
-                                    <tr><th>Email:</th><td id="modalEmail"></td></tr>
-                                    <tr><th>SĐT:</th><td id="modalPhone"></td></tr>
-                                    <tr><th>Địa chỉ:</th><td id="modalAddress"></td></tr>
-                                    <tr><th>Ghi chú:</th><td id="modalNote"></td></tr>
+                                    <tr>
+                                        <th width="100">Tên:</th>
+                                        <td id="modalCustomer"></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Email:</th>
+                                        <td id="modalEmail"></td>
+                                    </tr>
+                                    <tr>
+                                        <th>SĐT:</th>
+                                        <td id="modalPhone"></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Địa chỉ:</th>
+                                        <td id="modalAddress"></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Ghi chú:</th>
+                                        <td id="modalNote"></td>
+                                    </tr>
                                 </table>
                             </div>
                         </div>
@@ -486,8 +641,14 @@
                                     <i class="fa-solid fa-money-bill me-2"></i>Thông tin đơn hàng
                                 </h6>
                                 <table class="table table-borderless table-sm mb-0">
-                                    <tr><th width="120">Ngày đặt:</th><td id="modalDate"></td></tr>
-                                    <tr><th>Tổng tiền:</th><td class="fw-bold text-danger" id="modalTotal"></td></tr>
+                                    <tr>
+                                        <th width="120">Ngày đặt:</th>
+                                        <td id="modalDate"></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Tổng tiền:</th>
+                                        <td class="fw-bold text-danger" id="modalTotal"></td>
+                                    </tr>
                                     <tr>
                                         <th>Thanh toán:</th>
                                         <td>
@@ -495,7 +656,10 @@
                                             <span id="modalPaymentStatus" class="ms-1"></span>
                                         </td>
                                     </tr>
-                                    <tr><th>Trạng thái:</th><td><span id="modalStatus"></span></td></tr>
+                                    <tr>
+                                        <th>Trạng thái:</th>
+                                        <td><span id="modalStatus"></span></td>
+                                    </tr>
                                 </table>
                             </div>
                         </div>
@@ -551,18 +715,18 @@
         function viewOrderFromBtn(btn) {
             const d = btn.dataset;
 
-            document.getElementById('modalOrderId').textContent  = '#' + d.id;
+            document.getElementById('modalOrderId').textContent = '#' + d.id;
             document.getElementById('modalCustomer').textContent = d.customer || 'N/A';
-            document.getElementById('modalEmail').textContent    = d.email    || 'N/A';
-            document.getElementById('modalPhone').textContent    = d.phone    || 'N/A';
-            document.getElementById('modalAddress').textContent  = d.address  || 'N/A';
-            document.getElementById('modalNote').textContent     = d.note     || 'Không có';
-            document.getElementById('modalDate').textContent     = d.date     || '';
-            document.getElementById('modalTotal').textContent    = Number(d.total).toLocaleString('vi-VN') + 'đ';
+            document.getElementById('modalEmail').textContent = d.email || 'N/A';
+            document.getElementById('modalPhone').textContent = d.phone || 'N/A';
+            document.getElementById('modalAddress').textContent = d.address || 'N/A';
+            document.getElementById('modalNote').textContent = d.note || 'Không có';
+            document.getElementById('modalDate').textContent = d.date || '';
+            document.getElementById('modalTotal').textContent = Number(d.total).toLocaleString('vi-VN') + 'đ';
 
             document.getElementById('modalMethod').innerHTML =
                 d.method == '0' ? '<span class="badge bg-secondary">COD</span>'
-                                : '<span class="badge bg-info text-dark">VNPay</span>';
+                    : '<span class="badge bg-info text-dark">VNPay</span>';
 
             document.getElementById('modalPaymentStatus').innerHTML =
                 d.paymentStatus == '1'
@@ -583,8 +747,8 @@
 
             // ===== Thông tin ngân hàng =====
             const bankSection = document.getElementById('modalBankSection');
-            const bankRows    = document.getElementById('modalBankRows');
-            const bankRaw     = (d.bank || '').trim();
+            const bankRows = document.getElementById('modalBankRows');
+            const bankRaw = (d.bank || '').trim();
 
             if (bankRaw && bankRaw !== 'null') {
                 // Format: "Tên ngân hàng | Số tài khoản | Tên chủ TK"
@@ -592,7 +756,7 @@
                 const labels = ['Ngân hàng', 'Số tài khoản', 'Chủ tài khoản'];
                 bankRows.innerHTML = parts.map((val, i) => `
                     <div class="bank-info-row">
-                        <span class="lbl">${labels[i] || ('Thông tin ' + (i+1))}:</span>
+                        <span class="lbl">${labels[i] || ('Thông tin ' + (i + 1))}:</span>
                         <span class="val">${val}</span>
                     </div>
                 `).join('');
@@ -654,26 +818,26 @@
 
     <!-- ===== PAGINATION JS ===== -->
     <script th:inline="javascript">
-        const TOTAL_ITEMS  = /*[[${totalItems}]]*/ 0;
-const CURRENT_PAGE = /*[[${currentPage}]]*/ 1;
-const TOTAL_PAGES  = /*[[${totalPages}]]*/ 1;
-const BASE_STATUS  = /*[[${selectedStatus}]]*/ null;
-const BASE_KEYWORD = /*[[${keyword != null ? keyword : ''}]]*/ '';
-const BASE_FROM    = /*[[${fromDate != null ? fromDate : ''}]]*/ '';
-const BASE_TO      = /*[[${toDate != null ? toDate : ''}]]*/ '';
+        const TOTAL_ITEMS = /*[[${totalItems}]]*/ 0;
+        const CURRENT_PAGE = /*[[${currentPage}]]*/ 1;
+        const TOTAL_PAGES = /*[[${totalPages}]]*/ 1;
+        const BASE_STATUS = /*[[${selectedStatus}]]*/ null;
+        const BASE_KEYWORD = /*[[${keyword != null ? keyword : ''}]]*/ '';
+        const BASE_FROM = /*[[${fromDate != null ? fromDate : ''}]]*/ '';
+        const BASE_TO = /*[[${toDate != null ? toDate : ''}]]*/ '';
 
-function buildUrl(page) {
-    const params = new URLSearchParams();
-    // Kiểm tra null cả string lẫn thật
-    if (BASE_STATUS !== null && BASE_STATUS !== 'null' && BASE_STATUS !== '') {
-        params.set('status', BASE_STATUS);
-    }
-    if (BASE_KEYWORD && BASE_KEYWORD !== 'null') params.set('keyword', BASE_KEYWORD);
-    if (BASE_FROM    && BASE_FROM    !== 'null') params.set('fromDate', BASE_FROM);
-    if (BASE_TO      && BASE_TO      !== 'null') params.set('toDate',   BASE_TO);
-    params.set('page', page);
-    return '/admin/orders?' + params.toString();
-}
+        function buildUrl(page) {
+            const params = new URLSearchParams();
+            // Kiểm tra null cả string lẫn thật
+            if (BASE_STATUS !== null && BASE_STATUS !== 'null' && BASE_STATUS !== '') {
+                params.set('status', BASE_STATUS);
+            }
+            if (BASE_KEYWORD && BASE_KEYWORD !== 'null') params.set('keyword', BASE_KEYWORD);
+            if (BASE_FROM && BASE_FROM !== 'null') params.set('fromDate', BASE_FROM);
+            if (BASE_TO && BASE_TO !== 'null') params.set('toDate', BASE_TO);
+            params.set('page', page);
+            return '/admin/orders?' + params.toString();
+        }
 
         function makeBtn(label, disabled, active, href) {
             const btn = document.createElement('a');
@@ -684,16 +848,16 @@ function buildUrl(page) {
         }
 
         function getPageNumbers(current, total) {
-            if (total <= 7) return Array.from({length: total}, (_, i) => i + 1);
+            if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
             if (current <= 4) return [1, 2, 3, 4, 5, '...', total];
-            if (current >= total - 3) return [1, '...', total-4, total-3, total-2, total-1, total];
-            return [1, '...', current-1, current, current+1, '...', total];
+            if (current >= total - 3) return [1, '...', total - 4, total - 3, total - 2, total - 1, total];
+            return [1, '...', current - 1, current, current + 1, '...', total];
         }
 
         function renderPagination() {
-            const footer  = document.getElementById('ordersFooter');
+            const footer = document.getElementById('ordersFooter');
             const wrapper = document.getElementById('paginationWrapper');
-            const info    = document.getElementById('footerInfo');
+            const info = document.getElementById('footerInfo');
             if (!footer || !wrapper || !info) return;
 
             info.innerHTML = `Tổng cộng <strong>${TOTAL_ITEMS}</strong> đơn hàng &nbsp;·&nbsp; Trang <strong>${CURRENT_PAGE}</strong>/${TOTAL_PAGES}`;
@@ -723,4 +887,5 @@ function buildUrl(page) {
         document.addEventListener('DOMContentLoaded', renderPagination);
     </script>
 </body>
+
 </html>

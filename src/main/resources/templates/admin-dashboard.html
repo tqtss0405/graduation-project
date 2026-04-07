@@ -251,7 +251,8 @@
 
     <!-- ===== SIDEBAR ===== -->
     <nav class="sidebar">
-        <div class="sidebar-brand">BEO<span style="color:white">BOOKS</span></div>
+        <div class="sidebar-brand"><a class="text-decoration-none" href="/home"><span
+                    style="color:#27ae60">BEO</span><span style="color:white">BOOKS</span></a></div>
         <ul class="nav flex-column mt-3">
             <li class="nav-item"><a href="/admin/dashboard" class="nav-link active">
                     <i class="fa-solid fa-gauge"></i> Tổng quan</a></li>
@@ -291,260 +292,260 @@
                 </div>
                 <i class="fa-solid fa-chevron-down ms-2"></i>
             </div>
-            </div>
+        </div>
 
 
-            <!-- ===== BỘ LỌC ===== -->
-            <div class="filter-section">
-                <form method="get" action="/admin/dashboard" id="filterForm" novalidate>
-                    <div class="row g-3 align-items-end">
+        <!-- ===== BỘ LỌC ===== -->
+        <div class="filter-section">
+            <form method="get" action="/admin/dashboard" id="filterForm" novalidate>
+                <div class="row g-3 align-items-end">
 
-                        <!-- Tab nhanh -->
-                        <div class="col-12 col-lg-auto">
-                            <label class="form-label small fw-bold text-muted d-block">Chu kỳ nhanh</label>
-                            <div class="period-tabs d-flex flex-wrap gap-2">
-                                <button type="submit" name="period" value="day"
-                                    th:classappend="${period == 'day'} ? 'active' : ''"
-                                    class="btn btn-outline-success btn-sm">
-                                    <i class="fa-regular fa-sun me-1"></i>Hôm nay
-                                </button>
-                                <button type="submit" name="period" value="week"
-                                    th:classappend="${period == 'week'} ? 'active' : ''"
-                                    class="btn btn-outline-success btn-sm">
-                                    <i class="fa-regular fa-calendar-week me-1"></i>Tuần này
-                                </button>
-                                <button type="submit" name="period" value="month"
-                                    th:classappend="${period == 'month' or period == null} ? 'active' : ''"
-                                    class="btn btn-outline-success btn-sm">
-                                    <i class="fa-regular fa-calendar me-1"></i>Tháng này
-                                </button>
-                                <button type="submit" name="period" value="year"
-                                    th:classappend="${period == 'year'} ? 'active' : ''"
-                                    class="btn btn-outline-success btn-sm">
-                                    <i class="fa-regular fa-calendar-days me-1"></i>Năm nay
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Divider dọc (ẩn trên mobile) -->
-                        <div class="col-auto d-none d-lg-flex align-items-center" style="height:36px">
-                            <div style="width:1px;height:100%;background:#dee2e6;margin-top:1.6rem"></div>
-                        </div>
-
-                        <!-- Khoảng tùy chọn -->
-                        <div class="col-6 col-md-auto">
-                            <label class="form-label small fw-bold text-muted">Từ ngày</label>
-                            <input type="date" id="fromDate" name="fromDate" class="form-control form-control-sm"
-                                th:value="${fromDate}" style="min-width:145px">
-                        </div>
-                        <div class="col-6 col-md-auto">
-                            <label class="form-label small fw-bold text-muted">Đến ngày</label>
-                            <input type="date" id="toDate" name="toDate" class="form-control form-control-sm"
-                                th:value="${toDate}" style="min-width:145px">
-                        </div>
-                        <div class="col-auto">
-                            <button type="submit" id="btnFilter" class="btn btn-success btn-sm">
-                                <i class="fa-solid fa-filter me-1"></i>Lọc
+                    <!-- Tab nhanh -->
+                    <div class="col-12 col-lg-auto">
+                        <label class="form-label small fw-bold text-muted d-block">Chu kỳ nhanh</label>
+                        <div class="period-tabs d-flex flex-wrap gap-2">
+                            <button type="submit" name="period" value="day"
+                                th:classappend="${period == 'day'} ? 'active' : ''"
+                                class="btn btn-outline-success btn-sm">
+                                <i class="fa-regular fa-sun me-1"></i>Hôm nay
+                            </button>
+                            <button type="submit" name="period" value="week"
+                                th:classappend="${period == 'week'} ? 'active' : ''"
+                                class="btn btn-outline-success btn-sm">
+                                <i class="fa-regular fa-calendar-week me-1"></i>Tuần này
+                            </button>
+                            <button type="submit" name="period" value="month"
+                                th:classappend="${period == 'month' or period == null} ? 'active' : ''"
+                                class="btn btn-outline-success btn-sm">
+                                <i class="fa-regular fa-calendar me-1"></i>Tháng này
+                            </button>
+                            <button type="submit" name="period" value="year"
+                                th:classappend="${period == 'year'} ? 'active' : ''"
+                                class="btn btn-outline-success btn-sm">
+                                <i class="fa-regular fa-calendar-days me-1"></i>Năm nay
                             </button>
                         </div>
+                    </div>
 
-                        <!-- Badge hiển thị kỳ đang chọn -->
-                        <div class="col-auto d-flex align-items-end">
-                            <span
-                                class="badge rounded-pill bg-success-subtle text-success border border-success-subtle px-3 py-2"
-                                style="font-size:.78rem;font-weight:600">
-                                <i class="fa-solid fa-clock-rotate-left me-1"></i>
-                                <span th:switch="${period}">
-                                    <span th:case="'day'">Hôm nay</span>
-                                    <span th:case="'week'">Tuần này</span>
-                                    <span th:case="'year'">Năm nay</span>
-                                    <span th:case="'custom'">
-                                        Tùy chỉnh:
-                                        <span th:text="${fromDate}">—</span> →
-                                        <span th:text="${toDate}">—</span>
-                                    </span>
-                                    <span th:case="*">Tháng này</span>
+                    <!-- Divider dọc (ẩn trên mobile) -->
+                    <div class="col-auto d-none d-lg-flex align-items-center" style="height:36px">
+                        <div style="width:1px;height:100%;background:#dee2e6;margin-top:1.6rem"></div>
+                    </div>
+
+                    <!-- Khoảng tùy chọn -->
+                    <div class="col-6 col-md-auto">
+                        <label class="form-label small fw-bold text-muted">Từ ngày</label>
+                        <input type="date" id="fromDate" name="fromDate" class="form-control form-control-sm"
+                            th:value="${fromDate}" style="min-width:145px">
+                    </div>
+                    <div class="col-6 col-md-auto">
+                        <label class="form-label small fw-bold text-muted">Đến ngày</label>
+                        <input type="date" id="toDate" name="toDate" class="form-control form-control-sm"
+                            th:value="${toDate}" style="min-width:145px">
+                    </div>
+                    <div class="col-auto">
+                        <button type="submit" id="btnFilter" class="btn btn-success btn-sm">
+                            <i class="fa-solid fa-filter me-1"></i>Lọc
+                        </button>
+                    </div>
+
+                    <!-- Badge hiển thị kỳ đang chọn -->
+                    <div class="col-auto d-flex align-items-end">
+                        <span
+                            class="badge rounded-pill bg-success-subtle text-success border border-success-subtle px-3 py-2"
+                            style="font-size:.78rem;font-weight:600">
+                            <i class="fa-solid fa-clock-rotate-left me-1"></i>
+                            <span th:switch="${period}">
+                                <span th:case="'day'">Hôm nay</span>
+                                <span th:case="'week'">Tuần này</span>
+                                <span th:case="'year'">Năm nay</span>
+                                <span th:case="'custom'">
+                                    Tùy chỉnh:
+                                    <span th:text="${fromDate}">—</span> →
+                                    <span th:text="${toDate}">—</span>
                                 </span>
+                                <span th:case="*">Tháng này</span>
                             </span>
-                        </div>
-
+                        </span>
                     </div>
-                </form>
-            </div>
 
-            <!-- ===== KPI CARDS ===== -->
-            <div class="row g-4 mb-4">
-
-                <div class="col-xl-3 col-md-6">
-                    <div class="stat-card blue">
-                        <i class="fa-solid fa-dollar-sign stat-icon"></i>
-                        <div class="stat-label">Doanh thu</div>
-                        <div class="stat-value"
-                            th:text="${#numbers.formatDecimal(revenue / 1000000, 1, 'COMMA', 1, 'POINT')} + 'M'">0M
-                        </div>
-                        <div class="stat-change">
-                            <span th:if="${revenueChange >= 0}">
-                                <i class="fa-solid fa-arrow-up trend-up"></i>
-                                +<span th:text="${revenueChange}">0</span>% so với kỳ trước
-                            </span>
-                            <span th:if="${revenueChange < 0}">
-                                <i class="fa-solid fa-arrow-down trend-down"></i>
-                                <span th:text="${revenueChange}">0</span>% so với kỳ trước
-                            </span>
-                        </div>
-                    </div>
                 </div>
+            </form>
+        </div>
 
-                <div class="col-xl-3 col-md-6">
-                    <div class="stat-card green">
-                        <i class="fa-solid fa-shopping-cart stat-icon"></i>
-                        <div class="stat-label">Đơn hàng</div>
-                        <div class="stat-value" th:text="${#numbers.formatInteger(orderCount, 1, 'COMMA')}">0</div>
-                        <div class="stat-change">
-                            <span th:if="${orderChange >= 0}">
-                                <i class="fa-solid fa-arrow-up trend-up"></i>
-                                +<span th:text="${orderChange}">0</span>% so với kỳ trước
-                            </span>
-                            <span th:if="${orderChange < 0}">
-                                <i class="fa-solid fa-arrow-down trend-down"></i>
-                                <span th:text="${orderChange}">0</span>% so với kỳ trước
-                            </span>
-                        </div>
+        <!-- ===== KPI CARDS ===== -->
+        <div class="row g-4 mb-4">
+
+            <div class="col-xl-3 col-md-6">
+                <div class="stat-card blue">
+                    <i class="fa-solid fa-dollar-sign stat-icon"></i>
+                    <div class="stat-label">Doanh thu</div>
+                    <div class="stat-value"
+                        th:text="${#numbers.formatDecimal(revenue / 1000000, 1, 'COMMA', 1, 'POINT')} + 'M'">0M
                     </div>
-                </div>
-
-                <div class="col-xl-3 col-md-6">
-                    <div class="stat-card orange">
-                        <i class="fa-solid fa-users stat-icon"></i>
-                        <div class="stat-label">Khách hàng mới</div>
-                        <div class="stat-value" th:text="${newCustomers}">0</div>
-                        <div class="stat-change">
-                            <span th:if="${customerChange >= 0}">
-                                <i class="fa-solid fa-arrow-up trend-up"></i>
-                                +<span th:text="${customerChange}">0</span>% so với kỳ trước
-                            </span>
-                            <span th:if="${customerChange < 0}">
-                                <i class="fa-solid fa-arrow-down trend-down"></i>
-                                <span th:text="${customerChange}">0</span>% so với kỳ trước
-                            </span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-xl-3 col-md-6">
-                    <div class="stat-card purple">
-                        <i class="fa-solid fa-book stat-icon"></i>
-                        <div class="stat-label">Sản phẩm bán ra</div>
-                        <div class="stat-value" th:text="${#numbers.formatInteger(soldQty, 1, 'COMMA')}">0</div>
-                        <div class="stat-change">
-                            <span th:if="${soldQtyChange >= 0}">
-                                <i class="fa-solid fa-arrow-up trend-up"></i>
-                                +<span th:text="${soldQtyChange}">0</span>% so với kỳ trước
-                            </span>
-                            <span th:if="${soldQtyChange < 0}">
-                                <i class="fa-solid fa-arrow-down trend-down"></i>
-                                <span th:text="${soldQtyChange}">0</span>% so với kỳ trước
-                            </span>
-                        </div>
+                    <div class="stat-change">
+                        <span th:if="${revenueChange >= 0}">
+                            <i class="fa-solid fa-arrow-up trend-up"></i>
+                            +<span th:text="${revenueChange}">0</span>% so với kỳ trước
+                        </span>
+                        <span th:if="${revenueChange < 0}">
+                            <i class="fa-solid fa-arrow-down trend-down"></i>
+                            <span th:text="${revenueChange}">0</span>% so với kỳ trước
+                        </span>
                     </div>
                 </div>
             </div>
 
-            <!-- ===== BIỂU ĐỒ HÀNG 1 ===== -->
-            <div class="row g-4 mb-4">
-                <div class="col-lg-8">
-                    <div class="chart-container">
-                        <div class="chart-title">
-                            <i class="fa-solid fa-chart-line text-success me-2"></i>Doanh thu theo thời gian
-                        </div>
-                        <canvas id="revenueChart" height="90"></canvas>
-                    </div>
-                </div>
-                <div class="col-lg-4">
-                    <div class="chart-container">
-                        <div class="chart-title">
-                            <i class="fa-solid fa-chart-pie text-success me-2"></i>Phân loại đơn hàng
-                        </div>
-                        <canvas id="orderStatusChart"></canvas>
-                        <div class="text-center mt-3 text-muted small">
-                            Tổng hệ thống: <strong th:text="${totalOrders}">0</strong> đơn
-                        </div>
+            <div class="col-xl-3 col-md-6">
+                <div class="stat-card green">
+                    <i class="fa-solid fa-shopping-cart stat-icon"></i>
+                    <div class="stat-label">Đơn hàng</div>
+                    <div class="stat-value" th:text="${#numbers.formatInteger(orderCount, 1, 'COMMA')}">0</div>
+                    <div class="stat-change">
+                        <span th:if="${orderChange >= 0}">
+                            <i class="fa-solid fa-arrow-up trend-up"></i>
+                            +<span th:text="${orderChange}">0</span>% so với kỳ trước
+                        </span>
+                        <span th:if="${orderChange < 0}">
+                            <i class="fa-solid fa-arrow-down trend-down"></i>
+                            <span th:text="${orderChange}">0</span>% so với kỳ trước
+                        </span>
                     </div>
                 </div>
             </div>
 
-            <!-- ===== BIỂU ĐỒ HÀNG 2 ===== -->
-            <div class="row g-4 mb-4">
-                <div class="col-lg-6">
-                    <div class="chart-container">
-                        <div class="chart-title">
-                            <i class="fa-solid fa-layer-group text-success me-2"></i>Top danh mục bán chạy
-                        </div>
-                        <canvas id="categoryChart" height="120"></canvas>
-                    </div>
-                </div>
-                <div class="col-lg-6">
-                    <div class="chart-container">
-                        <div class="chart-title">
-                            <i class="fa-solid fa-chart-bar text-success me-2"></i>Đơn hàng theo thời gian
-                        </div>
-                        <canvas id="orderTrendChart" height="120"></canvas>
+            <div class="col-xl-3 col-md-6">
+                <div class="stat-card orange">
+                    <i class="fa-solid fa-users stat-icon"></i>
+                    <div class="stat-label">Khách hàng mới</div>
+                    <div class="stat-value" th:text="${newCustomers}">0</div>
+                    <div class="stat-change">
+                        <span th:if="${customerChange >= 0}">
+                            <i class="fa-solid fa-arrow-up trend-up"></i>
+                            +<span th:text="${customerChange}">0</span>% so với kỳ trước
+                        </span>
+                        <span th:if="${customerChange < 0}">
+                            <i class="fa-solid fa-arrow-down trend-down"></i>
+                            <span th:text="${customerChange}">0</span>% so với kỳ trước
+                        </span>
                     </div>
                 </div>
             </div>
 
-            <!-- ===== TOP SẢN PHẨM ===== -->
-            <div class="report-table">
-                <div class="p-3 pb-0 d-flex justify-content-between align-items-center">
-                    <h6 class="fw-bold mb-3">
-                        <i class="fa-solid fa-trophy text-warning me-2"></i>Top sản phẩm bán chạy trong kỳ
-                    </h6>
+            <div class="col-xl-3 col-md-6">
+                <div class="stat-card purple">
+                    <i class="fa-solid fa-book stat-icon"></i>
+                    <div class="stat-label">Sản phẩm bán ra</div>
+                    <div class="stat-value" th:text="${#numbers.formatInteger(soldQty, 1, 'COMMA')}">0</div>
+                    <div class="stat-change">
+                        <span th:if="${soldQtyChange >= 0}">
+                            <i class="fa-solid fa-arrow-up trend-up"></i>
+                            +<span th:text="${soldQtyChange}">0</span>% so với kỳ trước
+                        </span>
+                        <span th:if="${soldQtyChange < 0}">
+                            <i class="fa-solid fa-arrow-down trend-down"></i>
+                            <span th:text="${soldQtyChange}">0</span>% so với kỳ trước
+                        </span>
+                    </div>
                 </div>
-                <table class="table table-hover mb-0">
-                    <thead>
-                        <tr>
-                            <th>Xếp hạng</th>
-                            <th>Tên sách</th>
-                            <th>Danh mục</th>
-                            <th>Đã bán</th>
-                            <th>Doanh thu</th>
-                            <th>Đánh giá</th>
-                            <th>Tồn kho</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr th:if="${topProducts.empty}">
-                            <td colspan="7" class="text-center text-muted py-4">
-                                Chưa có dữ liệu bán hàng trong kỳ này
-                            </td>
-                        </tr>
-                        <tr th:each="p, stat : ${topProducts}">
-                            <td>
-                                <span th:if="${stat.index == 0}" class="badge bg-warning text-dark">🥇 1</span>
-                                <span th:if="${stat.index == 1}" class="badge bg-secondary">🥈 2</span>
-                                <span th:if="${stat.index == 2}" class="badge bg-danger">🥉 3</span>
-                                <span th:if="${stat.index >= 3}" class="badge bg-light text-dark"
-                                    th:text="${stat.index + 1}">4</span>
-                            </td>
-                            <td class="fw-bold" th:text="${p.name}">—</td>
-                            <td th:text="${p.category}">—</td>
-                            <td><strong th:text="${p.sold}">0</strong> cuốn</td>
-                            <td class="text-success fw-bold"
-                                th:text="${#numbers.formatInteger(p.revenue, 1, 'COMMA')} + 'đ'">0đ</td>
-                            <td>
-                                <span class="text-warning">★</span>
-                                <span th:text="${p.rating}">0</span>
-                            </td>
-                            <td>
-                                <span th:if="${p.stock > 50}" class="badge bg-success" th:text="${p.stock}">—</span>
-                                <span th:if="${p.stock > 10 and p.stock <= 50}" class="badge bg-warning text-dark"
-                                    th:text="${p.stock}">—</span>
-                                <span th:if="${p.stock <= 10}" class="badge bg-danger" th:text="${p.stock}">—</span>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
             </div>
+        </div>
+
+        <!-- ===== BIỂU ĐỒ HÀNG 1 ===== -->
+        <div class="row g-4 mb-4">
+            <div class="col-lg-8">
+                <div class="chart-container">
+                    <div class="chart-title">
+                        <i class="fa-solid fa-chart-line text-success me-2"></i>Doanh thu theo thời gian
+                    </div>
+                    <canvas id="revenueChart" height="90"></canvas>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="chart-container">
+                    <div class="chart-title">
+                        <i class="fa-solid fa-chart-pie text-success me-2"></i>Phân loại đơn hàng
+                    </div>
+                    <canvas id="orderStatusChart"></canvas>
+                    <div class="text-center mt-3 text-muted small">
+                        Tổng hệ thống: <strong th:text="${totalOrders}">0</strong> đơn
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== BIỂU ĐỒ HÀNG 2 ===== -->
+        <div class="row g-4 mb-4">
+            <div class="col-lg-6">
+                <div class="chart-container">
+                    <div class="chart-title">
+                        <i class="fa-solid fa-layer-group text-success me-2"></i>Top danh mục bán chạy
+                    </div>
+                    <canvas id="categoryChart" height="120"></canvas>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="chart-container">
+                    <div class="chart-title">
+                        <i class="fa-solid fa-chart-bar text-success me-2"></i>Đơn hàng theo thời gian
+                    </div>
+                    <canvas id="orderTrendChart" height="120"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== TOP SẢN PHẨM ===== -->
+        <div class="report-table">
+            <div class="p-3 pb-0 d-flex justify-content-between align-items-center">
+                <h6 class="fw-bold mb-3">
+                    <i class="fa-solid fa-trophy text-warning me-2"></i>Top sản phẩm bán chạy trong kỳ
+                </h6>
+            </div>
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Xếp hạng</th>
+                        <th>Tên sách</th>
+                        <th>Danh mục</th>
+                        <th>Đã bán</th>
+                        <th>Doanh thu</th>
+                        <th>Đánh giá</th>
+                        <th>Tồn kho</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${topProducts.empty}">
+                        <td colspan="7" class="text-center text-muted py-4">
+                            Chưa có dữ liệu bán hàng trong kỳ này
+                        </td>
+                    </tr>
+                    <tr th:each="p, stat : ${topProducts}">
+                        <td>
+                            <span th:if="${stat.index == 0}" class="badge bg-warning text-dark">🥇 1</span>
+                            <span th:if="${stat.index == 1}" class="badge bg-secondary">🥈 2</span>
+                            <span th:if="${stat.index == 2}" class="badge bg-danger">🥉 3</span>
+                            <span th:if="${stat.index >= 3}" class="badge bg-light text-dark"
+                                th:text="${stat.index + 1}">4</span>
+                        </td>
+                        <td class="fw-bold" th:text="${p.name}">—</td>
+                        <td th:text="${p.category}">—</td>
+                        <td><strong th:text="${p.sold}">0</strong> cuốn</td>
+                        <td class="text-success fw-bold"
+                            th:text="${#numbers.formatInteger(p.revenue, 1, 'COMMA')} + 'đ'">0đ</td>
+                        <td>
+                            <span class="text-warning">★</span>
+                            <span th:text="${p.rating}">0</span>
+                        </td>
+                        <td>
+                            <span th:if="${p.stock > 50}" class="badge bg-success" th:text="${p.stock}">—</span>
+                            <span th:if="${p.stock > 10 and p.stock <= 50}" class="badge bg-warning text-dark"
+                                th:text="${p.stock}">—</span>
+                            <span th:if="${p.stock <= 10}" class="badge bg-danger" th:text="${p.stock}">—</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
 
     </main>
 

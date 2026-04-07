@@ -242,7 +242,8 @@
 
 <body>
     <nav class="sidebar">
-        <div class="sidebar-brand">BEO<span style="color:white">BOOKS</span></div>
+        <div class="sidebar-brand"><a class="text-decoration-none" href="/home"><span
+                    style="color:#27ae60">BEO</span><span style="color:white">BOOKS</span></a></div>
         <ul class="nav flex-column mt-3">
             <li class="nav-item">
                 <a href="/admin/dashboard" class="nav-link">
@@ -300,15 +301,16 @@
                 </button>
 
                 <div class="admin-profile" onclick="window.location.href='/user/profile'" style="cursor:pointer;">
-    <img th:src="${currentUser != null && currentUser.image != null ? currentUser.image : 
-                  'https://ui-avatars.com/api/?name=' + (currentUser != null ? currentUser.fullname : 'Admin') + '&background=28a745&color=fff'}" 
-         alt="Admin" class="admin-avatar">
-    <div class="admin-info">
-        <h6 th:text="${currentUser != null ? currentUser.fullname : 'Admin'}">Admin</h6>
-        <small><i class="fa-solid fa-circle text-success" style="font-size:.5rem;"></i> Đang hoạt động</small>
-    </div>
-    <i class="fa-solid fa-chevron-down ms-2"></i>
-</div>
+                    <img th:src="${currentUser != null && currentUser.image != null ? currentUser.image : 
+                  'https://ui-avatars.com/api/?name=' + (currentUser != null ? currentUser.fullname : 'Admin') + '&background=28a745&color=fff'}"
+                        alt="Admin" class="admin-avatar">
+                    <div class="admin-info">
+                        <h6 th:text="${currentUser != null ? currentUser.fullname : 'Admin'}">Admin</h6>
+                        <small><i class="fa-solid fa-circle text-success" style="font-size:.5rem;"></i> Đang hoạt
+                            động</small>
+                    </div>
+                    <i class="fa-solid fa-chevron-down ms-2"></i>
+                </div>
             </div>
         </div>
 
@@ -447,7 +449,8 @@
                                     onclick="selectIcon(this, 'fa-solid fa-chart-line')"><i
                                         class="fa-solid fa-chart-line fa-fw"></i></div>
                                 <div class="icon-option p-2 rounded" onclick="selectIcon(this, 'fa-solid fa-utensils')">
-                                    <i class="fa-solid fa-utensils fa-fw"></i></div>
+                                    <i class="fa-solid fa-utensils fa-fw"></i>
+                                </div>
                             </div>
                         </div>
                         <div class="mb-3">
