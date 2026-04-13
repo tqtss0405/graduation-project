@@ -56,38 +56,51 @@ public class UserOrderController {
     // ================================================
     // POST: User hủy đơn (chỉ hủy được khi status 0 hoặc 1)
     // ================================================
-    @PostMapping("/cancel/{id}")
-    @Transactional
-    public String cancelOrder(@PathVariable Integer id,
-                              HttpSession session,
-                              RedirectAttributes ra) {
+    // Sửa method cancelOrder — thêm @RequestParam reason
+@PostMapping("/cancel/{id}")
+@Transactional
+public String cancelOrder(
+        @PathVariable Integer id,
+        @RequestParam(value = "cancelReason", required = false) String cancelReason,
+        HttpSession session,
+        RedirectAttributes ra) {
 
-        User currentUser = (User) session.getAttribute("currentUser");
-        Order order = orderRepository.findById(id).orElse(null);
+    User currentUser = (User) session.getAttribute("currentUser");
+    Order order = orderRepository.findById(id).orElse(null);
 
-        if (order == null || !order.getUser().getId().equals(currentUser.getId())) {
-            return "redirect:/user/order-details";
-        }
-
-        if (order.getStatus() != 0 && order.getStatus() != 1) {
-            ra.addFlashAttribute("errorMessage", "Không thể hủy đơn hàng này!");
-            return "redirect:/user/order-details";
-        }
-
-        // Restock
-        if (order.getOrderDetails() != null) {
-            for (OrderDetail od : order.getOrderDetails()) {
-                var product = od.getProduct();
-                product.setStockQuantity(product.getStockQuantity() + od.getQuantity());
-                productRepository.save(product);
-            }
-        }
-
-        order.setStatus(5);
-        orderRepository.save(order);
-        ra.addFlashAttribute("successMessage", "Đã hủy đơn hàng thành công!");
+    if (order == null || !order.getUser().getId().equals(currentUser.getId())) {
         return "redirect:/user/order-details";
     }
+
+    if (order.getStatus() != 0 && order.getStatus() != 1) {
+        ra.addFlashAttribute("errorMessage", "Không thể hủy đơn hàng này!");
+        return "redirect:/user/order-details";
+    }
+
+    // Restock
+    if (order.getOrderDetails() != null) {
+        for (OrderDetail od : order.getOrderDetails()) {
+            var product = od.getProduct();
+            product.setStockQuantity(product.getStockQuantity() + od.getQuantity());
+            productRepository.save(product);
+        }
+    }
+
+    // Ghi lý do vào note
+    String reasonText = (cancelReason != null && !cancelReason.trim().isEmpty())
+            ? cancelReason.trim()
+            : "Không có lý do";
+    String cancelNote = "[KHÁCH HỦY] Lý do: " + reasonText;
+    String currentNote = (order.getNote() != null && !order.getNote().isBlank())
+            ? order.getNote() + " | " + cancelNote
+            : cancelNote;
+    order.setNote(currentNote);
+
+    order.setStatus(5);
+    orderRepository.save(order);
+    ra.addFlashAttribute("successMessage", "Đã hủy đơn hàng thành công!");
+    return "redirect:/user/order-details";
+}
 
     // ================================================
     // POST: User yêu cầu hoàn tiền / trả hàng (status 3 → 6)

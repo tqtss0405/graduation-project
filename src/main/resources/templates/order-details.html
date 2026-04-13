@@ -159,7 +159,6 @@
             box-shadow: 0 20px 60px rgba(0,0,0,0.18);
             text-align: center; animation: popIn 0.22s ease;
         }
-        /* Refund modal cần rộng hơn vì có form bank */
         .custom-modal-box.wide { max-width: 520px; text-align: left; }
 
         .custom-modal-icon { width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; font-size: 1.8rem; }
@@ -169,7 +168,7 @@
         .custom-modal-title { font-weight: 700; font-size: 1.1rem; color: #1a1a2e; margin-bottom: 8px; }
         .custom-modal-desc  { color: #6c757d; font-size: 0.9rem; margin-bottom: 20px; }
 
-        /* Bank info section trong refund modal */
+        /* Bank info section */
         .bank-info-section {
             background: #f0f8ff;
             border: 1.5px solid #bee3f8;
@@ -191,8 +190,31 @@
         .bank-input:focus { border-color: #0d6efd; box-shadow: 0 0 0 3px rgba(13,110,253,0.1); }
         .bank-input.error { border-color: #dc3545; }
 
-        /* Reason select */
         .reason-section { margin-bottom: 16px; }
+
+        /* Cancel modal specific */
+        .cancel-reason-section {
+            background: #fff8f8;
+            border: 1.5px solid #f5c6cb;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .cancel-reason-section .section-title {
+            font-weight: 700; font-size: 0.88rem; color: #721c24;
+            margin-bottom: 10px;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .cancel-info-box {
+            background: #fff3cd;
+            border: 1px solid #ffeeba;
+            border-radius: 8px;
+            padding: 10px 14px;
+            margin-bottom: 14px;
+            font-size: 0.82rem;
+            color: #856404;
+        }
 
         /* Toast */
         .toast-container-custom { position: fixed; top: 24px; right: 24px; z-index: 10000; display: flex; flex-direction: column; gap: 10px; }
@@ -375,13 +397,11 @@
 
                 <!-- Hoàn tiền / trả hàng (status=3) -->
                 <th:block th:if="${order.status == 3}">
-                    <!-- VNPay → Yêu cầu hoàn tiền (cần nhập tài khoản ngân hàng) -->
                     <button th:if="${order.paymentMethod == 1}" type="button"
                             class="btn btn-outline-primary btn-sm rounded-pill fw-bold"
                             th:onclick="'openRefundModal(' + ${order.id} + ', \'refund\')'">
                         <i class="fa-solid fa-rotate-left me-1"></i>Yêu cầu hoàn tiền
                     </button>
-                    <!-- COD → Yêu cầu trả hàng (không cần tài khoản) -->
                     <button th:if="${order.paymentMethod == 0}" type="button"
                             class="btn btn-outline-warning btn-sm rounded-pill fw-bold"
                             th:onclick="'openRefundModal(' + ${order.id} + ', \'return\')'">
@@ -409,16 +429,19 @@
                     <i class="fa-solid fa-circle-check me-1"></i>Đã được hoàn tiền / hoàn hàng
                 </span>
 
-                <!-- Hủy đơn (status=0,1) -->
-                <form th:if="${order.status == 0 or order.status == 1}"
-                      th:id="'form-cancel-' + ${order.id}"
-                      th:action="@{/user/order-details/cancel/{id}(id=${order.id})}"
-                      method="post" style="display:inline;">
+                <!-- Hủy đơn (status=0,1) — chỉ render hidden form tại đây -->
+                <th:block th:if="${order.status == 0 or order.status == 1}">
                     <button type="button" class="btn btn-outline-danger btn-sm rounded-pill fw-bold"
-                            th:onclick="'openModal(\'cancel\', ' + ${order.id} + ')'">
+                            th:onclick="'openCancelModal(' + ${order.id} + ')'">
                         <i class="fa-solid fa-xmark me-1"></i>Hủy đơn
                     </button>
-                </form>
+                    <!-- Form ẩn submit hủy kèm lý do -->
+                    <form th:id="'form-cancel-' + ${order.id}"
+                          th:action="@{/user/order-details/cancel/{id}(id=${order.id})}"
+                          method="post" style="display:none;">
+                        <input type="hidden" name="cancelReason" value="">
+                    </form>
+                </th:block>
 
             </div>
 
@@ -498,7 +521,7 @@
     <div id="batchReviewInputs"></div>
 </form>
 
-<!-- Modal confirm nhận hàng -->
+<!-- ===== Modal confirm nhận hàng ===== -->
 <div class="custom-modal-backdrop" id="modalConfirm">
     <div class="custom-modal-box">
         <div class="custom-modal-icon modal-icon-success"><i class="fa-solid fa-circle-check"></i></div>
@@ -511,24 +534,56 @@
     </div>
 </div>
 
-<!-- Modal hủy đơn -->
+<!-- ===== Modal hủy đơn — CÓ LÝ DO ===== -->
 <div class="custom-modal-backdrop" id="modalCancel">
-    <div class="custom-modal-box">
-        <div class="custom-modal-icon modal-icon-danger"><i class="fa-solid fa-triangle-exclamation"></i></div>
-        <div class="custom-modal-title">Hủy đơn hàng?</div>
-        <div class="custom-modal-desc">Bạn có chắc muốn hủy đơn hàng này không?<br>Hành động này <strong>không thể hoàn tác</strong>.</div>
-        <div class="d-flex gap-3 justify-content-center">
+    <div class="custom-modal-box wide">
+        <div class="custom-modal-icon modal-icon-danger">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+        <div class="custom-modal-title text-center">Hủy đơn hàng?</div>
+        <div class="custom-modal-desc text-center">
+            Hành động này <strong>không thể hoàn tác</strong>.
+            Kho hàng sẽ được hoàn lại tự động.
+        </div>
+
+        <!-- Thông báo VNPay nếu cần -->
+        <div class="cancel-info-box" id="cancelVnpayNote" style="display:none;">
+            <i class="fa-solid fa-credit-card me-1"></i>
+            Đơn hàng đã thanh toán qua <strong>VNPay</strong>. Sau khi hủy, chúng tôi sẽ liên hệ để hoàn tiền trong vòng <strong>1–3 ngày làm việc</strong>.
+        </div>
+
+        <!-- Lý do hủy -->
+        <div class="cancel-reason-section">
+            <div class="section-title">
+                <i class="fa-solid fa-comment-dots"></i>
+                Lý do hủy đơn <span class="text-danger ms-1">*</span>
+            </div>
+            <select class="form-select form-select-sm rounded-3 mb-2" id="cancelReasonSelect">
+                <option value="">-- Chọn lý do --</option>
+                <option value="Đặt nhầm sản phẩm">Đặt nhầm sản phẩm</option>
+                <option value="Muốn thay đổi địa chỉ giao hàng">Muốn thay đổi địa chỉ giao hàng</option>
+                <option value="Tìm được nơi mua rẻ hơn">Tìm được nơi mua rẻ hơn</option>
+                <option value="Không còn nhu cầu">Không còn nhu cầu</option>
+                <option value="Đặt trùng đơn">Đặt trùng đơn</option>
+                <option value="Khác">Khác</option>
+            </select>
+            <div class="text-danger small d-none" id="cancelReasonError">
+                <i class="fa-solid fa-circle-exclamation me-1"></i>Vui lòng chọn lý do hủy!
+            </div>
+        </div>
+
+        <div class="d-flex gap-3 justify-content-end">
             <button class="btn btn-light rounded-pill px-4 fw-bold" onclick="closeModal('cancel')">Giữ lại</button>
-            <button class="btn btn-danger rounded-pill px-4 fw-bold" onclick="submitModal('cancel')"><i class="fa-solid fa-xmark me-1"></i>Hủy đơn</button>
+            <button class="btn btn-danger rounded-pill px-4 fw-bold" onclick="submitCancelWithReason()">
+                <i class="fa-solid fa-xmark me-1"></i>Xác nhận hủy
+            </button>
         </div>
     </div>
 </div>
 
-<!-- ===== Modal hoàn tiền / trả hàng (redesigned) ===== -->
+<!-- ===== Modal hoàn tiền / trả hàng ===== -->
 <div class="custom-modal-backdrop" id="modalRefund">
     <div class="custom-modal-box wide">
-
-        <!-- Header -->
         <div class="text-center mb-4">
             <div class="custom-modal-icon modal-icon-warning mx-auto">
                 <i class="fa-solid fa-rotate-left" id="refundModalIcon"></i>
@@ -612,7 +667,6 @@
             </div>
         </div>
 
-        <!-- Buttons -->
         <div class="d-flex gap-3 justify-content-end mt-3">
             <button class="btn btn-light rounded-pill px-4 fw-bold" onclick="closeRefundModal()">Quay lại</button>
             <button class="btn btn-warning rounded-pill px-4 fw-bold text-dark" onclick="submitRefundModal()">
@@ -625,22 +679,71 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 // =============================================
-// CONFIRM / CANCEL MODALS
+// CONFIRM MODAL
 // =============================================
 let pendingOrderId = null, pendingRefundId = null, pendingRefundType = null;
+let pendingCancelId = null;
 
 function openModal(type, orderId) {
     pendingOrderId = orderId;
-    document.getElementById(type === 'confirm' ? 'modalConfirm' : 'modalCancel').classList.add('show');
+    if (type === 'confirm') {
+        document.getElementById('modalConfirm').classList.add('show');
+    }
 }
 function closeModal(type) {
-    document.getElementById(type === 'confirm' ? 'modalConfirm' : 'modalCancel').classList.remove('show');
-    pendingOrderId = null;
+    if (type === 'confirm') {
+        document.getElementById('modalConfirm').classList.remove('show');
+        pendingOrderId = null;
+    } else if (type === 'cancel') {
+        document.getElementById('modalCancel').classList.remove('show');
+        pendingCancelId = null;
+    }
 }
 function submitModal(type) {
-    if (!pendingOrderId) return;
-    document.getElementById((type === 'confirm' ? 'form-confirm-' : 'form-cancel-') + pendingOrderId).submit();
+    if (type === 'confirm' && pendingOrderId) {
+        document.getElementById('form-confirm-' + pendingOrderId).submit();
+    }
 }
+
+// =============================================
+// CANCEL MODAL — CÓ LÝ DO
+// =============================================
+function openCancelModal(orderId) {
+    pendingCancelId = orderId;
+
+    // Reset
+    document.getElementById('cancelReasonSelect').value = '';
+    document.getElementById('cancelReasonError').classList.add('d-none');
+
+    // Kiểm tra nếu đơn có VNPay đã thanh toán (không cần thiết ở frontend,
+    // chỉ hiển thị note chung về hoàn tiền — admin xử lý thủ công)
+    // Nếu cần, có thể truyền thêm data-payment-method qua button
+    document.getElementById('cancelVnpayNote').style.display = 'none';
+
+    document.getElementById('modalCancel').classList.add('show');
+}
+
+function submitCancelWithReason() {
+    const select = document.getElementById('cancelReasonSelect');
+    if (!select.value) {
+        document.getElementById('cancelReasonError').classList.remove('d-none');
+        select.focus();
+        return;
+    }
+    document.getElementById('cancelReasonError').classList.add('d-none');
+
+    const form = document.getElementById('form-cancel-' + pendingCancelId);
+    if (!form) return;
+    form.querySelector('input[name="cancelReason"]').value = select.value;
+
+    document.getElementById('modalCancel').classList.remove('show');
+    form.submit();
+}
+
+// Xóa lỗi khi chọn
+document.getElementById('cancelReasonSelect')
+    ?.addEventListener('change', () =>
+        document.getElementById('cancelReasonError').classList.add('d-none'));
 
 // =============================================
 // REFUND MODAL
@@ -649,8 +752,7 @@ function openRefundModal(orderId, type) {
     pendingRefundId   = orderId;
     pendingRefundType = type;
 
-    const isRefund = (type === 'refund'); // VNPay
-    const isReturn = (type === 'return'); // COD
+    const isRefund = (type === 'refund');
 
     document.getElementById('refundModalTitle').textContent =
         isRefund ? 'Yêu cầu hoàn tiền' : 'Yêu cầu trả hàng';
@@ -659,15 +761,10 @@ function openRefundModal(orderId, type) {
             ? 'Vui lòng điền thông tin bên dưới. Chúng tôi sẽ liên hệ trong 24 giờ.'
             : 'Vui lòng cho chúng tôi biết lý do trả hàng.';
 
-    // Chỉ hiện ô ngân hàng khi VNPay
     const bankSection = document.getElementById('bankInfoSection');
-    if (isRefund) {
-        bankSection.classList.remove('d-none');
-    } else {
-        bankSection.classList.add('d-none');
-    }
+    isRefund ? bankSection.classList.remove('d-none') : bankSection.classList.add('d-none');
 
-    // Reset form
+    // Reset
     document.getElementById('refundReasonSelect').value = '';
     document.getElementById('refundReasonError').classList.add('d-none');
     ['bankName','bankNumber','bankHolder'].forEach(id => {
@@ -689,7 +786,6 @@ function closeRefundModal() {
 function submitRefundModal() {
     let hasError = false;
 
-    // Validate lý do
     const select = document.getElementById('refundReasonSelect');
     if (!select.value) {
         document.getElementById('refundReasonError').classList.remove('d-none');
@@ -698,7 +794,6 @@ function submitRefundModal() {
         document.getElementById('refundReasonError').classList.add('d-none');
     }
 
-    // Validate ngân hàng (chỉ khi VNPay)
     if (pendingRefundType === 'refund') {
         const bankNameEl   = document.getElementById('bankName');
         const bankNumberEl = document.getElementById('bankNumber');
@@ -748,6 +843,7 @@ document.querySelectorAll('.custom-modal-backdrop').forEach(el => {
         if (e.target === el) {
             el.classList.remove('show');
             pendingOrderId = null;
+            pendingCancelId = null;
             pendingRefundId = null;
             pendingRefundType = null;
         }

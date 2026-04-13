@@ -102,8 +102,10 @@ public class OrderController {
 
         int totalItems = orders.size();
         int totalPages = (int) Math.ceil((double) totalItems / PAGE_SIZE);
-        if (page < 1) page = 1;
-        if (page > totalPages && totalPages > 0) page = totalPages;
+        if (page < 1)
+            page = 1;
+        if (page > totalPages && totalPages > 0)
+            page = totalPages;
 
         int fromIdx = (page - 1) * PAGE_SIZE;
         int toIdx = Math.min(fromIdx + PAGE_SIZE, totalItems);
@@ -118,15 +120,15 @@ public class OrderController {
         model.addAttribute("totalPages", totalPages);
         model.addAttribute("totalItems", totalItems);
 
-        model.addAttribute("countAll",       orderRepository.count());
-        model.addAttribute("countPending",   orderRepository.findByStatusOrderByCreateAtDesc(0).size());
+        model.addAttribute("countAll", orderRepository.count());
+        model.addAttribute("countPending", orderRepository.findByStatusOrderByCreateAtDesc(0).size());
         model.addAttribute("countConfirmed", orderRepository.findByStatusOrderByCreateAtDesc(1).size());
-        model.addAttribute("countShipping",  orderRepository.findByStatusOrderByCreateAtDesc(2).size());
+        model.addAttribute("countShipping", orderRepository.findByStatusOrderByCreateAtDesc(2).size());
         model.addAttribute("countDelivered", orderRepository.findByStatusOrderByCreateAtDesc(3).size());
         model.addAttribute("countCompleted", orderRepository.findByStatusOrderByCreateAtDesc(4).size());
         model.addAttribute("countCancelled", orderRepository.findByStatusOrderByCreateAtDesc(5).size());
-        model.addAttribute("countRefund",    orderRepository.findByStatusOrderByCreateAtDesc(6).size());
-        model.addAttribute("countRefunded",  orderRepository.findByStatusOrderByCreateAtDesc(7).size());
+        model.addAttribute("countRefund", orderRepository.findByStatusOrderByCreateAtDesc(6).size());
+        model.addAttribute("countRefunded", orderRepository.findByStatusOrderByCreateAtDesc(7).size());
 
         return "admin-orders";
     }
@@ -146,9 +148,9 @@ public class OrderController {
                 .map(od -> {
                     Map<String, Object> item = new java.util.HashMap<>();
                     item.put("productName", od.getProduct() != null ? od.getProduct().getName() : "N/A");
-                    item.put("author",      od.getProduct() != null ? od.getProduct().getAuthor() : "");
-                    item.put("quantity",    od.getQuantity());
-                    item.put("price",       od.getPrice());
+                    item.put("author", od.getProduct() != null ? od.getProduct().getAuthor() : "");
+                    item.put("quantity", od.getQuantity());
+                    item.put("price", od.getPrice());
                     return item;
                 })
                 .collect(Collectors.toList());
@@ -264,6 +266,14 @@ public class OrderController {
         order.setNote(currentNote);
 
         order.setStatus(5);
+        // Sau khi set order.setStatus(5), thêm đoạn này:
+        // Nếu đã thanh toán VNPay → ghi chú cần hoàn tiền thủ công
+        if (order.getPaymentMethod() != null && order.getPaymentMethod() == 1
+                && order.getPaymentStatus() != null && order.getPaymentStatus() == 1) {
+            String refundNote = "[CẦN HOÀN TIỀN VNPAY] Vào VNPay Merchant Portal để hoàn tiền thủ công.";
+            currentNote = currentNote + " | " + refundNote;
+            order.setNote(currentNote);
+        }
         orderRepository.save(order);
 
         // Gửi email thông báo cho khách

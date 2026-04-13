@@ -77,6 +77,46 @@
         .bank-info-row .lbl { color: #6c757d; min-width: 90px; }
         .bank-info-row .val { font-weight: 700; color: #1a1a2e; }
 
+        /* ===== Note blocks in modal ===== */
+        .note-block {
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 0.85rem;
+            margin-bottom: 6px;
+        }
+        .note-block:last-child { margin-bottom: 0; }
+        .note-block.note-customer-cancel {
+            background: #fff3cd;
+            border-left: 3px solid #ffc107;
+            color: #856404;
+        }
+        .note-block.note-admin-cancel {
+            background: #f8d7da;
+            border-left: 3px solid #dc3545;
+            color: #721c24;
+        }
+        .note-block.note-refund-request {
+            background: #fff8f0;
+            border-left: 3px solid #fd7e14;
+            color: #7a3e00;
+        }
+        .note-block.note-vnpay-refund {
+            background: #e8f4fd;
+            border-left: 3px solid #0d6efd;
+            color: #084298;
+        }
+        .note-block.note-general {
+            background: #f8f9fa;
+            border-left: 3px solid #adb5bd;
+            color: #495057;
+        }
+        .note-block .note-tag {
+            font-weight: 700;
+            font-size: 0.78rem;
+            display: block;
+            margin-bottom: 2px;
+        }
+
         /* ===== PAGINATION ===== */
         .orders-footer {
             background: #fff;
@@ -301,6 +341,10 @@
             <i class="fa-solid fa-clock me-2"></i>
             Đơn "Đã giao" sẽ <strong>tự động Hoàn thành sau 7 ngày</strong> nếu khách không xác nhận.
         </div>
+        <div th:if="${selectedStatus == 5}" class="alert alert-secondary py-2 mb-3">
+            <i class="fa-solid fa-info-circle me-2"></i>
+            Xem chi tiết đơn để biết <strong>lý do hủy</strong> (khách tự hủy hoặc admin hủy) và trạng thái hoàn tiền VNPay nếu có.
+        </div>
         <div th:if="${selectedStatus == 6}" class="alert alert-warning py-2 mb-3">
             <i class="fa-solid fa-triangle-exclamation me-2"></i>
             Khách đã <strong>yêu cầu hoàn tiền / trả hàng</strong>. Xem chi tiết (tài khoản ngân hàng, lý do) rồi xử lý.<br>
@@ -363,7 +407,7 @@
                         <td>
                             <div class="d-flex gap-1 flex-wrap">
 
-                                <!-- ── Nút XEM CHI TIẾT: xuất hiện ở MỌI tab ── -->
+                                <!-- Nút XEM CHI TIẾT -->
                                 <button class="btn btn-sm btn-outline-secondary"
                                     th:data-id="${order.id}"
                                     th:data-customer="${order.user != null ? order.user.fullname : 'N/A'}"
@@ -381,7 +425,7 @@
                                     <i class="fa-solid fa-eye"></i> Xem
                                 </button>
 
-                                <!-- ── Chờ xác nhận (0): Xác nhận + Hủy ── -->
+                                <!-- Chờ xác nhận (0) -->
                                 <th:block th:if="${order.status == 0}">
                                     <form th:action="@{/admin/orders/update-status/{id}(id=${order.id})}" method="post" class="d-inline">
                                         <input type="hidden" name="status" value="1">
@@ -397,7 +441,7 @@
                                     </button>
                                 </th:block>
 
-                                <!-- ── Đã xác nhận (1): Giao hàng + Hủy ── -->
+                                <!-- Đã xác nhận (1) -->
                                 <th:block th:if="${order.status == 1}">
                                     <form th:action="@{/admin/orders/update-status/{id}(id=${order.id})}" method="post" class="d-inline">
                                         <input type="hidden" name="status" value="2">
@@ -413,7 +457,7 @@
                                     </button>
                                 </th:block>
 
-                                <!-- ── Đang giao (2): chỉ Đã giao ── -->
+                                <!-- Đang giao (2) -->
                                 <th:block th:if="${order.status == 2}">
                                     <form th:action="@{/admin/orders/update-status/{id}(id=${order.id})}" method="post" class="d-inline">
                                         <input type="hidden" name="status" value="3">
@@ -423,7 +467,7 @@
                                     </form>
                                 </th:block>
 
-                                <!-- ── Yêu cầu hoàn tiền (6): Hoàn tiền + Từ chối ── -->
+                                <!-- Yêu cầu hoàn tiền (6) -->
                                 <th:block th:if="${order.status == 6}">
                                     <form th:action="@{/admin/orders/update-status/{id}(id=${order.id})}" method="post" class="d-inline"
                                         th:onsubmit="'return confirm(\'Xác nhận đã hoàn tiền cho đơn #' + ${order.id} + '?\');'">
@@ -484,7 +528,6 @@
                                     <tr><th>Email:</th><td id="modalEmail"></td></tr>
                                     <tr><th>SĐT:</th><td id="modalPhone"></td></tr>
                                     <tr><th>Địa chỉ:</th><td id="modalAddress"></td></tr>
-                                    <tr><th>Ghi chú:</th><td id="modalNote"></td></tr>
                                 </table>
                             </div>
                         </div>
@@ -507,6 +550,14 @@
                                 </table>
                             </div>
                         </div>
+                    </div>
+
+                    <!-- Ghi chú đơn hàng (hiển thị theo từng loại) -->
+                    <div class="mt-3" id="modalNoteSection">
+                        <h6 class="fw-bold mb-2">
+                            <i class="fa-solid fa-note-sticky me-2 text-muted"></i>Ghi chú & Lý do
+                        </h6>
+                        <div id="modalNoteBlocks"></div>
                     </div>
 
                     <!-- Thông tin tài khoản ngân hàng -->
@@ -553,7 +604,7 @@
         </div>
     </div>
 
-    <!-- ===== MODAL HỦY ĐƠN ===== -->
+    <!-- ===== MODAL HỦY ĐƠN (ADMIN) ===== -->
     <div class="modal fade" id="cancelModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content border-0 shadow-lg rounded-4">
@@ -564,8 +615,6 @@
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body p-4">
-
-                    <!-- Thông tin đơn hàng sẽ bị hủy -->
                     <div class="cancel-order-info mb-4">
                         <div class="d-flex align-items-center gap-2 mb-1">
                             <i class="fa-solid fa-box fa-lg text-warning"></i>
@@ -586,15 +635,12 @@
                     <div id="cancelReasonError" class="text-danger small mt-1 d-none">
                         <i class="fa-solid fa-circle-exclamation me-1"></i>Vui lòng nhập lý do hủy đơn!
                     </div>
-
                 </div>
                 <div class="modal-footer border-0 pt-0">
-                    <button type="button" class="btn btn-outline-secondary rounded-pill px-4"
-                        data-bs-dismiss="modal">
+                    <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">
                         <i class="fa-solid fa-arrow-left me-1"></i>Quay lại
                     </button>
-                    <button type="button" class="btn btn-danger rounded-pill px-4 fw-semibold"
-                        onclick="submitCancel()">
+                    <button type="button" class="btn btn-danger rounded-pill px-4 fw-semibold" onclick="submitCancel()">
                         <i class="fa-solid fa-xmark me-1"></i>Xác nhận hủy
                     </button>
                 </div>
@@ -602,7 +648,7 @@
         </div>
     </div>
 
-    <!-- Form ẩn để submit hủy đơn -->
+    <!-- Form ẩn để submit hủy đơn (admin) -->
     <form id="cancelForm" method="post" style="display:none;">
         <input type="hidden" id="cancelReasonHidden" name="cancelReason">
     </form>
@@ -623,10 +669,8 @@
             document.getElementById('modalDate').textContent     = d.date     || '';
             document.getElementById('modalTotal').textContent    = Number(d.total).toLocaleString('vi-VN') + 'đ';
 
-            // Ghi chú — lọc bỏ dòng [ADMIN HUY] để hiện phần note gốc sạch hơn
-            const rawNote = (d.note || '').trim();
-            const noteLines = rawNote.split('|').map(s => s.trim()).filter(s => !s.startsWith('[ADMIN HUY]') && !s.startsWith('[Yêu cầu hoàn tiền]') && !s.startsWith('[Yêu cầu trả hàng]'));
-            document.getElementById('modalNote').textContent = noteLines.join(' | ') || 'Không có';
+            // ── Xử lý note — phân loại từng dòng ──
+            renderNoteBlocks(d.note || '');
 
             document.getElementById('modalMethod').innerHTML =
                 d.method == '0' ? '<span class="badge bg-secondary">COD</span>'
@@ -715,7 +759,70 @@
             new bootstrap.Modal(document.getElementById('orderModal')).show();
         }
 
-        // ========== HỦY ĐƠN ==========
+        /**
+         * Phân loại từng phần của note và render thành các block màu sắc khác nhau.
+         * Tags được nhận dạng:
+         *   [KHÁCH HỦY]          → màu vàng
+         *   [ADMIN HUY]          → màu đỏ
+         *   [Yêu cầu hoàn tiền]  → màu cam
+         *   [Yêu cầu trả hàng]   → màu cam
+         *   [CẦN HOÀN TIỀN VNPAY]→ màu xanh dương
+         *   (còn lại)            → màu xám (ghi chú thường)
+         */
+        function renderNoteBlocks(rawNote) {
+            const container = document.getElementById('modalNoteBlocks');
+            const section   = document.getElementById('modalNoteSection');
+
+            if (!rawNote || rawNote.trim() === '' || rawNote === 'null') {
+                section.style.display = 'none';
+                container.innerHTML = '';
+                return;
+            }
+
+            section.style.display = '';
+            const parts = rawNote.split('|').map(s => s.trim()).filter(Boolean);
+            container.innerHTML = '';
+
+            parts.forEach(part => {
+                const block = document.createElement('div');
+
+                if (part.startsWith('[KHÁCH HỦY]')) {
+                    block.className = 'note-block note-customer-cancel';
+                    block.innerHTML = `<span class="note-tag"><i class="fa-solid fa-user me-1"></i>Khách tự hủy</span>` +
+                        escHtml(part.replace('[KHÁCH HỦY]', '').trim());
+
+                } else if (part.startsWith('[ADMIN HUY]')) {
+                    block.className = 'note-block note-admin-cancel';
+                    block.innerHTML = `<span class="note-tag"><i class="fa-solid fa-user-shield me-1"></i>Admin hủy</span>` +
+                        escHtml(part.replace('[ADMIN HUY]', '').trim());
+
+                } else if (part.startsWith('[Yêu cầu hoàn tiền]') || part.startsWith('[Yêu cầu trả hàng]')) {
+                    const tag = part.startsWith('[Yêu cầu hoàn tiền]') ? 'Yêu cầu hoàn tiền' : 'Yêu cầu trả hàng';
+                    block.className = 'note-block note-refund-request';
+                    block.innerHTML = `<span class="note-tag"><i class="fa-solid fa-rotate-left me-1"></i>${tag}</span>` +
+                        escHtml(part.replace(/^\[.+?\]/, '').trim());
+
+                } else if (part.startsWith('[CẦN HOÀN TIỀN VNPAY]')) {
+                    block.className = 'note-block note-vnpay-refund';
+                    block.innerHTML = `<span class="note-tag"><i class="fa-solid fa-building-columns me-1"></i>Cần hoàn tiền VNPay</span>` +
+                        escHtml(part.replace('[CẦN HOÀN TIỀN VNPAY]', '').trim());
+
+                } else {
+                    block.className = 'note-block note-general';
+                    block.innerHTML = `<span class="note-tag"><i class="fa-solid fa-note-sticky me-1"></i>Ghi chú</span>` +
+                        escHtml(part);
+                }
+
+                container.appendChild(block);
+            });
+        }
+
+        function escHtml(str) {
+            if (!str) return '';
+            return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        // ========== HỦY ĐƠN (ADMIN) ==========
         let _cancelOrderId = null;
 
         function openCancelModal(btn) {
@@ -729,7 +836,6 @@
         function submitCancel() {
             const reason = document.getElementById('cancelReasonInput').value.trim();
 
-            // Validate: lý do không được trống
             if (!reason) {
                 document.getElementById('cancelReasonError').classList.remove('d-none');
                 document.getElementById('cancelReasonInput').focus();
@@ -737,17 +843,14 @@
             }
             document.getElementById('cancelReasonError').classList.add('d-none');
 
-            // Gán action cho form ẩn rồi submit
             const form = document.getElementById('cancelForm');
             form.action = '/admin/orders/cancel/' + _cancelOrderId;
             document.getElementById('cancelReasonHidden').value = reason;
 
-            // Đóng modal trước khi submit
             bootstrap.Modal.getInstance(document.getElementById('cancelModal')).hide();
             form.submit();
         }
 
-        // Xóa lỗi khi người dùng bắt đầu gõ
         document.getElementById('cancelReasonInput')
             ?.addEventListener('input', () =>
                 document.getElementById('cancelReasonError').classList.add('d-none'));
