@@ -18,6 +18,7 @@ import com.poly.graduation_project.model.Order;
 import com.poly.graduation_project.model.OrderDetail;
 import com.poly.graduation_project.repository.OrderRepository;
 import com.poly.graduation_project.repository.ProductRepository;
+import com.poly.graduation_project.service.OrderEmailService;
 import com.poly.graduation_project.service.SessionService;
 import com.poly.graduation_project.model.User;
 import jakarta.transaction.Transactional;
@@ -28,17 +29,6 @@ public class OrderController {
 
     private static final int PAGE_SIZE = 10;
 
-    /**
-     * Thứ tự ưu tiên hiển thị theo status (tab "Tất cả")
-     * 0 = Chờ xác nhận (cao nhất)
-     * 6 = Yêu cầu hoàn tiền
-     * 1 = Đã xác nhận
-     * 2 = Đang giao
-     * 3 = Đã giao
-     * 4 = Hoàn thành
-     * 7 = Đã hoàn tiền
-     * 5 = Đã hủy
-     */
     private static final Map<Integer, Integer> STATUS_PRIORITY = Map.of(
             0, 1,
             6, 2,
@@ -54,8 +44,12 @@ public class OrderController {
 
     @Autowired
     private ProductRepository productRepository;
+
     @Autowired
     private SessionService sessionService;
+
+    @Autowired
+    private OrderEmailService orderEmailService;
 
     // ================================================
     // GET: Danh sách đơn hàng
@@ -71,12 +65,11 @@ public class OrderController {
 
         User currentUser = (User) sessionService.getAttribute("currentUser");
         model.addAttribute("currentUser", currentUser);
-        // 1. Lấy danh sách gốc
+
         List<Order> orders = (status != null)
                 ? orderRepository.findByStatusOrderByCreateAtDesc(status)
                 : orderRepository.findAllByOrderByCreateAtDesc();
 
-        // 2. Lọc theo keyword
         if (keyword != null && !keyword.trim().isEmpty()) {
             String kw = keyword.trim().toLowerCase();
             orders = orders.stream()
@@ -86,7 +79,6 @@ public class OrderController {
                     .collect(Collectors.toList());
         }
 
-        // 3. Lọc theo khoảng ngày
         if (fromDate != null && !fromDate.isEmpty()) {
             LocalDateTime from = LocalDate.parse(fromDate).atStartOfDay();
             orders = orders.stream()
@@ -100,7 +92,6 @@ public class OrderController {
                     .collect(Collectors.toList());
         }
 
-        // 4. Sắp xếp ưu tiên (chỉ khi tab "Tất cả")
         if (status == null) {
             orders = orders.stream()
                     .sorted(Comparator
@@ -109,19 +100,15 @@ public class OrderController {
                     .collect(Collectors.toList());
         }
 
-        // 5. Phân trang
         int totalItems = orders.size();
         int totalPages = (int) Math.ceil((double) totalItems / PAGE_SIZE);
-        if (page < 1)
-            page = 1;
-        if (page > totalPages && totalPages > 0)
-            page = totalPages;
+        if (page < 1) page = 1;
+        if (page > totalPages && totalPages > 0) page = totalPages;
 
         int fromIdx = (page - 1) * PAGE_SIZE;
         int toIdx = Math.min(fromIdx + PAGE_SIZE, totalItems);
         List<Order> pagedOrders = (totalItems > 0) ? orders.subList(fromIdx, toIdx) : orders;
 
-        // 6. Đưa vào model
         model.addAttribute("orders", pagedOrders);
         model.addAttribute("selectedStatus", status);
         model.addAttribute("keyword", keyword);
@@ -131,15 +118,15 @@ public class OrderController {
         model.addAttribute("totalPages", totalPages);
         model.addAttribute("totalItems", totalItems);
 
-        model.addAttribute("countAll", orderRepository.count());
-        model.addAttribute("countPending", orderRepository.findByStatusOrderByCreateAtDesc(0).size());
+        model.addAttribute("countAll",       orderRepository.count());
+        model.addAttribute("countPending",   orderRepository.findByStatusOrderByCreateAtDesc(0).size());
         model.addAttribute("countConfirmed", orderRepository.findByStatusOrderByCreateAtDesc(1).size());
-        model.addAttribute("countShipping", orderRepository.findByStatusOrderByCreateAtDesc(2).size());
+        model.addAttribute("countShipping",  orderRepository.findByStatusOrderByCreateAtDesc(2).size());
         model.addAttribute("countDelivered", orderRepository.findByStatusOrderByCreateAtDesc(3).size());
         model.addAttribute("countCompleted", orderRepository.findByStatusOrderByCreateAtDesc(4).size());
         model.addAttribute("countCancelled", orderRepository.findByStatusOrderByCreateAtDesc(5).size());
-        model.addAttribute("countRefund", orderRepository.findByStatusOrderByCreateAtDesc(6).size());
-        model.addAttribute("countRefunded", orderRepository.findByStatusOrderByCreateAtDesc(7).size());
+        model.addAttribute("countRefund",    orderRepository.findByStatusOrderByCreateAtDesc(6).size());
+        model.addAttribute("countRefunded",  orderRepository.findByStatusOrderByCreateAtDesc(7).size());
 
         return "admin-orders";
     }
@@ -159,9 +146,9 @@ public class OrderController {
                 .map(od -> {
                     Map<String, Object> item = new java.util.HashMap<>();
                     item.put("productName", od.getProduct() != null ? od.getProduct().getName() : "N/A");
-                    item.put("author", od.getProduct() != null ? od.getProduct().getAuthor() : "");
-                    item.put("quantity", od.getQuantity());
-                    item.put("price", od.getPrice());
+                    item.put("author",      od.getProduct() != null ? od.getProduct().getAuthor() : "");
+                    item.put("quantity",    od.getQuantity());
+                    item.put("price",       od.getPrice());
                     return item;
                 })
                 .collect(Collectors.toList());
@@ -169,7 +156,7 @@ public class OrderController {
     }
 
     // ================================================
-    // POST: Cập nhật trạng thái
+    // POST: Cập nhật trạng thái thông thường
     // ================================================
     @PostMapping("/update-status/{id}")
     @Transactional
@@ -186,7 +173,6 @@ public class OrderController {
 
         int cur = order.getStatus();
 
-        // Không thay đổi đơn hoàn thành (4) hoặc đã hoàn tiền (7) hoặc đã hủy (5)
         if (cur == 4) {
             ra.addFlashAttribute("errorMessage", "Không thể thay đổi đơn hàng đã hoàn thành!");
             return "redirect:/admin/orders";
@@ -200,7 +186,6 @@ public class OrderController {
             return "redirect:/admin/orders";
         }
 
-        // Không hủy khi đang giao hoặc đã giao
         if (status == 5) {
             if (cur == 2) {
                 ra.addFlashAttribute("errorMessage", "Không thể hủy đơn đang giao!");
@@ -212,16 +197,12 @@ public class OrderController {
             }
         }
 
-        // Đơn yêu cầu hoàn tiền (6):
-        // - Duyệt → status 7 (Đã hoàn tiền)
-        // - Từ chối → status 4 (Hoàn thành) — khách giữ hàng, không hoàn kho
         if (cur == 6 && status != 7 && status != 4) {
             ra.addFlashAttribute("errorMessage",
                     "Đơn yêu cầu hoàn tiền chỉ có thể 'Hoàn tiền thành công' hoặc 'Từ chối'!");
             return "redirect:/admin/orders";
         }
 
-        // Lưu trạng thái mới
         order.setStatus(status);
         orderRepository.save(order);
 
@@ -230,6 +211,68 @@ public class OrderController {
                 : "Cập nhật trạng thái đơn #" + id + " thành công!";
 
         ra.addFlashAttribute("successMessage", msg);
+        return "redirect:/admin/orders";
+    }
+
+    // ================================================
+    // POST: Admin hủy đơn có lý do + hoàn kho + gửi mail
+    // Chỉ áp dụng cho status 0 (Chờ xác nhận) và 1 (Đã xác nhận)
+    // ================================================
+    @PostMapping("/cancel/{id}")
+    @Transactional
+    public String adminCancelOrder(
+            @PathVariable Integer id,
+            @RequestParam(value = "cancelReason", required = false) String cancelReason,
+            RedirectAttributes ra) {
+
+        Order order = orderRepository.findById(id).orElse(null);
+        if (order == null) {
+            ra.addFlashAttribute("errorMessage", "Không tìm thấy đơn hàng #" + id + "!");
+            return "redirect:/admin/orders";
+        }
+
+        int cur = order.getStatus();
+
+        // Chỉ cho phép hủy khi đơn chưa giao (status 0 hoặc 1)
+        if (cur != 0 && cur != 1) {
+            ra.addFlashAttribute("errorMessage",
+                    "Không thể hủy đơn #" + id + "! Chỉ hủy được đơn 'Chờ xác nhận' hoặc 'Đã xác nhận'.");
+            return "redirect:/admin/orders";
+        }
+
+        // Hoàn lại số lượng tồn kho
+        if (order.getOrderDetails() != null) {
+            for (OrderDetail od : order.getOrderDetails()) {
+                if (od.getProduct() != null && od.getQuantity() != null) {
+                    var product = od.getProduct();
+                    int newStock = (product.getStockQuantity() != null ? product.getStockQuantity() : 0)
+                            + od.getQuantity();
+                    product.setStockQuantity(newStock);
+                    productRepository.save(product);
+                }
+            }
+        }
+
+        // Ghi lý do vào ghi chú đơn hàng
+        String reasonText = (cancelReason != null && !cancelReason.trim().isEmpty())
+                ? cancelReason.trim()
+                : "Không có lý do cụ thể";
+        String cancelNote = "[ADMIN HUY] Ly do: " + reasonText;
+        String currentNote = (order.getNote() != null && !order.getNote().isBlank())
+                ? order.getNote() + " | " + cancelNote
+                : cancelNote;
+        order.setNote(currentNote);
+
+        order.setStatus(5);
+        orderRepository.save(order);
+
+        // Gửi email thông báo cho khách
+        if (order.getUser() != null) {
+            orderEmailService.sendCancellationEmail(order.getUser(), order, reasonText);
+        }
+
+        ra.addFlashAttribute("successMessage",
+                "Đã hủy đơn #" + id + " thành công! Email thông báo đã được gửi đến khách hàng.");
         return "redirect:/admin/orders";
     }
 }

@@ -121,11 +121,11 @@ public class CheckoutController {
 
         Map<String, Object> res = new HashMap<>();
         User currentUser = (User) session.getAttribute("currentUser");
-        if (currentUser == null) {
-            res.put("success", false);
-            res.put("message", "Vui lòng đăng nhập!");
-            return ResponseEntity.ok(res);
-        }
+        // if (currentUser == null) {
+        //     res.put("success", false);
+        //     res.put("message", "Vui lòng đăng nhập!");
+        //     return ResponseEntity.ok(res);
+        // }
 
         List<CartDetail> cartItems = cartDetailRepository.findByUser(currentUser);
         BigDecimal subtotal = calcSubtotal(cartItems);
