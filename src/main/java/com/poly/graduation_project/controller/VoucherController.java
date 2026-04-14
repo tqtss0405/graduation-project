@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -27,61 +26,57 @@ import com.poly.graduation_project.model.User;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
-
 @Controller
 @RequiredArgsConstructor
 public class VoucherController {
 
     private final VoucherService voucherService;
-@Autowired
-private SessionService sessionService;
-    // Hiển thị danh sách
+
+    @Autowired
+    private SessionService sessionService;
+
+    // ── Danh sách ─────────────────────────────────────────────────────────────
     @GetMapping("/admin/vouchers")
     public String vouchers(Model model) {
         User currentUser = (User) sessionService.getAttribute("currentUser");
-    model.addAttribute("currentUser", currentUser);
+        model.addAttribute("currentUser", currentUser);
+
         List<Voucher> all = voucherService.getAll();
         LocalDateTime now = LocalDateTime.now();
 
-        long total = all.size();
-        long active = all.stream().filter(v -> Boolean.TRUE.equals(v.getActive())).count();
-        long expired = all.stream().filter(v -> v.getEndAt() != null && v.getEndAt().isBefore(now)).count();
+        long total    = all.size();
+        long active   = all.stream().filter(v -> Boolean.TRUE.equals(v.getActive())).count();
+        long expired  = all.stream().filter(v -> v.getEndAt() != null && v.getEndAt().isBefore(now)).count();
         long upcoming = all.stream().filter(v -> v.getStartedAt() != null && v.getStartedAt().isAfter(now)).count();
 
-        // Đếm số lần đã dùng cho từng voucher
         Map<Integer, Long> usedCountMap = voucherService.getUsedCountMap(all);
 
-        model.addAttribute("vouchers", all);
-        model.addAttribute("usedCountMap", usedCountMap);
-        model.addAttribute("totalVouchers", total);
-        model.addAttribute("activeVouchers", active);
+        model.addAttribute("vouchers",        all);
+        model.addAttribute("usedCountMap",    usedCountMap);
+        model.addAttribute("totalVouchers",   total);
+        model.addAttribute("activeVouchers",  active);
         model.addAttribute("expiredVouchers", expired);
-        model.addAttribute("upcomingVouchers", upcoming);
-        model.addAttribute("voucherDTO", new VoucherDTO());
+        model.addAttribute("upcomingVouchers",upcoming);
+        model.addAttribute("voucherDTO",      new VoucherDTO());
         return "admin-vouchers";
     }
 
-    // Tạo mới
+    // ── Tạo mới ───────────────────────────────────────────────────────────────
     @PostMapping("/admin/vouchers/save")
     public String create(@Valid @ModelAttribute("voucherDTO") VoucherDTO dto,
-            BindingResult result,
-            RedirectAttributes ra,
-            Model model) {
+            BindingResult result, RedirectAttributes ra, Model model) {
 
-        if (!dto.isEndAfterStart()) {
+        if (!dto.isEndAfterStart())
             result.rejectValue("endAt", "date.invalid", "Ngày hết hạn phải sau ngày bắt đầu");
-        }
 
         if (result.hasErrors()) {
             boolean hasBlank = result.getFieldErrors().stream()
                     .anyMatch(e -> e.getCode().equals("NotBlank") || e.getCode().equals("NotNull"));
-
             String errorMsg = hasBlank
                     ? "Vui lòng nhập đầy đủ thông tin"
                     : result.getFieldErrors().stream()
                             .map(FieldError::getDefaultMessage)
                             .collect(Collectors.joining(" • "));
-
             ra.addFlashAttribute("errorMsg", errorMsg);
             return "redirect:/admin/vouchers";
         }
@@ -95,7 +90,7 @@ private SessionService sessionService;
         return "redirect:/admin/vouchers";
     }
 
-    // Load data sửa (trả JSON cho modal)
+    // ── Load data sửa (JSON cho modal) ────────────────────────────────────────
     @GetMapping("/admin/vouchers/edit/{id}")
     @ResponseBody
     public VoucherDTO getForEdit(@PathVariable Integer id) {
@@ -112,28 +107,23 @@ private SessionService sessionService;
         return dto;
     }
 
-    // Cập nhật
+    // ── Cập nhật ──────────────────────────────────────────────────────────────
     @PostMapping("/admin/vouchers/update/{id}")
     public String update(@PathVariable Integer id,
             @Valid @ModelAttribute("editDTO") VoucherDTO dto,
-            BindingResult result,
-            RedirectAttributes ra,
-            Model model) {
+            BindingResult result, RedirectAttributes ra, Model model) {
 
-        if (!dto.isEndAfterStart()) {
+        if (!dto.isEndAfterStart())
             result.rejectValue("endAt", "date.invalid", "Ngày hết hạn phải sau ngày bắt đầu");
-        }
 
         if (result.hasErrors()) {
             boolean hasBlank = result.getFieldErrors().stream()
                     .anyMatch(e -> e.getCode().equals("NotBlank") || e.getCode().equals("NotNull"));
-
             String errorMsg = hasBlank
                     ? "Vui lòng nhập đầy đủ thông tin"
                     : result.getFieldErrors().stream()
                             .map(FieldError::getDefaultMessage)
                             .collect(Collectors.joining(" • "));
-
             ra.addFlashAttribute("errorMsg", errorMsg);
             return "redirect:/admin/vouchers";
         }
@@ -147,7 +137,24 @@ private SessionService sessionService;
         return "redirect:/admin/vouchers";
     }
 
-    // Xóa
+    // ── Toggle active (Bật / Tắt) ─────────────────────────────────────────────
+    @PostMapping("/admin/vouchers/toggle/{id}")
+    public String toggleActive(@PathVariable Integer id, RedirectAttributes ra) {
+        try {
+            Voucher v = voucherService.getById(id);
+            boolean newState = !Boolean.TRUE.equals(v.getActive());
+            v.setActive(newState);
+            voucherService.save(v);
+            ra.addFlashAttribute("successMsg",
+                    newState ? "Đã bật mã \"" + v.getCode() + "\"!"
+                             : "Đã tắt mã \"" + v.getCode() + "\"!");
+        } catch (Exception e) {
+            ra.addFlashAttribute("errorMsg", "Lỗi: " + e.getMessage());
+        }
+        return "redirect:/admin/vouchers";
+    }
+
+    // ── Xóa (chỉ khi chưa có ai dùng) ────────────────────────────────────────
     @PostMapping("/admin/vouchers/delete/{id}")
     public String delete(@PathVariable Integer id, RedirectAttributes ra) {
         try {

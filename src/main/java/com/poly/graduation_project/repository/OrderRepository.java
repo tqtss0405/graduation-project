@@ -10,10 +10,9 @@ import com.poly.graduation_project.model.Order;
 import com.poly.graduation_project.model.User;
 
 public interface OrderRepository extends JpaRepository<Order, Integer> {
-    // Lấy đơn hàng theo user, sắp xếp mới nhất
+
     List<Order> findByUserOrderByCreateAtDesc(User user);
-    
-    // Lấy đơn hàng đã hoàn thành của user (status = 4)
+
     @Query("SELECT o FROM Order o WHERE o.user = :user AND o.status = 4 ORDER BY o.createAt DESC")
     List<Order> findCompletedOrdersByUser(@Param("user") User user);
 
@@ -24,4 +23,15 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
     List<Order> findByStatusOrderByCreateAtDesc(@Param("status") Integer status);
 
     List<Order> findByUserAndStatus(User user, Integer status);
+
+    /**
+     * Kiểm tra user đã từng đặt đơn hàng thành công dùng voucher này chưa.
+     * Bỏ qua đơn bị hủy (status = 5).
+     */
+    @Query("SELECT COUNT(o) > 0 FROM Order o " +
+            "WHERE o.user = :user " +
+            "AND o.voucher.id = :voucherId " +
+            "AND o.status <> 5")
+    boolean existsByUserAndVoucherId(@Param("user") User user,
+            @Param("voucherId") Integer voucherId);
 }

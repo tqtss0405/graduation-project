@@ -14,10 +14,20 @@
             background: #fff;
             border-radius: 16px;
             box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
-            overflow: hidden;
+
+            overflow-x: auto;
+            /* Cuộn ngang */
+            overflow-y: auto;
+            /* THÊM DÒNG NÀY: Bật cuộn dọc */
+            max-height: 75vh;
+            /* THÊM DÒNG NÀY: Giới hạn chiều cao khung (75% chiều cao màn hình) */
+
+            -webkit-overflow-scrolling: touch;
         }
 
         .data-table {
+            width: 100%;
+            table-layout: auto;
             margin-bottom: 0;
         }
 
@@ -44,6 +54,19 @@
             background: #f6fdf8;
         }
 
+        .data-table th,
+        .data-table td {
+            white-space: nowrap;
+            vertical-align: middle;
+        }
+
+        /* Chỉ cột Tên cho wrap */
+        .col-name {
+            white-space: normal !important;
+            min-width: 140px;
+            max-width: 200px;
+        }
+
         .data-table tbody td {
             padding: 13px 18px;
             vertical-align: middle;
@@ -51,6 +74,40 @@
             font-size: 0.93rem;
         }
 
+        /* ── Badges trạng thái ── */
+        .status-active,
+        .status-expired,
+        .status-upcoming,
+        .status-disabled {
+            display: inline-block;
+            white-space: nowrap;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-active {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: #fff;
+        }
+
+        .status-expired {
+            background: linear-gradient(135deg, #6c757d, #5a6268);
+            color: #fff;
+        }
+
+        .status-upcoming {
+            background: linear-gradient(135deg, #ffc107, #fd7e14);
+            color: #fff;
+        }
+
+        .status-disabled {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            color: #fff;
+        }
+
+        /* ── Search bar ── */
         .search-bar-wrapper {
             background: #fff;
             border-radius: 12px;
@@ -102,6 +159,7 @@
             white-space: nowrap;
         }
 
+        /* ── Table footer & pagination ── */
         .table-footer {
             padding: 12px 18px;
             background: #f8f9fa;
@@ -113,6 +171,14 @@
             justify-content: space-between;
             flex-wrap: wrap;
             gap: 10px;
+
+            /* THÊM CÁC DÒNG NÀY ĐỂ GHIM FOOTER ĐỨNG YÊN Ở ĐÁY */
+            position: sticky;
+            bottom: 0;
+            z-index: 10;
+            /* Đảm bảo nổi lên trên các hàng của bảng */
+            box-shadow: 0 -4px 8px -4px rgba(0, 0, 0, 0.08);
+            /* Thêm bóng đổ hắt lên trên cho có chiều sâu */
         }
 
         .pagination-wrapper {
@@ -155,12 +221,14 @@
             cursor: not-allowed;
         }
 
+        /* ── Empty state ── */
         .empty-state {
             padding: 60px 0;
             text-align: center;
             color: #adb5bd;
         }
 
+        /* ── Coupon & discount ── */
         .coupon-code {
             font-family: monospace;
             background: #f0f4ff;
@@ -169,6 +237,7 @@
             border-radius: 6px;
             font-weight: 700;
             font-size: 0.88rem;
+            white-space: nowrap;
         }
 
         .discount-badge {
@@ -179,6 +248,32 @@
             font-size: 0.82rem;
             font-weight: 700;
             border: 1px solid #ffc107;
+            white-space: nowrap;
+        }
+
+        /* ── FIX: Ghim cột Thao tác cuối cùng bên phải ── */
+        .data-table th:last-child,
+        .data-table td:last-child {
+            position: sticky;
+            right: 0;
+            /* Neo chặt vào mép phải */
+            background-color: #fff;
+            /* Đảm bảo nội dung cuộn bên dưới không bị đè lên chữ */
+            z-index: 1;
+            box-shadow: -4px 0 8px -4px rgba(0, 0, 0, 0.1);
+            /* Tạo bóng đổ nhẹ để tạo cảm giác 3D phân lớp */
+        }
+
+        /* Trùng màu nền với thead để không bị lệch màu khi cuộn */
+        .data-table thead th:last-child {
+            background-color: #f8f9fa;
+            z-index: 2;
+            /* Header phải cao hơn body */
+        }
+
+        /* Trùng màu nền với tr:hover để ô thao tác cũng đổi màu theo hàng */
+        .data-table tbody tr:hover td:last-child {
+            background-color: #f6fdf8;
         }
     </style>
 </head>
@@ -188,17 +283,26 @@
     <nav class="sidebar">
         <div class="sidebar-brand"><a class="text-decoration-none" href="/home"><span
                     style="color:#27ae60">BEO</span><span style="color:white">BOOKS</span></a></div>
-       <ul class="nav flex-column mt-3">
-        <li class="nav-item"><a href="/admin/dashboard"  class="nav-link"><i class="fa-solid fa-gauge"></i> Tổng quan</a></li>
-        <li class="nav-item"><a href="/admin/products"   class="nav-link"><i class="fa-solid fa-book"></i> Quản lý sách</a></li>
-        <li class="nav-item"><a href="/admin/orders"     class="nav-link"><i class="fa-solid fa-cart-shopping"></i> Đơn hàng</a></li>
-        <li class="nav-item"><a href="/admin/customers"  class="nav-link"><i class="fa-solid fa-users"></i> Khách hàng</a></li>
-        <li class="nav-item"><a href="/admin/categories" class="nav-link"><i class="fa-solid fa-layer-group"></i> Danh mục</a></li>
-        <li class="nav-item"><a href="/admin/authors"    class="nav-link active"><i class="fa-solid fa-user-pen"></i> Tác giả</a></li>
-        <li class="nav-item"><a href="/admin/vouchers"   class="nav-link"><i class="fa-solid fa-ticket"></i> Mã giảm giá</a></li>
-        <li class="nav-item"><a href="/admin/reviews"    class="nav-link"><i class="fa-solid fa-star"></i> Đánh giá</a></li>
-        <li class="nav-item mt-5"><a href="/logout" class="nav-link text-danger"><i class="fa-solid fa-right-from-bracket"></i> Thoát</a></li>
-    </ul>
+        <ul class="nav flex-column mt-3">
+            <li class="nav-item"><a href="/admin/dashboard" class="nav-link"><i class="fa-solid fa-gauge"></i> Tổng
+                    quan</a></li>
+            <li class="nav-item"><a href="/admin/products" class="nav-link"><i class="fa-solid fa-book"></i> Quản lý
+                    sách</a></li>
+            <li class="nav-item"><a href="/admin/orders" class="nav-link"><i class="fa-solid fa-cart-shopping"></i> Đơn
+                    hàng</a></li>
+            <li class="nav-item"><a href="/admin/customers" class="nav-link"><i class="fa-solid fa-users"></i> Khách
+                    hàng</a></li>
+            <li class="nav-item"><a href="/admin/categories" class="nav-link"><i class="fa-solid fa-layer-group"></i>
+                    Danh mục</a></li>
+            <li class="nav-item"><a href="/admin/authors" class="nav-link active"><i class="fa-solid fa-user-pen"></i>
+                    Tác giả</a></li>
+            <li class="nav-item"><a href="/admin/vouchers" class="nav-link"><i class="fa-solid fa-ticket"></i> Mã giảm
+                    giá</a></li>
+            <li class="nav-item"><a href="/admin/reviews" class="nav-link"><i class="fa-solid fa-star"></i> Đánh giá</a>
+            </li>
+            <li class="nav-item mt-5"><a href="/logout" class="nav-link text-danger"><i
+                        class="fa-solid fa-right-from-bracket"></i> Thoát</a></li>
+        </ul>
     </nav>
 
     <main class="main-content">
@@ -287,7 +391,7 @@
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>Tên chương trình</th>
+                        <th class="col-name">Tên chương trình</th>
                         <th>Mã giảm giá</th>
                         <th>Giảm giá</th>
                         <th>Số lượng</th>
@@ -295,9 +399,10 @@
                         <th>Ngày bắt đầu</th>
                         <th>Ngày hết hạn</th>
                         <th>Trạng thái</th>
-                        <th class="text-center" style="width:100px;">Thao tác</th>
+                        <th class="text-center">Thao tác</th>
                     </tr>
                 </thead>
+
                 <tbody id="tableBody">
                     <tr th:each="v : ${vouchers}" class="data-row"
                         th:data-search="${v.name.toLowerCase() + ' ' + v.code.toLowerCase()}">
@@ -325,28 +430,68 @@
                         <td th:text="${v.startedAt} ? ${#temporals.format(v.startedAt, 'dd/MM/yyyy')} : '—'"></td>
                         <td th:text="${v.endAt} ? ${#temporals.format(v.endAt, 'dd/MM/yyyy')} : '—'"></td>
                         <td>
-                            <span th:if="${!v.active}" class="status-expired">Đã tắt</span>
+                            <span th:if="${!v.active}" class="status-disabled">Đã tắt</span>
+
                             <span th:if="${v.active and v.endAt != null and v.endAt.isBefore(#temporals.createNow())}"
-                                class="status-expired">Đã hết hạn</span>
+                                class="status-expired">Hết hạn</span>
+
                             <span
-                                th:if="${v.active and (v.endAt == null or v.endAt.isAfter(#temporals.createNow())) and (v.startedAt == null or v.startedAt.isAfter(#temporals.createNow()))}"
+                                th:if="${v.active and (v.endAt == null or v.endAt.isAfter(#temporals.createNow())) and (v.startedAt != null and v.startedAt.isAfter(#temporals.createNow()))}"
                                 class="status-upcoming">Sắp diễn ra</span>
+
                             <span
                                 th:if="${v.active and (v.endAt == null or v.endAt.isAfter(#temporals.createNow())) and (v.startedAt == null or v.startedAt.isBefore(#temporals.createNow()))}"
                                 class="status-active">Đang hoạt động</span>
                         </td>
+
+
                         <td class="text-center">
-                            <button class="btn btn-sm btn-outline-primary" style="border-radius:8px;"
-                                th:data-id="${v.id}" onclick="openEditModal(this.dataset.id)" title="Sửa"><i
-                                    class="fa-solid fa-pen"></i></button>
-                            <form th:action="@{/admin/vouchers/delete/{id}(id=${v.id})}" method="post"
-                                style="display:inline;" th:id="'del-form-' + ${v.id}">
-                                <button type="button" class="btn btn-sm btn-outline-danger ms-1"
-                                    style="border-radius:8px;" title="Xóa" th:data-id="${v.id}" th:data-code="${v.code}"
-                                    onclick="showConfirm('Xóa mã ' + this.dataset.code + '?', () => document.getElementById('del-form-' + this.dataset.id).submit())">
-                                    <i class="fa-solid fa-trash"></i>
+                            <div class="d-flex align-items-center justify-content-center gap-1 flex-nowrap">
+
+                                <!-- Nút Sửa — luôn hiển thị -->
+                                <button class="btn btn-sm btn-outline-primary"
+                                    style="border-radius:8px; width:32px; height:32px; padding:0;" th:data-id="${v.id}"
+                                    onclick="openEditModal(this.dataset.id)" title="Sửa">
+                                    <i class="fa-solid fa-pen" style="font-size:0.75rem;"></i>
                                 </button>
-                            </form>
+
+                                <!-- Nút Disable / Enable -->
+                                <form th:action="@{/admin/vouchers/toggle/{id}(id=${v.id})}" method="post"
+                                    style="display:contents;">
+                                    <button th:if="${v.active}" type="button" class="btn btn-sm btn-outline-warning"
+                                        style="border-radius:8px; width:32px; height:32px; padding:0;"
+                                        title="Tắt mã này" th:data-code="${v.code}"
+                                        onclick="showConfirm('Tắt mã ' + this.dataset.code + '?', () => this.closest('form').submit())">
+                                        <i class="fa-solid fa-ban" style="font-size:0.75rem;"></i>
+                                    </button>
+                                    <button th:if="${!v.active}" type="submit" class="btn btn-sm btn-outline-success"
+                                        style="border-radius:8px; width:32px; height:32px; padding:0;"
+                                        title="Bật mã này">
+                                        <i class="fa-solid fa-circle-check" style="font-size:0.75rem;"></i>
+                                    </button>
+                                </form>
+
+                                <!-- Nút Xóa — chỉ khi usedCount = 0 -->
+                                <form th:if="${usedCountMap[v.id] == 0}"
+                                    th:action="@{/admin/vouchers/delete/{id}(id=${v.id})}" method="post"
+                                    style="display:contents;" th:id="'del-form-' + ${v.id}">
+                                    <button type="button" class="btn btn-sm btn-outline-danger"
+                                        style="border-radius:8px; width:32px; height:32px; padding:0;" title="Xóa"
+                                        th:data-id="${v.id}" th:data-code="${v.code}"
+                                        onclick="showConfirm('Xóa mã ' + this.dataset.code + '?', () => document.getElementById('del-form-' + this.dataset.id).submit())">
+                                        <i class="fa-solid fa-trash" style="font-size:0.75rem;"></i>
+                                    </button>
+                                </form>
+
+                                <!-- Icon khóa khi đã có người dùng — thay thế nút Xóa -->
+                                <span th:if="${usedCountMap[v.id] > 0}"
+                                    class="text-muted d-inline-flex align-items-center justify-content-center"
+                                    style="width:32px; height:32px; font-size:0.75rem; cursor:default;"
+                                    title="Đã có người dùng, không thể xóa">
+                                    <i class="fa-solid fa-lock"></i>
+                                </span>
+
+                            </div>
                         </td>
                     </tr>
                     <tr th:if="${#lists.isEmpty(vouchers)}" id="thymeleafEmpty">
@@ -371,50 +516,82 @@
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header bg-success text-white">
-                    <h5 class="modal-title fw-bold"><i class="fa-solid fa-plus me-2"></i>Tạo Mã giảm giá Mới</h5>
+                    <h5 class="modal-title fw-bold">
+                        <i class="fa-solid fa-plus me-2"></i>Tạo Mã giảm giá Mới
+                    </h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <form id="addCouponForm" th:action="@{/admin/vouchers/save}" th:object="${voucherDTO}" method="post"
                         class="row g-3">
-                        <div class="col-md-12"><label class="form-label fw-semibold">Tên chương trình *</label><input
-                                type="text" th:field="*{name}" class="form-control"
-                                placeholder="VD: Khuyến mãi Tết 2025"></div>
-                        <div class="col-md-6"><label class="form-label fw-semibold">Mã giảm giá *</label>
-                            <div class="input-group"><input type="text" th:field="*{code}" id="couponCode"
-                                    class="form-control text-uppercase" placeholder="VD: TET2025"><button
-                                    class="btn btn-outline-secondary" type="button" onclick="generateCode()"><i
-                                        class="fa-solid fa-wand-magic-sparkles"></i> Tạo tự động</button></div><small
-                                class="text-muted">Chữ hoa, không dấu, không khoảng trắng, tối đa 10 ký tự</small>
+
+                        <div class="col-md-12">
+                            <label class="form-label fw-semibold">Tên chương trình *</label>
+                            <input type="text" th:field="*{name}" class="form-control"
+                                placeholder="VD: Khuyến mãi Tết 2025">
                         </div>
-                        <div class="col-md-6"><label class="form-label fw-semibold">Giảm giá (%) *</label>
-                            <div class="input-group"><input type="number" th:field="*{discount}" class="form-control"
-                                    min="1" max="100" placeholder="Nhập % giảm"><span class="input-group-text">%</span>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Mã giảm giá *</label>
+                            <div class="input-group">
+                                <input type="text" th:field="*{code}" id="couponCode"
+                                    class="form-control text-uppercase" placeholder="VD: TET2025">
+                                <button class="btn btn-outline-secondary" type="button" onclick="generateCode()">
+                                    <i class="fa-solid fa-wand-magic-sparkles"></i> Tạo tự động
+                                </button>
+                            </div>
+                            <small class="text-muted">Chữ hoa, không dấu, không khoảng trắng, tối đa 10 ký tự</small>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Giảm giá (%) *</label>
+                            <div class="input-group">
+                                <input type="number" th:field="*{discount}" class="form-control" min="1" max="100"
+                                    placeholder="Nhập % giảm">
+                                <span class="input-group-text">%</span>
                             </div>
                         </div>
-                        <div class="col-md-6"><label class="form-label fw-semibold">Số lượng mã *</label><input
-                                type="number" th:field="*{quantity}" class="form-control" min="0"
-                                placeholder="0 = Không giới hạn"></div>
-                        <div class="col-md-6"><label class="form-label fw-semibold">Ngày bắt đầu *</label><input
-                                type="datetime-local" name="startedAt" class="form-control"></div>
-                        <div class="col-md-6"><label class="form-label fw-semibold">Ngày hết hạn *</label><input
-                                type="datetime-local" name="endAt" class="form-control"></div>
-                        <div class="col-12">
-                            <div class="form-check"><input class="form-check-input" type="checkbox" th:field="*{active}"
-                                    id="activeStatus"><label class="form-check-label" for="activeStatus">Kích hoạt ngay
-                                    sau khi tạo</label></div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Số lượng mã *</label>
+                            <input type="number" th:field="*{quantity}" class="form-control" min="0"
+                                placeholder="0 = Không giới hạn">
                         </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Ngày bắt đầu *</label>
+                            <input type="datetime-local" name="startedAt" class="form-control">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Ngày hết hạn *</label>
+                            <input type="datetime-local" name="endAt" class="form-control">
+                        </div>
+
+                        <!--
+                        KHÔNG CÓ checkbox "Kích hoạt ngay" —
+                        VoucherService.create() tự động đặt active = true
+                    -->
+                        <div class="col-12">
+                            <div class="alert alert-info py-2 mb-0 d-flex align-items-center gap-2"
+                                style="font-size:0.85rem;">
+                                <i class="fa-solid fa-circle-info"></i>
+                                Mã giảm giá sẽ <strong>tự động kích hoạt</strong> ngay sau khi tạo.
+                                Bạn có thể tắt/bật lại trong phần chỉnh sửa.
+                            </div>
+                        </div>
+
                     </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="submit" form="addCouponForm" class="btn btn-success"><i
-                            class="fa-solid fa-check me-2"></i>Tạo mã giảm giá</button>
+                    <button type="submit" form="addCouponForm" class="btn btn-success">
+                        <i class="fa-solid fa-check me-2"></i>Tạo mã giảm giá
+                    </button>
                 </div>
             </div>
         </div>
     </div>
-
     <!-- Edit Modal -->
     <div class="modal fade" id="editCouponModal" tabindex="-1">
         <div class="modal-dialog modal-lg">

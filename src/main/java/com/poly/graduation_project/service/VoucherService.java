@@ -40,7 +40,7 @@ public class VoucherService {
             throw new IllegalArgumentException("Mã '" + dto.getCode() + "' đã tồn tại");
 
         Voucher v = new Voucher();
-        mapDtoToEntity(dto, v);
+        mapDtoToEntity(dto, v, true); // isNew = true → luôn active
         v.setCreatedAt(LocalDateTime.now());
         return voucherRepository.save(v);
     }
@@ -52,8 +52,12 @@ public class VoucherService {
         if (voucherRepository.existsByCodeAndIdNot(dto.getCode(), id))
             throw new IllegalArgumentException("Mã '" + dto.getCode() + "' đã được sử dụng");
 
-        mapDtoToEntity(dto, v);
+        mapDtoToEntity(dto, v, false); // isNew = false → giữ logic active của admin
         return voucherRepository.save(v);
+    }
+
+    public Voucher save(Voucher voucher) {
+        return voucherRepository.save(voucher);
     }
 
     public void delete(Integer id) {
@@ -68,16 +72,29 @@ public class VoucherService {
         }
     }
 
-    private void mapDtoToEntity(VoucherDTO dto, Voucher v) {
+    /**
+     * Map DTO → entity.
+     *
+     * @param isNew khi tạo mới → active = true (trừ khi endAt đã qua)
+     *              khi cập nhật → admin quyết định qua dto.active
+     */
+    private void mapDtoToEntity(VoucherDTO dto, Voucher v, boolean isNew) {
         v.setCode(dto.getCode().toUpperCase());
         v.setName(dto.getName());
         v.setDiscount(dto.getDiscount());
         v.setQuantity(dto.getQuantity());
         v.setStartedAt(dto.getStartedAt());
         v.setEndAt(dto.getEndAt());
-        // Nếu endAt đã qua → bắt buộc false dù admin chọn active
+
         boolean expired = dto.getEndAt() != null && dto.getEndAt().isBefore(LocalDateTime.now());
-        v.setActive(expired ? false : (dto.getActive() != null ? dto.getActive() : true));
+
+        if (isNew) {
+            // Khi tạo mới: luôn active, trừ khi ngày hết hạn đã qua
+            v.setActive(!expired);
+        } else {
+            // Khi cập nhật: nếu đã hết hạn thì bắt buộc false, ngược lại theo ý admin
+            v.setActive(expired ? false : (dto.getActive() != null ? dto.getActive() : true));
+        }
     }
 
     public Map<Integer, Long> getUsedCountMap(List<Voucher> vouchers) {

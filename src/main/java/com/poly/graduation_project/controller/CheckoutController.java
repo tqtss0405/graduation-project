@@ -39,7 +39,6 @@ import jakarta.transaction.Transactional;
 @Controller
 public class CheckoutController {
 
-    // Phí ship mặc định dùng làm fallback khi frontend không gửi
     private static final BigDecimal DEFAULT_SHIP_FEE = new BigDecimal("30000");
 
     @Autowired
@@ -67,10 +66,9 @@ public class CheckoutController {
         User currentUser = (User) session.getAttribute("currentUser");
 
         List<CartDetail> cartItems = cartDetailRepository.findByUser(currentUser);
-
         if (cartItems.isEmpty())
             return "redirect:/user/cart";
-        // Chỉ lấy sản phẩm còn hàng để tính tiền và hiển thị
+
         List<CartDetail> validItems = cartItems.stream()
                 .filter(ci -> Boolean.TRUE.equals(ci.getProduct().getActive())
                         && ci.getProduct().getStockQuantity() > 0)
@@ -79,7 +77,6 @@ public class CheckoutController {
         if (validItems.isEmpty())
             return "redirect:/user/cart";
 
-        // Điều chỉnh số lượng nếu vượt stock
         for (CartDetail ci : validItems) {
             Long stock = ci.getProduct().getStockQuantity();
             if (ci.getQuantity() > stock) {
@@ -89,28 +86,24 @@ public class CheckoutController {
         }
 
         Long totalQuantity = cartItems.stream().mapToLong(CartDetail::getQuantity).sum();
-        model.addAttribute("totalQuantity", totalQuantity);
-
         BigDecimal subtotal = calcSubtotal(validItems);
 
         List<Address> addresses = addressRepository.findByUser(currentUser);
-        Address defaultAddress = addressRepository
-                .findByUserAndIsDefaultTrue(currentUser).orElse(null);
+        Address defaultAddress = addressRepository.findByUserAndIsDefaultTrue(currentUser).orElse(null);
 
         model.addAttribute("cartItems", validItems);
         model.addAttribute("subtotal", subtotal);
-        // Phí ship ban đầu = 0; sẽ được tính động bởi GHN ở frontend
         model.addAttribute("shippingFee", BigDecimal.ZERO);
-        model.addAttribute("total", subtotal); // sẽ cập nhật sau khi GHN trả về
+        model.addAttribute("total", subtotal);
         model.addAttribute("addresses", addresses);
         model.addAttribute("defaultAddress", defaultAddress);
         model.addAttribute("currentUser", currentUser);
+        model.addAttribute("totalQuantity", totalQuantity);
         return "checkout";
     }
 
     // ============================================================
-    // POST (AJAX): Apply voucher
-    // Discount tính trên tổng hóa đơn (subtotal + shippingFee từ GHN)
+    // POST (AJAX): Apply voucher — kiểm tra user chưa dùng voucher này
     // ============================================================
     @PostMapping("/user/checkout/apply-voucher")
     @ResponseBody
@@ -121,15 +114,9 @@ public class CheckoutController {
 
         Map<String, Object> res = new HashMap<>();
         User currentUser = (User) session.getAttribute("currentUser");
-        // if (currentUser == null) {
-        //     res.put("success", false);
-        //     res.put("message", "Vui lòng đăng nhập!");
-        //     return ResponseEntity.ok(res);
-        // }
 
         List<CartDetail> cartItems = cartDetailRepository.findByUser(currentUser);
         BigDecimal subtotal = calcSubtotal(cartItems);
-        // Tổng trước giảm = subtotal + phí ship GHN
         BigDecimal totalBeforeDiscount = subtotal.add(shippingFee);
 
         Voucher voucher = voucherRepository.findByCode(code.trim().toUpperCase()).orElse(null);
@@ -143,6 +130,7 @@ public class CheckoutController {
             res.put("message", "Mã giảm giá đã hết hiệu lực!");
             return ResponseEntity.ok(res);
         }
+
         LocalDateTime now = LocalDateTime.now();
         if (voucher.getStartedAt() != null && now.isBefore(voucher.getStartedAt())) {
             res.put("success", false);
@@ -157,6 +145,14 @@ public class CheckoutController {
         if (voucher.getQuantity() != null && voucher.getQuantity() <= 0) {
             res.put("success", false);
             res.put("message", "Mã giảm giá đã được sử dụng hết!");
+            return ResponseEntity.ok(res);
+        }
+
+        // ── Kiểm tra user đã dùng voucher này chưa ──────────────────────────
+        if (currentUser != null &&
+                orderRepository.existsByUserAndVoucherId(currentUser, voucher.getId())) {
+            res.put("success", false);
+            res.put("message", "Bạn đã sử dụng mã giảm giá này rồi!");
             return ResponseEntity.ok(res);
         }
 
@@ -181,7 +177,6 @@ public class CheckoutController {
 
     // ============================================================
     // POST: Đặt hàng COD
-    // shippingFee được gửi từ frontend (đã tính bởi GHN)
     // ============================================================
     @Transactional
     @PostMapping("/user/checkout/cod")
@@ -190,8 +185,7 @@ public class CheckoutController {
             @RequestParam(value = "voucherId", required = false) Integer voucherId,
             @RequestParam(value = "note", required = false) String note,
             @RequestParam(value = "shippingFee", required = false, defaultValue = "30000") BigDecimal shippingFee,
-            HttpSession session,
-            RedirectAttributes ra) {
+            HttpSession session, RedirectAttributes ra) {
 
         User currentUser = (User) session.getAttribute("currentUser");
         List<CartDetail> allItems = cartDetailRepository.findByUser(currentUser);
@@ -203,6 +197,15 @@ public class CheckoutController {
 
         if (cartItems.isEmpty())
             return "redirect:/user/cart";
+
+        // Validate voucher lần cuối trước khi lưu đơn
+        if (voucherId != null) {
+            String voucherError = validateVoucherForUser(currentUser, voucherId);
+            if (voucherError != null) {
+                ra.addFlashAttribute("errorMessage", voucherError);
+                return "redirect:/user/checkout";
+            }
+        }
 
         try {
             Order order = buildOrder(currentUser, cartItems, addressText, voucherId, note, 0, shippingFee);
@@ -229,13 +232,22 @@ public class CheckoutController {
             @RequestParam(value = "voucherId", required = false) Integer voucherId,
             @RequestParam(value = "note", required = false) String note,
             @RequestParam(value = "shippingFee", required = false, defaultValue = "30000") BigDecimal shippingFee,
-            HttpSession session,
-            HttpServletRequest request) {
+            HttpSession session, HttpServletRequest request) {
 
         User currentUser = (User) session.getAttribute("currentUser");
         List<CartDetail> cartItems = cartDetailRepository.findByUser(currentUser);
         if (cartItems.isEmpty())
             return "redirect:/user/cart";
+
+        // Validate voucher trước khi redirect sang VNPay
+        if (voucherId != null) {
+            String voucherError = validateVoucherForUser(currentUser, voucherId);
+            if (voucherError != null) {
+                // Không thể dùng RedirectAttributes ở đây nên lưu session tạm
+                session.setAttribute("checkoutError", voucherError);
+                return "redirect:/user/checkout";
+            }
+        }
 
         session.setAttribute("vnpay_addressText", addressText);
         session.setAttribute("vnpay_voucherId", voucherId);
@@ -275,8 +287,7 @@ public class CheckoutController {
     @GetMapping("/vnpay/return")
     public String vnpayReturn(
             @RequestParam Map<String, String> params,
-            HttpSession session,
-            RedirectAttributes ra) {
+            HttpSession session, RedirectAttributes ra) {
 
         if (!vnPayUtil.verifySignature(params)) {
             ra.addFlashAttribute("paymentError", "Chữ ký không hợp lệ!");
@@ -297,8 +308,6 @@ public class CheckoutController {
             shippingFee = DEFAULT_SHIP_FEE;
 
         List<CartDetail> allItems = cartDetailRepository.findByUser(currentUser);
-
-        // Lọc chỉ lấy sp còn hàng
         List<CartDetail> cartItems = allItems.stream()
                 .filter(ci -> Boolean.TRUE.equals(ci.getProduct().getActive())
                         && ci.getProduct().getStockQuantity() > 0)
@@ -344,8 +353,29 @@ public class CheckoutController {
     }
 
     // ============================================================
+    // Helper: Validate voucher cho user (kiểm tra đã dùng chưa)
+    // Trả về null nếu hợp lệ, trả về message lỗi nếu không
+    // ============================================================
+    private String validateVoucherForUser(User user, Integer voucherId) {
+        Voucher voucher = voucherRepository.findById(voucherId).orElse(null);
+        if (voucher == null)
+            return "Mã giảm giá không tồn tại!";
+        if (!Boolean.TRUE.equals(voucher.getActive()))
+            return "Mã giảm giá đã hết hiệu lực!";
+
+        LocalDateTime now = LocalDateTime.now();
+        if (voucher.getEndAt() != null && now.isAfter(voucher.getEndAt()))
+            return "Mã giảm giá đã hết hạn!";
+        if (voucher.getQuantity() != null && voucher.getQuantity() <= 0)
+            return "Mã giảm giá đã hết lượt sử dụng!";
+        if (user != null && orderRepository.existsByUserAndVoucherId(user, voucherId))
+            return "Bạn đã sử dụng mã giảm giá này rồi!";
+
+        return null; // hợp lệ
+    }
+
+    // ============================================================
     // Helper: Xây dựng Order entity
-    // shippingFee truyền vào từ GHN (đã tính ở frontend)
     // ============================================================
     private Order buildOrder(User user, List<CartDetail> cartItems,
             String addressText, Integer voucherId,
@@ -356,15 +386,16 @@ public class CheckoutController {
             shippingFee = DEFAULT_SHIP_FEE;
 
         BigDecimal totalBeforeDiscount = subtotal.add(shippingFee);
-
         BigDecimal discount = BigDecimal.ZERO;
         Voucher voucher = null;
+
         if (voucherId != null) {
             voucher = voucherRepository.findById(voucherId).orElse(null);
             if (voucher != null) {
                 discount = totalBeforeDiscount
                         .multiply(BigDecimal.valueOf(voucher.getDiscount()))
                         .divide(BigDecimal.valueOf(100));
+                // Trừ số lượng voucher
                 if (voucher.getQuantity() != null && voucher.getQuantity() > 0) {
                     voucher.setQuantity(voucher.getQuantity() - 1);
                     voucherRepository.save(voucher);
@@ -401,14 +432,16 @@ public class CheckoutController {
     }
 
     @Transactional
-    private void clearCartAndStock(User user, List<CartDetail> cartItems) {
-        for (CartDetail ci : cartItems) {
+    private void clearCartAndStock(User user, List<CartDetail> validItems, List<CartDetail> allItems) {
+        for (CartDetail ci : validItems) {
             var product = ci.getProduct();
             Long newStock = Math.max(0, product.getStockQuantity() - ci.getQuantity());
             product.setStockQuantity(newStock);
             productRepository.save(product);
         }
-        cartDetailRepository.deleteByUser(user);
+        for (CartDetail ci : validItems) {
+            cartDetailRepository.deleteById(ci.getId());
+        }
     }
 
     private BigDecimal calcSubtotal(List<CartDetail> cartItems) {
@@ -417,20 +450,4 @@ public class CheckoutController {
                         .multiply(BigDecimal.valueOf(ci.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
-
-    @Transactional
-private void clearCartAndStock(User user, List<CartDetail> validItems, List<CartDetail> allItems) {
-    // Trừ stock cho sp đã đặt
-    for (CartDetail ci : validItems) {
-        var product = ci.getProduct();
-        Long newStock = Math.max(0, product.getStockQuantity() - ci.getQuantity());
-        product.setStockQuantity(newStock);
-        productRepository.save(product);
-    }
-
-    // Chỉ xóa sp đã đặt, KHÔNG xóa sp hết hàng
-    for (CartDetail ci : validItems) {
-        cartDetailRepository.deleteById(ci.getId());
-    }
-}
 }
