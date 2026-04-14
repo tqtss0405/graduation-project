@@ -13,8 +13,8 @@ public class ProductDTO {
     @NotBlank(message = "Tên sách không được để trống")
     private String name;
 
-    @NotBlank(message = "Tác giả không được để trống")
-    private String author;
+    // authorId: null => tác giả ẩn danh
+    private Integer authorId;
 
     @NotBlank(message = "Nhà xuất bản không được để trống")
     private String publisher;
@@ -25,17 +25,13 @@ public class ProductDTO {
 
     @NotNull(message = "Số lượng kho không được để trống")
     @Min(value = 0, message = "Số lượng kho không được âm")
-    private Integer stockQuantity;
+    private Long stockQuantity;
 
     @NotNull(message = "Vui lòng chọn danh mục")
     private Integer categoryId;
 
     private String description;
 
-    // Checkbox active: Spring MVC gửi null nếu không check
-    // → dùng Boolean (wrapper) thay vì boolean (primitive)
-    private Boolean active;
-
-    private MultipartFile mainImage;      // Ảnh bìa chính
-    private MultipartFile[] detailImages; // Nhiều ảnh gallery
+    private MultipartFile mainImage;
+    private MultipartFile[] detailImages;
 }

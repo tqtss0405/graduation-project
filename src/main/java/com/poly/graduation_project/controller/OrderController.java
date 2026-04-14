@@ -247,7 +247,7 @@ public class OrderController {
             for (OrderDetail od : order.getOrderDetails()) {
                 if (od.getProduct() != null && od.getQuantity() != null) {
                     var product = od.getProduct();
-                    int newStock = (product.getStockQuantity() != null ? product.getStockQuantity() : 0)
+                    Long newStock = (product.getStockQuantity() != null ? product.getStockQuantity() : 0)
                             + od.getQuantity();
                     product.setStockQuantity(newStock);
                     productRepository.save(product);

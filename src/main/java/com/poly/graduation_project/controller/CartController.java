@@ -84,7 +84,7 @@ public class CartController {
                         ? java.math.BigDecimal.ZERO
                         : new java.math.BigDecimal("30000");
 
-        int totalQuantity = sortedItems.stream().mapToInt(CartDetail::getQuantity).sum();
+        Long totalQuantity = sortedItems.stream().mapToLong(CartDetail::getQuantity).sum();
 
         model.addAttribute("cartItems",      sortedItems);
         model.addAttribute("hasActiveItems", hasActiveItems);
@@ -141,7 +141,7 @@ public class CartController {
                 .orElse(null);
 
         if (cartDetail != null) {
-            int newQty = cartDetail.getQuantity() + quantity;
+            Long newQty = cartDetail.getQuantity() + quantity;
             newQty = Math.min(newQty, product.getStockQuantity());
             cartDetail.setQuantity(newQty);
         } else {
@@ -191,11 +191,11 @@ public class CartController {
             return ResponseEntity.ok(response);
         }
 
-        int stock = cartDetail.getProduct().getStockQuantity();
+        Long stock = cartDetail.getProduct().getStockQuantity();
         if (quantity < 1) quantity = 1;
-        if (quantity > stock) quantity = stock;
+        if (quantity > stock.intValue()) quantity = stock.intValue();
 
-        cartDetail.setQuantity(quantity);
+        cartDetail.setQuantity(Long.valueOf(quantity));
         cartDetailRepository.save(cartDetail);
 
         java.math.BigDecimal lineTotal = cartDetail.getProduct().getPrice()

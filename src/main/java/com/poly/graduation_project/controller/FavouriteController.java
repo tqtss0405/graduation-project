@@ -43,7 +43,7 @@ public class FavouriteController {
 
         List<Favourite> favorites = favouriteService.getByUser(currentUser);
         List<CartDetail> cartItems = cartDetailRepository.findByUser(currentUser);
-        int totalQuantity = cartItems.stream().mapToInt(CartDetail::getQuantity).sum();
+        Long totalQuantity = cartItems.stream().mapToLong(CartDetail::getQuantity).sum();
 
         model.addAttribute("favorites", favorites);
         model.addAttribute("totalQuantity", totalQuantity);

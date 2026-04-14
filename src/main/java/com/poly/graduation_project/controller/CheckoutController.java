@@ -81,14 +81,14 @@ public class CheckoutController {
 
         // Điều chỉnh số lượng nếu vượt stock
         for (CartDetail ci : validItems) {
-            int stock = ci.getProduct().getStockQuantity();
+            Long stock = ci.getProduct().getStockQuantity();
             if (ci.getQuantity() > stock) {
                 ci.setQuantity(stock);
                 cartDetailRepository.save(ci);
             }
         }
 
-        int totalQuantity = cartItems.stream().mapToInt(CartDetail::getQuantity).sum();
+        Long totalQuantity = cartItems.stream().mapToLong(CartDetail::getQuantity).sum();
         model.addAttribute("totalQuantity", totalQuantity);
 
         BigDecimal subtotal = calcSubtotal(validItems);
@@ -404,7 +404,7 @@ public class CheckoutController {
     private void clearCartAndStock(User user, List<CartDetail> cartItems) {
         for (CartDetail ci : cartItems) {
             var product = ci.getProduct();
-            int newStock = Math.max(0, product.getStockQuantity() - ci.getQuantity());
+            Long newStock = Math.max(0, product.getStockQuantity() - ci.getQuantity());
             product.setStockQuantity(newStock);
             productRepository.save(product);
         }
@@ -423,7 +423,7 @@ private void clearCartAndStock(User user, List<CartDetail> validItems, List<Cart
     // Trừ stock cho sp đã đặt
     for (CartDetail ci : validItems) {
         var product = ci.getProduct();
-        int newStock = Math.max(0, product.getStockQuantity() - ci.getQuantity());
+        Long newStock = Math.max(0, product.getStockQuantity() - ci.getQuantity());
         product.setStockQuantity(newStock);
         productRepository.save(product);
     }
