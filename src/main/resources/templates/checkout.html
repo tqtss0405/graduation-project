@@ -9,6 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/style.css">
     <script src="/js/sidebar.js"></script>
+    <script src="/js/ghn-address.js"></script>
     <style>
         body { font-family: 'Quicksand', sans-serif; background: #f5f7fa; }
         .checkout-wrapper { max-width: 1100px; margin: 0 auto; padding: 32px 16px 60px; }
@@ -557,81 +558,71 @@ function toggleNewAddress() {
     }
 }
 
-// ─ Tải tỉnh thành khi load trang ─
-axios.get('https://provinces.open-api.vn/api/?depth=1').then(res => {
-    const sel = document.getElementById('newProvince');
-    res.data.forEach(p => {
-        const opt = document.createElement('option');
-        opt.value = p.code; opt.text = p.name; opt.dataset.name = p.name;
-        sel.appendChild(opt);
-    });
+// ═══════════════════════════════════════════════════════════════
+//  THAY THẾ toàn bộ phần "Địa chỉ mới — TOGGLE + CASCADE" cũ
+//  trong checkout.html bằng đoạn này (dùng GHN API qua proxy)
+// ═══════════════════════════════════════════════════════════════
+
+// ── Tải tỉnh thành khi load trang ───────────────────────────────
+window.addEventListener('DOMContentLoaded', async () => {
+    await ghnLoadProvinces(document.getElementById('newProvince'));
+
+    // Tính phí ship nếu đã có địa chỉ mặc định
+    if (selectedDistrictId && selectedWardCode) {
+        fetchShippingFee(selectedDistrictId, selectedWardCode);
+    } else {
+        const badge = document.getElementById('coShipFee');
+        badge.className = 'ship-fee-badge loading';
+        badge.innerHTML = '<i class="fa-solid fa-location-dot"></i> Chọn địa chỉ để tính phí';
+        document.getElementById('coTotal').textContent = '—';
+    }
 });
 
-function onProvinceChange() {
-    const sel = document.getElementById('newProvince');
-    const distSel = document.getElementById('newDistrict');
-    const wardSel = document.getElementById('newWard');
-    distSel.innerHTML = '<option value="" disabled selected>-- Chọn Quận/Huyện --</option>';
-    wardSel.innerHTML = '<option value="" disabled selected>-- Chọn Phường/Xã --</option>';
-    distSel.disabled = true; wardSel.disabled = true;
-    document.getElementById('finalAddress').value = '';
-    updateNewAddress();
-
-    axios.get(`https://provinces.open-api.vn/api/p/${sel.value}?depth=2`).then(res => {
-        res.data.districts.forEach(d => {
-            const opt = document.createElement('option');
-            opt.value = d.code; opt.text = d.name; opt.dataset.name = d.name;
-            distSel.appendChild(opt);
-        });
-        distSel.disabled = false;
-    });
+// ── Xử lý cascade Province → District → Ward ────────────────────
+async function onProvinceChange() {
+    const provSel  = document.getElementById('newProvince');
+    const distSel  = document.getElementById('newDistrict');
+    const wardSel  = document.getElementById('newWard');
+    wardSel.innerHTML  = '<option value="" disabled selected>-- Chọn Phường/Xã --</option>';
+    wardSel.disabled   = true;
+    document.getElementById('finalAddress').value    = '';
+    document.getElementById('finalDistrictId').value = '';
+    document.getElementById('finalWardCode').value   = '';
+    updateTotal();
+    await ghnLoadDistricts(provSel.value, distSel);
 }
 
-function onDistrictChange() {
+async function onDistrictChange() {
     const distSel = document.getElementById('newDistrict');
     const wardSel = document.getElementById('newWard');
-    wardSel.innerHTML = '<option value="" disabled selected>-- Chọn Phường/Xã --</option>';
-    wardSel.disabled = true;
-    updateNewAddress();
-
-    axios.get(`https://provinces.open-api.vn/api/d/${distSel.value}?depth=2`).then(res => {
-        res.data.wards.forEach(w => {
-            const opt = document.createElement('option');
-            // GHN dùng WardCode là chuỗi (w.code từ provinces API là số nhưng GHN cần chuỗi)
-            opt.value = w.code; opt.text = w.name; opt.dataset.name = w.name;
-            wardSel.appendChild(opt);
-        });
-        wardSel.disabled = false;
-    });
+    document.getElementById('finalDistrictId').value = distSel.value;
+    document.getElementById('finalAddress').value    = '';
+    document.getElementById('finalWardCode').value   = '';
+    updateTotal();
+    await ghnLoadWards(distSel.value, wardSel);
 }
 
 function onWardChange() {
-    updateNewAddress();
     const distSel = document.getElementById('newDistrict');
     const wardSel = document.getElementById('newWard');
+    document.getElementById('finalWardCode').value = wardSel.value;
+    updateNewAddress();
 
     if (distSel.value && wardSel.value) {
-        // GHN district ID: từ provinces API (code quận là số, GHN cũng dùng số)
-        // Ward code: GHN dùng string → dùng .value trực tiếp
         selectedDistrictId = distSel.value;
-        selectedWardCode   = String(wardSel.value);
+        selectedWardCode   = wardSel.value;
         fetchShippingFee(selectedDistrictId, selectedWardCode);
     }
 }
 
 function updateNewAddress() {
-    const province = document.getElementById('newProvince').options[document.getElementById('newProvince').selectedIndex]?.dataset.name || '';
-    const district = document.getElementById('newDistrict').options[document.getElementById('newDistrict').selectedIndex]?.dataset.name || '';
-    const ward     = document.getElementById('newWard').options[document.getElementById('newWard').selectedIndex]?.dataset.name || '';
-    const street   = document.getElementById('newStreet').value.trim();
-
-    if (province && district && ward && street) {
-        document.getElementById('finalAddress').value = `${street}, ${ward}, ${district}, ${province}`;
-    } else {
-        document.getElementById('finalAddress').value = '';
-    }
+    const provSel  = document.getElementById('newProvince');
+    const distSel  = document.getElementById('newDistrict');
+    const wardSel  = document.getElementById('newWard');
+    const street   = document.getElementById('newStreet').value;
+    const full     = ghnBuildFullAddress(street, provSel, distSel, wardSel);
+    document.getElementById('finalAddress').value = full;
 }
-
 // ═══════════════════════════════════════════════════════
 //  PAYMENT METHOD
 // ═══════════════════════════════════════════════════════
