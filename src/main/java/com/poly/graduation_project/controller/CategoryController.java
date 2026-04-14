@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.poly.graduation_project.model.Category;
@@ -25,8 +26,10 @@ public class CategoryController {
 
     @Autowired
     ProductRepository productRepo;
+
     @Autowired
-private SessionService sessionService;
+    private SessionService sessionService;
+
     @GetMapping("/admin/categories")
     public String listCategories(Model model) {
         User currentUser = (User) sessionService.getAttribute("currentUser");
@@ -44,8 +47,10 @@ private SessionService sessionService;
             return "redirect:/admin/categories";
         }
 
+        boolean isNew = (category.getId() == null);
+
         // Kiểm tra trùng lặp tên
-        if (category.getId() == null) {
+        if (isNew) {
             if (categoryRepo.existsByName(category.getName().trim())) {
                 ra.addFlashAttribute("errorMessage", "Tên danh mục đã tồn tại!");
                 return "redirect:/admin/categories";
@@ -72,15 +77,54 @@ private SessionService sessionService;
             category.setIcon(category.getIcon().trim());
         }
 
-        if (category.getActive() == null) {
-            category.setActive(false);
+        // Thêm mới: luôn active = true, không phụ thuộc vào form
+        if (isNew) {
+            category.setActive(true);
+        } else {
+            // Cập nhật: active do form gửi lên (checkbox), nếu null thì false
+            if (category.getActive() == null) {
+                category.setActive(false);
+            }
         }
 
         categoryRepo.save(category);
-        ra.addFlashAttribute("successMessage", "Lưu thông tin danh mục thành công!");
+        ra.addFlashAttribute("successMessage",
+                isNew ? "Thêm danh mục '" + category.getName() + "' thành công!"
+                        : "Cập nhật danh mục '" + category.getName() + "' thành công!");
         return "redirect:/admin/categories";
     }
 
+    // ── Ẩn danh mục (soft delete) ──────────────────────────────────────────────
+    @GetMapping("/admin/categories/hide/{id}")
+    public String hideCategory(@PathVariable("id") int id, RedirectAttributes ra) {
+        Category category = categoryRepo.findById(id).orElse(null);
+        if (category == null) {
+            ra.addFlashAttribute("errorMessage", "Không tìm thấy danh mục!");
+            return "redirect:/admin/categories";
+        }
+        category.setActive(false);
+        categoryRepo.save(category);
+        ra.addFlashAttribute("successMessage",
+                "Đã ẩn danh mục '" + category.getName() + "' thành công.");
+        return "redirect:/admin/categories";
+    }
+
+    // ── Hiện danh mục (restore) ────────────────────────────────────────────────
+    @GetMapping("/admin/categories/show/{id}")
+    public String showCategory(@PathVariable("id") int id, RedirectAttributes ra) {
+        Category category = categoryRepo.findById(id).orElse(null);
+        if (category == null) {
+            ra.addFlashAttribute("errorMessage", "Không tìm thấy danh mục!");
+            return "redirect:/admin/categories";
+        }
+        category.setActive(true);
+        categoryRepo.save(category);
+        ra.addFlashAttribute("successMessage",
+                "Đã hiển thị danh mục '" + category.getName() + "' thành công.");
+        return "redirect:/admin/categories";
+    }
+
+    // ── Xóa vĩnh viễn (chỉ khi không có sản phẩm) ────────────────────────────
     @GetMapping("/admin/categories/delete/{id}")
     public String deleteCategory(@PathVariable("id") int id, RedirectAttributes ra) {
         try {
@@ -90,17 +134,15 @@ private SessionService sessionService;
                 return "redirect:/admin/categories";
             }
 
-            // KIỂM TRA: Danh mục có sản phẩm nào không?
             List<Product> products = productRepo.findByCategory(category);
 
             if (products != null && !products.isEmpty()) {
-                // TRƯỜNG HỢP 1: Có sản phẩm -> Chỉ thực hiện ẨN (Soft Delete)
-                category.setActive(false);
-                categoryRepo.save(category);
-                ra.addFlashAttribute("successMessage", "Danh mục '" + category.getName() + "' đang có "
-                        + products.size() + " sản phẩm nên hệ thống đã chuyển sang trạng thái ẨN để bảo vệ dữ liệu.");
+                // Có sản phẩm → không cho xóa vĩnh viễn, chỉ ẩn
+                ra.addFlashAttribute("errorMessage",
+                        "Không thể xóa vĩnh viễn danh mục '" + category.getName() +
+                                "' vì đang có " + products.size() + " sản phẩm! Hãy dùng chức năng Ẩn.");
             } else {
-                // TRƯỜNG HỢP 2: Không có sản phẩm -> XÓA vĩnh viễn (Hard Delete)
+                // Không có sản phẩm → xóa vĩnh viễn
                 categoryRepo.delete(category);
                 ra.addFlashAttribute("successMessage",
                         "Đã xóa vĩnh viễn danh mục '" + category.getName() + "' thành công.");

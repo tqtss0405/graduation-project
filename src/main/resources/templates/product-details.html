@@ -82,34 +82,27 @@
         </div>
     </div>
 
-    <!-- THAY THẾ PHẦN <main class="container"> TRONG product-details.html -->
-
     <main class="container">
         <div class="row g-4">
 
             <div class="col-md-5">
-                <!-- Ảnh chính -->
                 <div class="main-img-container mb-3" style="background:#f8f9fa; border-radius:16px; overflow:hidden;
                 height:380px; display:flex; align-items:center; justify-content:center;">
                     <img th:src="${product.image != null ? product.image : '/images/default-book.png'}" alt="Book Cover"
                         id="mainImage" style="max-width:100%; max-height:100%; object-fit:contain;">
                 </div>
 
-                <!-- Gallery thumbnails - scroll ngang, không tràn -->
                 <div th:if="${product.images != null and not #lists.isEmpty(product.images)}"
                     style="display:flex; gap:8px; overflow-x:auto; padding-bottom:6px; scrollbar-width:thin;">
-                    <!-- Ảnh bìa chính làm thumbnail đầu tiên -->
                     <img th:src="${product.image}" class="thumb-img active" onclick="changeImage(this)"
                         th:alt="${product.name}"
                         style="width:64px; height:80px; object-fit:cover; border-radius:8px; flex-shrink:0; cursor:pointer; border:2px solid #28a745;">
-                    <!-- Các ảnh gallery -->
                     <img th:each="img : ${product.images}" th:src="${img.name}" class="thumb-img"
                         onclick="changeImage(this)" th:alt="${product.name}"
                         style="width:64px; height:80px; object-fit:cover; border-radius:8px; flex-shrink:0; cursor:pointer; border:2px solid transparent; transition:border-color 0.15s;">
                 </div>
             </div>
 
-            <!-- ===== CỘT PHẢI: Thông tin sản phẩm ===== -->
             <div class="col-md-7">
                 <h1 class="product-title mb-2" th:text="${product.name}">Tên sách</h1>
 
@@ -163,7 +156,6 @@
                     </div>
                 </div>
 
-
                 <div class="d-flex align-items-center gap-2 mb-4">
                     <div class="input-group quantity-grp" style="width: 120px;">
                         <button class="btn btn-outline-secondary" type="button" onclick="decreaseQty()">-</button>
@@ -171,15 +163,33 @@
                             th:max="${product.stockQuantity}">
                         <button class="btn btn-outline-secondary" type="button" onclick="increaseQty()">+</button>
                     </div>
-                    <button class="btn btn-outline-success btn-lg flex-grow-1 fw-bold fs-6 px-2"
-                        th:onclick="'addToCart(' + ${product.id} + ')'" th:disabled="${product.stockQuantity <= 0}">
-                        <i class="fa-solid fa-cart-plus me-1"></i>
-                        <span th:text="${product.stockQuantity > 0 ? 'Giỏ hàng' : 'Hết hàng'}">Thêm vào giỏ hàng</span>
-                    </button>
-                    <button class="btn btn-success btn-lg flex-grow-1 fw-bold fs-6 px-2"
-                        th:onclick="'buyNow(' + ${product.id} + ')'" th:disabled="${product.stockQuantity <= 0}">
-                        Mua ngay
-                    </button>
+
+                    <th:block th:if="${session.currentUser != null}">
+                        <button class="btn btn-outline-success btn-lg flex-grow-1 fw-bold fs-6 px-2"
+                            th:onclick="'addToCart(' + ${product.id} + ')'" th:disabled="${product.stockQuantity <= 0}">
+                            <i class="fa-solid fa-cart-plus me-1"></i>
+                            <span th:text="${product.stockQuantity > 0 ? 'Giỏ hàng' : 'Hết hàng'}">Thêm vào giỏ hàng</span>
+                        </button>
+                        <button class="btn btn-success btn-lg flex-grow-1 fw-bold fs-6 px-2"
+                            th:onclick="'buyNow(' + ${product.id} + ')'" th:disabled="${product.stockQuantity <= 0}">
+                            Mua ngay
+                        </button>
+                    </th:block>
+
+                    <th:block th:if="${session.currentUser == null}">
+                        <a href="/login/form" class="btn btn-outline-success btn-lg flex-grow-1 fw-bold fs-6 px-2 text-decoration-none text-center"
+                           onclick="return confirm('Bạn cần đăng nhập để thêm sách vào giỏ. Đi đến trang Đăng nhập?');"
+                           th:style="${product.stockQuantity <= 0 ? 'pointer-events: none; opacity: 0.6;' : ''}">
+                            <i class="fa-solid fa-cart-plus me-1"></i>
+                            <span th:text="${product.stockQuantity > 0 ? 'Giỏ hàng' : 'Hết hàng'}">Thêm vào giỏ hàng</span>
+                        </a>
+                        <a href="/login/form" class="btn btn-success btn-lg flex-grow-1 fw-bold fs-6 px-2 text-decoration-none text-center"
+                           onclick="return confirm('Bạn cần đăng nhập để mua hàng. Đi đến trang Đăng nhập?');"
+                           th:style="${product.stockQuantity <= 0 ? 'pointer-events: none; opacity: 0.6;' : ''}">
+                            Mua ngay
+                        </a>
+                    </th:block>
+
                     <button id="favBtn" class="btn btn-lg px-3 flex-shrink-0"
                         th:class="${isFavourite} ? 'btn btn-danger btn-lg px-3 flex-shrink-0' : 'btn btn-outline-danger btn-lg px-3 flex-shrink-0'"
                         title="Yêu thích" th:attr="data-product-id=${product.id}, data-is-fav=${isFavourite}"
@@ -187,10 +197,9 @@
                         <i th:class="${isFavourite} ? 'fa-solid fa-heart' : 'fa-regular fa-heart'"></i>
                     </button>
                 </div>
-            </div>
+                </div>
         </div>
 
-        <!-- ===== TABS: Mô tả & Thông tin ===== -->
         <div class="row mt-5">
             <div class="col-12">
                 <div class="bg-white p-4 rounded shadow-sm">
@@ -243,7 +252,6 @@
             </div>
         </div>
 
-        <!-- ===== SÁCH CÙNG THỂ LOẠI ===== -->
         <div class="mt-5 mb-5" th:if="${relatedProducts != null and not #lists.isEmpty(relatedProducts)}">
             <h4 class="fw-bold mb-4">Sách Cùng Thể Loại</h4>
             <div class="row row-cols-2 row-cols-md-4 g-4">
@@ -266,13 +274,10 @@
                 </div>
             </div>
         </div>
-        <!-- ===== THÊM ĐOẠN NÀY VÀO product-details.html, SAU PHẦN "Sách Cùng Thể Loại" VÀ TRƯỚC THẺ </main> ===== -->
 
-        <!-- ===== SECTION ĐÁNH GIÁ SẢN PHẨM ===== -->
         <div class="mt-5 mb-5">
             <div class="bg-white p-4 rounded shadow-sm">
 
-                <!-- Header -->
                 <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-3">
                     <div>
                         <h4 class="fw-bold mb-1">Đánh giá từ khách hàng</h4>
@@ -291,7 +296,6 @@
                         </div>
                     </div>
 
-                    <!-- Nút viết đánh giá (chỉ hiện nếu đã mua và chưa review) -->
                     <div th:if="${reviewableOrderDetailId != null}">
                         <a th:href="@{'/user/review/write/' + ${reviewableOrderDetailId}}"
                             class="btn btn-success rounded-pill px-4 fw-bold">
@@ -300,19 +304,16 @@
                     </div>
                 </div>
 
-                <!-- Danh sách review -->
                 <div th:if="${reviews != null and not #lists.isEmpty(reviews)}">
                     <div th:each="review, iterStat : ${reviews}"
                         th:classappend="${!iterStat.last} ? 'border-bottom pb-4 mb-4' : 'pb-2'" class="review-item">
 
                         <div class="d-flex gap-3">
-                            <!-- Avatar -->
                             <img th:src="@{'https://ui-avatars.com/api/?name=' + ${review.user.fullname} + '&background=28a745&color=fff&size=48'}"
                                 class="rounded-circle flex-shrink-0" width="48" height="48"
                                 th:alt="${review.user.fullname}">
 
                             <div class="flex-grow-1">
-                                <!-- Tên + sao -->
                                 <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
                                     <div>
                                         <span class="fw-bold" th:text="${review.user.fullname}">Khách hàng</span>
@@ -326,16 +327,13 @@
                                     </small>
                                 </div>
 
-                                <!-- Stars -->
                                 <div class="text-warning my-1">
                                     <i th:each="i : ${#numbers.sequence(1, 5)}"
                                         th:class="${i <= review.rating} ? 'fa-solid fa-star' : 'fa-regular fa-star'"></i>
                                 </div>
 
-                                <!-- Nội dung -->
                                 <p class="mb-2 text-secondary" th:text="${review.content}"></p>
 
-                                <!-- Phản hồi của shop -->
                                 <div th:if="${review.adminReply != null}"
                                     class="bg-light rounded-3 p-3 mt-2 border-start border-success border-3">
                                     <div class="d-flex gap-2 align-items-start">
@@ -351,7 +349,6 @@
                     </div>
                 </div>
 
-                <!-- Chưa có review -->
                 <div th:if="${reviews == null or #lists.isEmpty(reviews)}" class="text-center py-5">
                     <i class="fa-regular fa-face-smile fa-3x text-muted mb-3"></i>
                     <p class="text-muted mb-1">Chưa có đánh giá nào cho sản phẩm này.</p>
@@ -443,7 +440,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- ===== THÊM SCRIPT NÀY VÀO CUỐI product-details.html, TRƯỚC </body> ===== -->
     <script>
         // Đổi ảnh thumbnail
         function changeImage(element) {
@@ -505,11 +501,8 @@
             else showCartToast(false, data.message, null);
         }
 
-
-
         // Toast thông báo
         function showCartToast(success, message, cartCount) {
-            // Xóa toast cũ nếu có
             document.getElementById('cartToast')?.remove();
 
             const toast = document.createElement('div');
@@ -538,7 +531,6 @@
             </a>` : ''}
         `;
 
-            // Thêm CSS animation nếu chưa có
             if (!document.getElementById('toastStyle')) {
                 const style = document.createElement('style');
                 style.id = 'toastStyle';
@@ -553,7 +545,6 @@
 
             document.body.appendChild(toast);
 
-            // Cập nhật badge navbar
             if (cartCount != null) {
                 document.querySelectorAll('[id*="cartBadge"], .cart-badge').forEach(el => {
                     el.textContent = cartCount;
@@ -562,6 +553,7 @@
 
             setTimeout(() => toast.remove(), 3500);
         }
+
         async function toggleFavDetail(btn) {
             const productId = btn.getAttribute('data-product-id');
             const res = await fetch('/user/favourites/toggle', {
@@ -576,22 +568,19 @@
             if (data.success) {
                 const icon = btn.querySelector('i');
                 if (data.isFavourite) {
-                    // Đã thích → fill đỏ
                     icon.className = 'fa-solid fa-heart';
                     btn.classList.remove('btn-outline-danger');
                     btn.classList.add('btn-danger');
                 } else {
-                    // Bỏ thích → outline
                     icon.className = 'fa-regular fa-heart';
                     btn.classList.remove('btn-danger');
                     btn.classList.add('btn-outline-danger');
                 }
-                // Dùng lại hàm toast đã có sẵn trong product-details.html
                 showCartToast(true, data.message, null);
             }
         }
     </script>
-     <script src="/js/sidebar.js"></script>
+    <script src="/js/sidebar.js"></script>
 </body>
 
 </html>
