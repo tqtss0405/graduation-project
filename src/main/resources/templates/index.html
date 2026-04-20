@@ -164,25 +164,95 @@
     </section>
 
     <section class="container mb-5">
-    <h3 class="fw-bold text-center mb-4">
-        <span style="border-bottom: 3px solid var(--primary-color)">Danh Mục Nổi Bật</span>
-    </h3>
-    <div class="row row-cols-2 row-cols-md-4 g-3 text-center">
-        <div class="col" th:each="cat : ${categories}">
-            <a th:href="@{/products(categoryId=${cat.id})}" class="text-decoration-none text-dark">
-                <div class="p-3 bg-light rounded hover-shadow"
-                     style="transition:all 0.2s; cursor:pointer;">
-                    <!-- Icon FontAwesome từ DB -->
-                    <div class="mb-2" style="font-size:2.5rem;">
+    <div class="d-flex justify-content-between align-items-end mb-4">
+        <h3 class="fw-bold mb-0">
+            <span style="border-bottom: 3px solid var(--primary-color)">Danh Mục Nổi Bật</span>
+        </h3>
+        <a href="/products" class="btn btn-outline-success btn-sm rounded-pill">
+            Tất cả <i class="fa-solid fa-arrow-right ms-1"></i>
+        </a>
+    </div>
+
+    <style>
+        .cat-card {
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+            cursor: pointer;
+            height: 180px;
+            display: flex;
+            align-items: flex-end;
+            text-decoration: none;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.10);
+            transition: transform 0.28s cubic-bezier(.34,1.56,.64,1), box-shadow 0.25s ease;
+        }
+        .cat-card:hover {
+            transform: translateY(-7px) scale(1.025);
+            box-shadow: 0 12px 36px rgba(0,0,0,0.18);
+        }
+        .cat-card-bg {
+            position: absolute; inset: 0;
+            transition: transform 0.4s ease;
+        }
+        .cat-card:hover .cat-card-bg { transform: scale(1.07); }
+        .cat-card-overlay {
+            position: absolute; inset: 0;
+            background: linear-gradient(180deg, rgba(0,0,0,0.02) 30%, rgba(0,0,0,0.62) 100%);
+        }
+        .cat-card-body {
+            position: relative; z-index: 2;
+            padding: 1rem 1.25rem; width: 100%;
+        }
+        .cat-card-icon {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 42px; height: 42px; border-radius: 12px;
+            background: rgba(255,255,255,0.22); backdrop-filter: blur(6px);
+            font-size: 1.3rem; color: #fff; margin-bottom: 0.5rem;
+            transition: background 0.2s;
+        }
+        .cat-card:hover .cat-card-icon { background: rgba(255,255,255,0.38); }
+        .cat-card-name {
+            font-size: 1rem; font-weight: 700; color: #fff; margin: 0;
+            text-shadow: 0 1px 6px rgba(0,0,0,0.35);
+        }
+        .cat-card-arrow {
+            position: absolute; top: 1rem; right: 1rem; z-index: 2;
+            width: 30px; height: 30px; border-radius: 50%;
+            background: rgba(255,255,255,0.18); backdrop-filter: blur(4px);
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; font-size: 0.75rem;
+            opacity: 0; transform: translateX(-6px);
+            transition: opacity 0.25s, transform 0.25s;
+        }
+        .cat-card:hover .cat-card-arrow { opacity: 1; transform: translateX(0); }
+        .cat-bg-0 { background: linear-gradient(135deg,#667eea,#764ba2); }
+        .cat-bg-1 { background: linear-gradient(135deg,#f093fb,#f5576c); }
+        .cat-bg-2 { background: linear-gradient(135deg,#4facfe,#00f2fe); }
+        .cat-bg-3 { background: linear-gradient(135deg,#43e97b,#38f9d7); }
+    </style>
+
+    <div class="row g-3" th:if="${not #lists.isEmpty(categories)}">
+        <div class="col-6 col-md-3"
+             th:each="cat, iterStat : ${categories}"
+             th:if="${iterStat.index < 4}">
+            <a th:href="@{/products(categoryId=${cat.id})}"
+               th:class="'cat-card cat-bg-' + ${iterStat.index % 4}">
+                <div class="cat-card-bg"
+                     th:style="${cat.color != null and !cat.color.isEmpty()} ? 'background:' + ${cat.color} : ''"></div>
+                <div class="cat-card-overlay"></div>
+                <span class="cat-card-arrow"><i class="fa-solid fa-arrow-right"></i></span>
+                <div class="cat-card-body">
+                    <div class="cat-card-icon">
                         <i th:class="${cat.icon != null ? cat.icon : 'fa-solid fa-book'}"></i>
                     </div>
-                    <h6 class="mb-0 fw-semibold" th:text="${cat.name}">Danh mục</h6>
+                    <p class="cat-card-name" th:text="${cat.name}">Danh mục</p>
                 </div>
             </a>
         </div>
-        <div class="col-12 text-center py-3" th:if="${#lists.isEmpty(categories)}">
-            <p class="text-muted small">Chưa có danh mục nào.</p>
-        </div>
+    </div>
+
+    <div class="text-center py-4" th:if="${#lists.isEmpty(categories)}">
+        <p class="text-muted small">Chưa có danh mục nào.</p>
     </div>
 </section>
 
@@ -240,19 +310,19 @@
                             <h6 class="book-title" th:text="${p.name}">Tên sách</h6>
                             <p class="book-author" th:text="${p.author}">Tác giả</p>
                             <!-- Rating + lượt bán -->
-<div class="d-flex align-items-center gap-2 mt-1 mb-1">
-    <!-- Sao -->
-    <span th:if="${ratingMap[p.id] != null and ratingMap[p.id] > 0}"
-          class="text-warning small fw-bold">
-        <i class="fa-solid fa-star" style="font-size:0.75rem;"></i>
-        <span th:text="${ratingMap[p.id]}">0</span>
-    </span>
-    <!-- Lượt bán -->
-    <span th:if="${soldCountMap[p.id] != null and soldCountMap[p.id] > 0}"
-          class="text-muted small">
-        · Đã bán <span th:text="${soldCountMap[p.id]}">0</span>
-    </span>
-</div>
+                            <div class="d-flex align-items-center gap-2 mt-1 mb-1">
+                                <!-- Sao -->
+                                <span th:if="${ratingMap[p.id] != null and ratingMap[p.id] > 0}"
+                                    class="text-warning small fw-bold">
+                                    <i class="fa-solid fa-star" style="font-size:0.75rem;"></i>
+                                    <span th:text="${ratingMap[p.id]}">0</span>
+                                </span>
+                                <!-- Lượt bán -->
+                                <span th:if="${soldCountMap[p.id] != null and soldCountMap[p.id] > 0}"
+                                    class="text-muted small">
+                                    · Đã bán <span th:text="${soldCountMap[p.id]}">0</span>
+                                </span>
+                            </div>
                             <div class="d-flex justify-content-between align-items-center mt-3">
                                 <span class="fw-bold fs-5"
                                     th:classappend="${p.stockQuantity == null or p.stockQuantity <= 0} ? ' text-muted text-decoration-line-through' : ' text-danger'"
@@ -281,25 +351,6 @@
             </div>
         </div>
     </main>
-
-    <div class="container mb-5">
-        <div class="newsletter-section text-center position-relative">
-            <div class="container" style="max-width: 600px">
-                <h3 class="fw-bold mb-3">Đăng Ký Nhận Tin</h3>
-                <p class="mb-4 text-light opacity-75">
-                    Nhận thông báo về sách mới và mã giảm giá đặc biệt hàng
-                    tuần.
-                </p>
-                <form class="d-flex gap-2">
-                    <input type="email" class="form-control rounded-pill px-4 py-2 border-0"
-                        placeholder="Nhập email của bạn..." />
-                    <button class="btn btn-success rounded-pill px-4 fw-bold">
-                        Đăng ký
-                    </button>
-                </form>
-            </div>
-        </div>
-    </div>
 
     <footer class="bg-white border-top pt-5">
         <div class="container">

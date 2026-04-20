@@ -30,7 +30,8 @@ public class Product {
     @Column(columnDefinition = "nvarchar(250)")
     private String name;
 
-    // Giữ lại trường author (String) để tương thích ngược, nhưng ưu tiên dùng authorEntity
+    // Giữ lại trường author (String) để tương thích ngược, nhưng ưu tiên dùng
+    // authorEntity
     @Column(columnDefinition = "nvarchar(250)")
     private String author;
 
@@ -57,7 +58,8 @@ public class Product {
     @JoinColumn(name = "category_id")
     private Category category;
 
-    // Quan hệ với bảng authors (nullable — nếu null thì tác giả = author String hoặc "Ẩn danh")
+    // Quan hệ với bảng authors (nullable — nếu null thì tác giả = author String
+    // hoặc "Ẩn danh")
     @ManyToOne
     @JoinColumn(name = "author_id", nullable = true)
     private Author authorEntity;
