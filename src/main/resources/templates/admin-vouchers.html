@@ -14,14 +14,9 @@
             background: #fff;
             border-radius: 16px;
             box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
-
             overflow-x: auto;
-            /* Cuộn ngang */
             overflow-y: auto;
-            /* THÊM DÒNG NÀY: Bật cuộn dọc */
             max-height: 75vh;
-            /* THÊM DÒNG NÀY: Giới hạn chiều cao khung (75% chiều cao màn hình) */
-
             -webkit-overflow-scrolling: touch;
         }
 
@@ -60,7 +55,6 @@
             vertical-align: middle;
         }
 
-        /* Chỉ cột Tên cho wrap */
         .col-name {
             white-space: normal !important;
             min-width: 140px;
@@ -74,7 +68,6 @@
             font-size: 0.93rem;
         }
 
-        /* ── Badges trạng thái ── */
         .status-active,
         .status-expired,
         .status-upcoming,
@@ -107,7 +100,6 @@
             color: #fff;
         }
 
-        /* ── Search bar ── */
         .search-bar-wrapper {
             background: #fff;
             border-radius: 12px;
@@ -159,7 +151,6 @@
             white-space: nowrap;
         }
 
-        /* ── Table footer & pagination ── */
         .table-footer {
             padding: 12px 18px;
             background: #f8f9fa;
@@ -171,14 +162,10 @@
             justify-content: space-between;
             flex-wrap: wrap;
             gap: 10px;
-
-            /* THÊM CÁC DÒNG NÀY ĐỂ GHIM FOOTER ĐỨNG YÊN Ở ĐÁY */
             position: sticky;
             bottom: 0;
             z-index: 10;
-            /* Đảm bảo nổi lên trên các hàng của bảng */
             box-shadow: 0 -4px 8px -4px rgba(0, 0, 0, 0.08);
-            /* Thêm bóng đổ hắt lên trên cho có chiều sâu */
         }
 
         .pagination-wrapper {
@@ -221,14 +208,12 @@
             cursor: not-allowed;
         }
 
-        /* ── Empty state ── */
         .empty-state {
             padding: 60px 0;
             text-align: center;
             color: #adb5bd;
         }
 
-        /* ── Coupon & discount ── */
         .coupon-code {
             font-family: monospace;
             background: #f0f4ff;
@@ -251,27 +236,20 @@
             white-space: nowrap;
         }
 
-        /* ── FIX: Ghim cột Thao tác cuối cùng bên phải ── */
         .data-table th:last-child,
         .data-table td:last-child {
             position: sticky;
             right: 0;
-            /* Neo chặt vào mép phải */
             background-color: #fff;
-            /* Đảm bảo nội dung cuộn bên dưới không bị đè lên chữ */
             z-index: 1;
             box-shadow: -4px 0 8px -4px rgba(0, 0, 0, 0.1);
-            /* Tạo bóng đổ nhẹ để tạo cảm giác 3D phân lớp */
         }
 
-        /* Trùng màu nền với thead để không bị lệch màu khi cuộn */
         .data-table thead th:last-child {
             background-color: #f8f9fa;
             z-index: 2;
-            /* Header phải cao hơn body */
         }
 
-        /* Trùng màu nền với tr:hover để ô thao tác cũng đổi màu theo hàng */
         .data-table tbody tr:hover td:last-child {
             background-color: #f6fdf8;
         }
@@ -316,7 +294,7 @@
                     <i class="fa-solid fa-plus me-2"></i>Tạo mã giảm giá
                 </button>
                 <div class="admin-profile" onclick="window.location.href='/user/profile'" style="cursor:pointer;">
-                    <img th:src="${currentUser != null && currentUser.image != null ? currentUser.image : 
+                    <img th:src="${currentUser != null && currentUser.image != null ? currentUser.image :
                   'https://ui-avatars.com/api/?name=' + (currentUser != null ? currentUser.fullname : 'Admin') + '&background=28a745&color=fff'}"
                         alt="Admin" class="admin-avatar">
                     <div class="admin-info">
@@ -444,7 +422,6 @@
                                 class="status-active">Đang hoạt động</span>
                         </td>
 
-
                         <td class="text-center">
                             <div class="d-flex align-items-center justify-content-center gap-1 flex-nowrap">
 
@@ -483,13 +460,7 @@
                                     </button>
                                 </form>
 
-                                <!-- Icon khóa khi đã có người dùng — thay thế nút Xóa -->
-                                <span th:if="${usedCountMap[v.id] > 0}"
-                                    class="text-muted d-inline-flex align-items-center justify-content-center"
-                                    style="width:32px; height:32px; font-size:0.75rem; cursor:default;"
-                                    title="Đã có người dùng, không thể xóa">
-                                    <i class="fa-solid fa-lock"></i>
-                                </span>
+                                <!-- ĐÃ XÓA: icon ổ khóa khi đã có người dùng -->
 
                             </div>
                         </td>
@@ -568,10 +539,6 @@
                             <input type="datetime-local" name="endAt" class="form-control">
                         </div>
 
-                        <!--
-                        KHÔNG CÓ checkbox "Kích hoạt ngay" —
-                        VoucherService.create() tự động đặt active = true
-                    -->
                         <div class="col-12">
                             <div class="alert alert-info py-2 mb-0 d-flex align-items-center gap-2"
                                 style="font-size:0.85rem;">
@@ -592,7 +559,8 @@
             </div>
         </div>
     </div>
-    <!-- Edit Modal -->
+
+    <!-- Edit Modal — ĐÃ XÓA checkbox "Đang kích hoạt" -->
     <div class="modal fade" id="editCouponModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -603,34 +571,52 @@
                 <div class="modal-body">
                     <form id="editCouponForm" method="post" class="row g-3">
                         <input type="hidden" id="editId">
-                        <div class="col-md-12"><label class="form-label fw-semibold">Tên chương trình *</label><input
-                                type="text" id="editName" name="name" class="form-control" required></div>
-                        <div class="col-md-6"><label class="form-label fw-semibold">Mã giảm giá *</label><input
-                                type="text" id="editCode" name="code" class="form-control text-uppercase" maxlength="10"
-                                required></div>
-                        <div class="col-md-6"><label class="form-label fw-semibold">Giảm giá (%) *</label>
-                            <div class="input-group"><input type="number" id="editDiscount" name="discount"
-                                    class="form-control" min="1" max="100" required><span
-                                    class="input-group-text">%</span></div>
+                        <div class="col-md-12">
+                            <label class="form-label fw-semibold">Tên chương trình *</label>
+                            <input type="text" id="editName" name="name" class="form-control" required>
                         </div>
-                        <div class="col-md-6"><label class="form-label fw-semibold">Số lượng *</label><input
-                                type="number" id="editQuantity" name="quantity" class="form-control" min="0" required>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Mã giảm giá *</label>
+                            <input type="text" id="editCode" name="code" class="form-control text-uppercase"
+                                maxlength="10" required>
                         </div>
-                        <div class="col-md-6"><label class="form-label fw-semibold">Ngày bắt đầu *</label><input
-                                type="datetime-local" id="editStartedAt" name="startedAt" class="form-control"></div>
-                        <div class="col-md-6"><label class="form-label fw-semibold">Ngày hết hạn *</label><input
-                                type="datetime-local" id="editEndAt" name="endAt" class="form-control"></div>
-                        <div class="col-12">
-                            <div class="form-check"><input class="form-check-input" type="checkbox" id="editActive"
-                                    name="active"><label class="form-check-label" for="editActive">Đang kích
-                                    hoạt</label></div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Giảm giá (%) *</label>
+                            <div class="input-group">
+                                <input type="number" id="editDiscount" name="discount" class="form-control" min="1"
+                                    max="100" required>
+                                <span class="input-group-text">%</span>
+                            </div>
                         </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Số lượng *</label>
+                            <input type="number" id="editQuantity" name="quantity" class="form-control" min="0"
+                                required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Ngày bắt đầu *</label>
+                            <input type="datetime-local" id="editStartedAt" name="startedAt" class="form-control">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Ngày hết hạn *</label>
+                            <input type="datetime-local" id="editEndAt" name="endAt" class="form-control">
+                        </div>
+                        <!-- Cảnh báo hết hạn — hiện/ẩn bằng JS -->
+                        <div class="col-12" id="editExpiredWarn" style="display:none;">
+                            <div class="alert alert-warning py-2 mb-0 d-flex align-items-center gap-2"
+                                style="font-size:0.85rem;">
+                                <i class="fa-solid fa-triangle-exclamation"></i>
+                                Mã đã <strong>hết hạn</strong> — không thể thay đổi ngày bắt đầu / hết hạn.
+                            </div>
+                        </div>
+                        <!-- ĐÃ XÓA: checkbox "Đang kích hoạt" -->
                     </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="submit" form="editCouponForm" class="btn btn-primary"><i
-                            class="fa-solid fa-save me-2"></i>Lưu thay đổi</button>
+                    <button type="submit" form="editCouponForm" class="btn btn-primary">
+                        <i class="fa-solid fa-save me-2"></i>Lưu thay đổi
+                    </button>
                 </div>
             </div>
         </div>
@@ -683,24 +669,90 @@
     <script src="/js/admin-avt.js"></script>
     <script src="/js/sidebar.js"></script>
     <script>
-        // Toast engine
+        // ===== Toast engine =====
         const TOAST_ICONS = { success: 'fa-circle-check', error: 'fa-circle-xmark', info: 'fa-circle-info', warning: 'fa-triangle-exclamation' };
         const TOAST_TITLES = { success: 'Thành công', error: 'Lỗi', info: 'Thông báo', warning: 'Cảnh báo' };
-        function showToast(type = 'info', title = '', message = '', duration = 4000) { const c = document.getElementById('toast-container'); const id = 'toast-' + Date.now(); const el = document.createElement('div'); el.className = `toast-item ${type}`; el.id = id; el.innerHTML = `<div class="toast-icon"><i class="fa-solid ${TOAST_ICONS[type]}"></i></div><div class="toast-body"><div class="toast-title">${title || TOAST_TITLES[type]}</div>${message ? `<div class="toast-msg">${message}</div>` : ''}</div><button class="toast-close" onclick="closeToast('${id}')"><i class="fa-solid fa-xmark"></i></button><div class="toast-progress" style="animation-duration:${duration}ms"></div>`; c.appendChild(el); setTimeout(() => closeToast(id), duration); }
-        function closeToast(id) { const el = document.getElementById(id); if (!el) return; el.classList.add('hiding'); setTimeout(() => el.remove(), 320); }
+        function showToast(type = 'info', title = '', message = '', duration = 4000) {
+            const c = document.getElementById('toast-container');
+            const id = 'toast-' + Date.now();
+            const el = document.createElement('div');
+            el.className = `toast-item ${type}`;
+            el.id = id;
+            el.innerHTML = `<div class="toast-icon"><i class="fa-solid ${TOAST_ICONS[type]}"></i></div><div class="toast-body"><div class="toast-title">${title || TOAST_TITLES[type]}</div>${message ? `<div class="toast-msg">${message}</div>` : ''}</div><button class="toast-close" onclick="closeToast('${id}')"><i class="fa-solid fa-xmark"></i></button><div class="toast-progress" style="animation-duration:${duration}ms"></div>`;
+            c.appendChild(el);
+            setTimeout(() => closeToast(id), duration);
+        }
+        function closeToast(id) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.classList.add('hiding');
+            setTimeout(() => el.remove(), 320);
+        }
 
-        function showConfirm(message, onConfirm) { const overlay = document.createElement('div'); overlay.style.cssText = 'position:fixed;inset:0;background:rgba(15,23,42,0.45);backdrop-filter:blur(4px);z-index:10000;display:flex;align-items:center;justify-content:center;'; overlay.innerHTML = `<div style="background:#fff;border-radius:18px;padding:32px 28px;max-width:360px;width:90%;box-shadow:0 24px 64px rgba(0,0,0,0.18);text-align:center;"><div style="width:56px;height:56px;border-radius:50%;background:#fee2e2;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;"><i class="fa-solid fa-trash" style="color:#ef4444;font-size:22px;"></i></div><div style="font-weight:700;font-size:1rem;color:#1e293b;margin-bottom:8px;">Xác nhận xóa</div><div style="font-size:0.85rem;color:#64748b;margin-bottom:24px;">${message}</div><div style="display:flex;gap:10px;"><button id="dlg-cancel" style="flex:1;padding:11px 0;border-radius:10px;border:1.5px solid #e2e8f0;background:#f8fafc;color:#475569;font-weight:600;cursor:pointer;">Hủy</button><button id="dlg-ok" style="flex:1;padding:11px 0;border-radius:10px;border:none;background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;font-weight:700;cursor:pointer;">Xóa</button></div></div>`; document.body.appendChild(overlay); overlay.querySelector('#dlg-cancel').onclick = () => overlay.remove(); overlay.querySelector('#dlg-ok').onclick = () => { overlay.remove(); onConfirm(); }; overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); }; }
+        // ===== Confirm dialog =====
+        function showConfirm(message, onConfirm) {
+            const overlay = document.createElement('div');
+            overlay.style.cssText = 'position:fixed;inset:0;background:rgba(15,23,42,0.45);backdrop-filter:blur(4px);z-index:10000;display:flex;align-items:center;justify-content:center;';
+            overlay.innerHTML = `<div style="background:#fff;border-radius:18px;padding:32px 28px;max-width:360px;width:90%;box-shadow:0 24px 64px rgba(0,0,0,0.18);text-align:center;"><div style="width:56px;height:56px;border-radius:50%;background:#fee2e2;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;"><i class="fa-solid fa-trash" style="color:#ef4444;font-size:22px;"></i></div><div style="font-weight:700;font-size:1rem;color:#1e293b;margin-bottom:8px;">Xác nhận xóa</div><div style="font-size:0.85rem;color:#64748b;margin-bottom:24px;">${message}</div><div style="display:flex;gap:10px;"><button id="dlg-cancel" style="flex:1;padding:11px 0;border-radius:10px;border:1.5px solid #e2e8f0;background:#f8fafc;color:#475569;font-weight:600;cursor:pointer;">Hủy</button><button id="dlg-ok" style="flex:1;padding:11px 0;border-radius:10px;border:none;background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;font-weight:700;cursor:pointer;">Xóa</button></div></div>`;
+            document.body.appendChild(overlay);
+            overlay.querySelector('#dlg-cancel').onclick = () => overlay.remove();
+            overlay.querySelector('#dlg-ok').onclick = () => { overlay.remove(); onConfirm(); };
+            overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
+        }
 
-        function copyCoupon(code) { navigator.clipboard.writeText(code).then(() => showToast('info', 'Đã sao chép!', `Mã <strong>${code}</strong> đã được copy.`, 2500)); }
-        function generateCode() { const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'; let code = ''; for (let i = 0; i < 8; i++)code += chars.charAt(Math.floor(Math.random() * chars.length)); document.getElementById('couponCode').value = code; }
-        function openEditModal(id) { fetch('/admin/vouchers/edit/' + id).then(r => r.json()).then(data => { document.getElementById('editId').value = data.id; document.getElementById('editName').value = data.name; document.getElementById('editCode').value = data.code; document.getElementById('editDiscount').value = data.discount; document.getElementById('editQuantity').value = data.quantity; document.getElementById('editStartedAt').value = data.startedAt ? data.startedAt.substring(0, 16) : ''; document.getElementById('editEndAt').value = data.endAt ? data.endAt.substring(0, 16) : ''; document.getElementById('editActive').checked = data.active; document.getElementById('editCouponForm').action = '/admin/vouchers/update/' + id; new bootstrap.Modal(document.getElementById('editCouponModal')).show(); }).catch(() => showToast('error', 'Lỗi', 'Không thể tải thông tin voucher.')); }
-        document.getElementById('couponCode')?.addEventListener('input', function (e) { e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ''); });
+        // ===== Helpers =====
+        function copyCoupon(code) {
+            navigator.clipboard.writeText(code).then(() => showToast('info', 'Đã sao chép!', `Mã <strong>${code}</strong> đã được copy.`, 2500));
+        }
 
-        // ===== SEARCH + PAGINATION =====
+        function generateCode() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let code = '';
+            for (let i = 0; i < 8; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
+            document.getElementById('couponCode').value = code;
+        }
+
+        // ===== Edit Modal — disable date fields nếu mã đã hết hạn =====
+        function openEditModal(id) {
+            fetch('/admin/vouchers/edit/' + id)
+                .then(r => r.json())
+                .then(data => {
+                    document.getElementById('editId').value = data.id;
+                    document.getElementById('editName').value = data.name;
+                    document.getElementById('editCode').value = data.code;
+                    document.getElementById('editDiscount').value = data.discount;
+                    document.getElementById('editQuantity').value = data.quantity;
+
+                    const startedAtInput = document.getElementById('editStartedAt');
+                    const endAtInput = document.getElementById('editEndAt');
+                    const warnEl = document.getElementById('editExpiredWarn');
+
+                    startedAtInput.value = data.startedAt ? data.startedAt.substring(0, 16) : '';
+                    endAtInput.value = data.endAt ? data.endAt.substring(0, 16) : '';
+
+                    // Kiểm tra hết hạn → disable date fields + hiện cảnh báo
+                    const isExpired = data.endAt && new Date(data.endAt) < new Date();
+                    startedAtInput.disabled = isExpired;
+                    endAtInput.disabled = isExpired;
+                    warnEl.style.display = isExpired ? '' : 'none';
+
+                    document.getElementById('editCouponForm').action = '/admin/vouchers/update/' + id;
+                    new bootstrap.Modal(document.getElementById('editCouponModal')).show();
+                })
+                .catch(() => showToast('error', 'Lỗi', 'Không thể tải thông tin voucher.'));
+        }
+
+        document.getElementById('couponCode')?.addEventListener('input', function (e) {
+            e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+        });
+
+        // ===== Search + Pagination =====
         const PAGE_SIZE = 10;
         let currentPage = 1, filteredRows = [];
+
         function getAllRows() { return Array.from(document.querySelectorAll('.data-row')); }
         function onSearch() { currentPage = 1; renderTable(); }
+
         function renderTable() {
             const keyword = (document.getElementById('searchInput').value || '').toLowerCase().trim();
             const allRows = getAllRows();
@@ -711,15 +763,65 @@
             const start = (currentPage - 1) * PAGE_SIZE;
             allRows.forEach(r => r.style.display = 'none');
             filteredRows.slice(start, start + PAGE_SIZE).forEach(r => r.style.display = '');
+
             let jsEmpty = document.getElementById('jsEmptyRow');
-            if (total === 0) { if (!jsEmpty) { jsEmpty = document.createElement('tr'); jsEmpty.id = 'jsEmptyRow'; jsEmpty.innerHTML = `<td colspan="10"><div class="empty-state"><i class="fa-solid fa-magnifying-glass fa-3x mb-3 opacity-50"></i><h5>Không tìm thấy mã giảm giá</h5></div></td>`; document.getElementById('tableBody').appendChild(jsEmpty); } jsEmpty.style.display = ''; } else if (jsEmpty) jsEmpty.style.display = 'none';
-            document.getElementById('footerInfo').innerHTML = keyword ? `Tìm thấy <strong>${total}</strong> mã &nbsp;·&nbsp; Trang <strong>${currentPage}</strong>/${totalPages}` : `Tổng cộng <strong>${total}</strong> mã &nbsp;·&nbsp; Trang <strong>${currentPage}</strong>/${totalPages}`;
-            document.getElementById('searchInfo').textContent = keyword ? `${total} kết quả cho "${keyword}"` : `${total} mã giảm giá`;
+            if (total === 0) {
+                if (!jsEmpty) {
+                    jsEmpty = document.createElement('tr');
+                    jsEmpty.id = 'jsEmptyRow';
+                    jsEmpty.innerHTML = `<td colspan="10"><div class="empty-state"><i class="fa-solid fa-magnifying-glass fa-3x mb-3 opacity-50"></i><h5>Không tìm thấy mã giảm giá</h5></div></td>`;
+                    document.getElementById('tableBody').appendChild(jsEmpty);
+                }
+                jsEmpty.style.display = '';
+            } else if (jsEmpty) {
+                jsEmpty.style.display = 'none';
+            }
+
+            document.getElementById('footerInfo').innerHTML = keyword
+                ? `Tìm thấy <strong>${total}</strong> mã &nbsp;·&nbsp; Trang <strong>${currentPage}</strong>/${totalPages}`
+                : `Tổng cộng <strong>${total}</strong> mã &nbsp;·&nbsp; Trang <strong>${currentPage}</strong>/${totalPages}`;
+            document.getElementById('searchInfo').textContent = keyword
+                ? `${total} kết quả cho "${keyword}"`
+                : `${total} mã giảm giá`;
             renderPagination(totalPages);
         }
-        function renderPagination(totalPages) { const wrapper = document.getElementById('paginationWrapper'); wrapper.innerHTML = ''; if (totalPages <= 1) return; wrapper.appendChild(makeBtn('‹', currentPage === 1, () => { currentPage--; renderTable(); })); getPageNums(currentPage, totalPages).forEach(p => { if (p === '...') { const d = document.createElement('span'); d.textContent = '…'; d.style.cssText = 'padding:0 4px;color:#adb5bd;align-self:center;'; wrapper.appendChild(d); } else { const b = makeBtn(p, false, () => { currentPage = p; renderTable(); }); if (p === currentPage) b.classList.add('active'); wrapper.appendChild(b); } }); wrapper.appendChild(makeBtn('›', currentPage === totalPages, () => { currentPage++; renderTable(); })); }
-        function makeBtn(label, disabled, onClick) { const b = document.createElement('button'); b.className = 'page-btn'; b.innerHTML = label; b.disabled = disabled; if (!disabled) b.addEventListener('click', onClick); return b; }
-        function getPageNums(c, t) { if (t <= 7) return Array.from({ length: t }, (_, i) => i + 1); if (c <= 4) return [1, 2, 3, 4, 5, '...', t]; if (c >= t - 3) return [1, '...', t - 4, t - 3, t - 2, t - 1, t]; return [1, '...', c - 1, c, c + 1, '...', t]; }
+
+        function renderPagination(totalPages) {
+            const wrapper = document.getElementById('paginationWrapper');
+            wrapper.innerHTML = '';
+            if (totalPages <= 1) return;
+            wrapper.appendChild(makeBtn('‹', currentPage === 1, () => { currentPage--; renderTable(); }));
+            getPageNums(currentPage, totalPages).forEach(p => {
+                if (p === '...') {
+                    const d = document.createElement('span');
+                    d.textContent = '…';
+                    d.style.cssText = 'padding:0 4px;color:#adb5bd;align-self:center;';
+                    wrapper.appendChild(d);
+                } else {
+                    const b = makeBtn(p, false, () => { currentPage = p; renderTable(); });
+                    if (p === currentPage) b.classList.add('active');
+                    wrapper.appendChild(b);
+                }
+            });
+            wrapper.appendChild(makeBtn('›', currentPage === totalPages, () => { currentPage++; renderTable(); }));
+        }
+
+        function makeBtn(label, disabled, onClick) {
+            const b = document.createElement('button');
+            b.className = 'page-btn';
+            b.innerHTML = label;
+            b.disabled = disabled;
+            if (!disabled) b.addEventListener('click', onClick);
+            return b;
+        }
+
+        function getPageNums(c, t) {
+            if (t <= 7) return Array.from({ length: t }, (_, i) => i + 1);
+            if (c <= 4) return [1, 2, 3, 4, 5, '...', t];
+            if (c >= t - 3) return [1, '...', t - 4, t - 3, t - 2, t - 1, t];
+            return [1, '...', c - 1, c, c + 1, '...', t];
+        }
+
         document.addEventListener('DOMContentLoaded', () => { renderTable(); });
     </script>
 </body>

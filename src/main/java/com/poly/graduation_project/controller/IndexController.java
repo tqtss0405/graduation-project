@@ -33,8 +33,10 @@ import java.math.BigDecimal;
 import java.text.Normalizer;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Controller
@@ -73,14 +75,10 @@ public class IndexController {
     public String home(Model model, HttpSession session) {
         User currentUser = (User) session.getAttribute("currentUser");
 
-        // ── Lấy top 8 sản phẩm bán chạy + đánh giá tốt ──────────────────
-        // Lấy tất cả sản phẩm active thuộc danh mục active
         List<Product> allActive = productRepository.findByActiveTrue().stream()
                 .filter(p -> p.getCategory() == null || Boolean.TRUE.equals(p.getCategory().getActive()))
                 .collect(Collectors.toList());
 
-        // Tính điểm = (soldQty * 0.6) + (avgRating * 20 * 0.4)
-        // chuẩn hóa để cả hai cùng đơn vị
         Map<Integer, Long> soldMap = new HashMap<>();
         for (Product p : allActive) {
             long sold = orderDetailRepository.sumQuantityByProductId(p.getId());
@@ -89,7 +87,6 @@ public class IndexController {
 
         List<Product> products = allActive.stream()
                 .sorted((a, b) -> {
-                    // ưu tiên còn hàng
                     boolean aStock = a.getStockQuantity() != null && a.getStockQuantity() > 0;
                     boolean bStock = b.getStockQuantity() != null && b.getStockQuantity() > 0;
                     if (aStock != bStock)
@@ -109,7 +106,6 @@ public class IndexController {
                 .limit(8)
                 .collect(Collectors.toList());
 
-        // ── Danh mục active (kèm icon/color từ DB) ───────────────────────
         List<Category> activeCategories = categoryRepository.findAll().stream()
                 .filter(c -> Boolean.TRUE.equals(c.getActive()))
                 .collect(Collectors.toList());
@@ -123,7 +119,6 @@ public class IndexController {
                     .forEach(fav -> favouriteProductIds.add(fav.getProduct().getId()));
         }
 
-        // Truyền soldMap và ratingMap cho template
         Map<Integer, Double> ratingMap = new HashMap<>();
         Map<Integer, Long> soldCountMap = new HashMap<>();
         for (Product p : products) {
@@ -160,7 +155,6 @@ public class IndexController {
         List<CartDetail> cartItems = cartDetailRepository.findByUser(currentUser);
         Long totalQuantity = cartItems.stream().mapToLong(CartDetail::getQuantity).sum();
 
-        // --- Parse preset khoảng giá ---
         if (!priceRange.isEmpty()) {
             switch (priceRange) {
                 case "0-100000":
@@ -182,12 +176,10 @@ public class IndexController {
             }
         }
 
-        // Lấy tất cả sản phẩm active VÀ thuộc danh mục active
         List<Product> all = productRepository.findByActiveTrue().stream()
                 .filter(p -> p.getCategory() == null || Boolean.TRUE.equals(p.getCategory().getActive()))
                 .collect(Collectors.toList());
 
-        // --- Lọc keyword ---
         final String kw = removeAccent(keyword.trim());
         String[] words = kw.split("\\s+");
         all = all.stream().filter(p -> {
@@ -195,7 +187,6 @@ public class IndexController {
             return java.util.Arrays.stream(words).allMatch(name::contains);
         }).collect(Collectors.toList());
 
-        // --- Lọc danh mục ---
         final Integer finalCatId = categoryId;
         if (categoryId != null) {
             all = all.stream()
@@ -203,7 +194,6 @@ public class IndexController {
                     .collect(Collectors.toList());
         }
 
-        // --- Lọc giá ---
         final BigDecimal fMin = minPrice, fMax = maxPrice;
         if (minPrice != null || maxPrice != null) {
             all = all.stream().filter(p -> {
@@ -217,7 +207,6 @@ public class IndexController {
             }).collect(Collectors.toList());
         }
 
-        // --- Sắp xếp theo tiêu chí người dùng chọn ---
         switch (sort) {
             case "price-asc":
                 all.sort(Comparator.comparing(Product::getPrice));
@@ -230,31 +219,24 @@ public class IndexController {
                 break;
         }
 
-        // --- Ưu tiên sản phẩm CÒN HÀNG lên trước ---
         all.sort(Comparator.comparingInt(p -> (p.getStockQuantity() != null && p.getStockQuantity() > 0) ? 0 : 1));
 
-        // --- Phân trang sản phẩm ---
         int totalProducts = all.size();
         int totalPages = Math.max(1, (int) Math.ceil((double) totalProducts / PRODUCTS_PER_PAGE));
-        if (page < 1)
-            page = 1;
-        if (page > totalPages)
-            page = totalPages;
+        if (page < 1) page = 1;
+        if (page > totalPages) page = totalPages;
         int fromIdx = (page - 1) * PRODUCTS_PER_PAGE;
         int toIdx = Math.min(fromIdx + PRODUCTS_PER_PAGE, totalProducts);
         List<Product> pagedProducts = totalProducts > 0 ? all.subList(fromIdx, toIdx) : all;
 
-        // --- Phân trang danh mục sidebar (chỉ lấy danh mục ACTIVE) ---
         List<Category> allCats = categoryRepository.findAll().stream()
                 .filter(c -> Boolean.TRUE.equals(c.getActive()))
                 .collect(Collectors.toList());
 
         int totalCats = allCats.size();
         int totalCatPages = Math.max(1, (int) Math.ceil((double) totalCats / CATS_PER_PAGE));
-        if (catPage < 1)
-            catPage = 1;
-        if (catPage > totalCatPages)
-            catPage = totalCatPages;
+        if (catPage < 1) catPage = 1;
+        if (catPage > totalCatPages) catPage = totalCatPages;
         int catFrom = (catPage - 1) * CATS_PER_PAGE;
         int catTo = Math.min(catFrom + CATS_PER_PAGE, totalCats);
         List<Category> pagedCats = allCats.subList(catFrom, catTo);
@@ -292,7 +274,6 @@ public class IndexController {
         User currentUser = (User) session.getAttribute("currentUser");
         Product product = productRepository.findBySlug(slug);
 
-        // Redirect nếu sản phẩm không tồn tại, bị ẩn, hoặc danh mục bị ẩn
         if (product == null
                 || !Boolean.TRUE.equals(product.getActive())
                 || (product.getCategory() != null && !Boolean.TRUE.equals(product.getCategory().getActive()))) {
@@ -303,7 +284,6 @@ public class IndexController {
         Long totalQuantity = cartItems.stream().mapToLong(CartDetail::getQuantity).sum();
         model.addAttribute("totalQuantity", totalQuantity);
 
-        // Sản phẩm liên quan cũng phải lọc danh mục active
         List<Product> related = productRepository
                 .findTop4ByCategoryAndIdNotAndActiveTrue(product.getCategory(), product.getId())
                 .stream()
@@ -391,23 +371,85 @@ public class IndexController {
         return "order-details";
     }
 
+    // ================================================
+    // Trang vouchers — sort ưu tiên, phân trang 10/trang
+    // ================================================
     @GetMapping("/vouchers")
-    public String vouchersPage(Model model, HttpSession session) {
+    public String vouchersPage(
+            @RequestParam(name = "page", required = false, defaultValue = "1") int page,
+            Model model, HttpSession session) {
+
         User currentUser = (User) session.getAttribute("currentUser");
-        List<Voucher> vouchers = voucherRepository.findAll();
+        List<Voucher> allVouchers = voucherRepository.findAll();
+
         Long totalQuantity = 0L;
         if (currentUser != null) {
             List<CartDetail> c = cartDetailRepository.findByUser(currentUser);
             totalQuantity = c.stream().mapToLong(CartDetail::getQuantity).sum();
         }
-        model.addAttribute("vouchers", vouchers);
-        model.addAttribute("totalQuantity", totalQuantity);
+
+        // ── Tập hợp ID voucher user đã dùng (bỏ qua đơn hủy) ──────────────
+        Set<Integer> usedVoucherIds = new HashSet<>();
+        if (currentUser != null) {
+            for (Voucher v : allVouchers) {
+                if (orderRepository.existsByUserAndVoucherId(currentUser, v.getId())) {
+                    usedVoucherIds.add(v.getId());
+                }
+            }
+        }
+
+        // ── Sort: ưu tiên voucher còn dùng được lên đầu ────────────────────
+        // Thứ tự: 0 = active & chưa dùng  →  1 = đã dùng  →  2 = hết hạn/tắt/hết lượt
+        java.time.LocalDateTime now = java.time.LocalDateTime.now();
+        final Set<Integer> finalUsedIds = usedVoucherIds;
+
+        allVouchers.sort((a, b) -> {
+            int rankA = voucherRank(a, finalUsedIds, now);
+            int rankB = voucherRank(b, finalUsedIds, now);
+            if (rankA != rankB) return Integer.compare(rankA, rankB);
+            // Cùng nhóm → voucher mới hơn (id lớn hơn) lên trên
+            return Integer.compare(b.getId(), a.getId());
+        });
+
+        // ── Phân trang 10 voucher/trang ────────────────────────────────────
+        final int PAGE_SIZE = 10;
+        int totalVouchers = allVouchers.size();
+        int totalPages = Math.max(1, (int) Math.ceil((double) totalVouchers / PAGE_SIZE));
+        if (page < 1) page = 1;
+        if (page > totalPages) page = totalPages;
+
+        int fromIdx = (page - 1) * PAGE_SIZE;
+        int toIdx   = Math.min(fromIdx + PAGE_SIZE, totalVouchers);
+        List<Voucher> pagedVouchers = allVouchers.subList(fromIdx, toIdx);
+
+        model.addAttribute("vouchers",      pagedVouchers);
+        model.addAttribute("usedVoucherIds", usedVoucherIds);
+        model.addAttribute("totalQuantity",  totalQuantity);
+        model.addAttribute("currentPage",    page);
+        model.addAttribute("totalPages",     totalPages);
+        model.addAttribute("totalVouchers",  totalVouchers);
         return "vouchers";
     }
 
+    /**
+     * Rank dùng để sort voucher:
+     *   0 = còn dùng được (active, chưa hết hạn, còn lượt, chưa dùng)
+     *   1 = đã dùng rồi
+     *   2 = hết hạn / bị tắt / hết lượt
+     */
+    private int voucherRank(Voucher v, Set<Integer> usedIds, java.time.LocalDateTime now) {
+        boolean inactive = !Boolean.TRUE.equals(v.getActive());
+        boolean expired  = v.getEndAt() != null && v.getEndAt().isBefore(now);
+        boolean outOfQty = v.getQuantity() != null && v.getQuantity() <= 0;
+        boolean used     = usedIds.contains(v.getId());
+
+        if (inactive || expired || outOfQty) return 2;
+        if (used) return 1;
+        return 0;
+    }
+
     public static String removeAccent(String s) {
-        if (s == null)
-            return "";
+        if (s == null) return "";
         String temp = Normalizer.normalize(s, Normalizer.Form.NFD);
         return temp.replaceAll("\\p{InCombiningDiacriticalMarks}+", "").toLowerCase();
     }

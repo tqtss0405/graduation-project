@@ -12,6 +12,7 @@
     <style>
         body { font-family: 'Quicksand', sans-serif; background: #f8f9fa; }
 
+        /* ── Voucher card ── */
         .voucher-card {
             background: #fff;
             border-radius: 16px;
@@ -26,15 +27,22 @@
             transform: translateY(-3px);
             box-shadow: 0 8px 28px rgba(40,167,69,0.13);
         }
-
-        .voucher-stripe {
-            width: 10px;
-            background: linear-gradient(180deg, #28a745, #20c997);
-            flex-shrink: 0;
+        /* Mờ toàn bộ card khi hết hạn hoặc đã dùng */
+        .voucher-card.dimmed {
+            opacity: 0.55;
         }
-        .voucher-stripe.expired { background: linear-gradient(180deg, #adb5bd, #ced4da); }
-        .voucher-stripe.low     { background: linear-gradient(180deg, #fd7e14, #ffc107); }
+        .voucher-card.dimmed:hover {
+            transform: none;
+            box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+        }
 
+        /* ── Stripe bên trái ── */
+        .voucher-stripe                    { width: 10px; background: linear-gradient(180deg, #28a745, #20c997); flex-shrink: 0; }
+        .voucher-stripe.stripe-expired     { background: linear-gradient(180deg, #adb5bd, #ced4da); }
+        .voucher-stripe.stripe-used        { background: linear-gradient(180deg, #6c757d, #868e96); }
+        .voucher-stripe.stripe-low         { background: linear-gradient(180deg, #fd7e14, #ffc107); }
+
+        /* ── Cut layout ── */
         .voucher-cut {
             position: relative;
             display: flex;
@@ -54,108 +62,73 @@
         .voucher-cut::before { left: 108px; }
         .voucher-cut::after  { right: -10px; }
 
+        /* ── Phần trái (%) ── */
         .voucher-left {
-            width: 120px;
-            flex-shrink: 0;
+            width: 120px; flex-shrink: 0;
             background: linear-gradient(135deg, #f0fff4, #e8f5e9);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
             padding: 20px 10px;
             border-right: 2px dashed #c3e6cb;
         }
-        .voucher-left.expired { background: linear-gradient(135deg, #f8f9fa, #e9ecef); border-color: #dee2e6; }
-        .voucher-left.low     { background: linear-gradient(135deg, #fff8f0, #fff3e0); border-color: #ffd699; }
+        .voucher-left.left-expired { background: linear-gradient(135deg, #f8f9fa, #e9ecef); border-color: #dee2e6; }
+        .voucher-left.left-used    { background: linear-gradient(135deg, #f5f5f5, #ebebeb); border-color: #d0d0d0; }
+        .voucher-left.left-low     { background: linear-gradient(135deg, #fff8f0, #fff3e0); border-color: #ffd699; }
 
-        .voucher-percent {
-            font-size: 2rem;
-            font-weight: 800;
-            color: #28a745;
-            line-height: 1;
-        }
-        .voucher-percent.expired { color: #adb5bd; }
-        .voucher-percent.low     { color: #fd7e14; }
+        .voucher-percent              { font-size: 2rem; font-weight: 800; color: #28a745; line-height: 1; }
+        .voucher-percent.pct-expired  { color: #adb5bd; }
+        .voucher-percent.pct-used     { color: #9e9e9e; }
+        .voucher-percent.pct-low      { color: #fd7e14; }
 
-        .voucher-off {
-            font-size: 0.75rem;
-            font-weight: 700;
-            color: #20c997;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-        .voucher-off.expired { color: #adb5bd; }
-        .voucher-off.low     { color: #fd7e14; }
+        .voucher-off              { font-size: 0.75rem; font-weight: 700; color: #20c997; letter-spacing: 1px; text-transform: uppercase; }
+        .voucher-off.off-expired  { color: #adb5bd; }
+        .voucher-off.off-used     { color: #9e9e9e; }
+        .voucher-off.off-low      { color: #fd7e14; }
 
+        /* ── Phần phải ── */
         .voucher-right {
-            flex: 1;
-            padding: 16px 20px 16px 24px;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
+            flex: 1; padding: 16px 20px 16px 24px;
+            display: flex; flex-direction: column; gap: 6px;
         }
-        .voucher-name {
-            font-weight: 700;
-            font-size: 0.95rem;
-            color: #1a1a2e;
-        }
-        .voucher-code-row {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .voucher-code {
-            font-family: 'Courier New', monospace;
-            font-weight: 700;
-            font-size: 0.9rem;
-            background: #f0fff4;
-            border: 1.5px dashed #28a745;
-            border-radius: 6px;
-            padding: 3px 10px;
-            color: #155724;
-            letter-spacing: 1px;
-        }
-        .voucher-code.expired { background: #f8f9fa; border-color: #adb5bd; color: #6c757d; }
-        .voucher-code.low     { background: #fff8f0; border-color: #fd7e14; color: #7d3f00; }
+        .voucher-name { font-weight: 700; font-size: 0.95rem; color: #1a1a2e; }
 
+        .voucher-code-row { display: flex; align-items: center; gap: 8px; }
+
+        .voucher-code               { font-family: 'Courier New', monospace; font-weight: 700; font-size: 0.9rem; background: #f0fff4; border: 1.5px dashed #28a745; border-radius: 6px; padding: 3px 10px; color: #155724; letter-spacing: 1px; }
+        .voucher-code.code-expired  { background: #f8f9fa; border-color: #adb5bd; color: #6c757d; }
+        .voucher-code.code-used     { background: #f5f5f5; border-color: #9e9e9e; color: #757575; }
+        .voucher-code.code-low      { background: #fff8f0; border-color: #fd7e14; color: #7d3f00; }
+
+        /* ── Nút copy ── */
         .btn-copy {
-            background: none;
-            border: 1.5px solid #28a745;
-            border-radius: 6px;
-            color: #28a745;
-            font-size: 0.75rem;
-            font-weight: 700;
-            padding: 3px 10px;
-            cursor: pointer;
-            transition: all 0.15s;
-            white-space: nowrap;
+            background: none; border: 1.5px solid #28a745; border-radius: 6px;
+            color: #28a745; font-size: 0.75rem; font-weight: 700;
+            padding: 3px 10px; cursor: pointer;
+            transition: all 0.15s; white-space: nowrap;
         }
-        .btn-copy:hover { background: #28a745; color: #fff; }
-        .btn-copy.copied { background: #28a745; color: #fff; border-color: #28a745; }
-        .btn-copy:disabled { opacity: 0.5; cursor: not-allowed; border-color: #adb5bd; color: #adb5bd; }
+        .btn-copy:hover:not(:disabled) { background: #28a745; color: #fff; }
+        .btn-copy.copied               { background: #28a745; color: #fff; border-color: #28a745; }
+        .btn-copy:disabled             { opacity: 0.45; cursor: not-allowed; border-color: #adb5bd; color: #adb5bd; }
 
-        .voucher-meta {
-            font-size: 0.78rem;
-            color: #6c757d;
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
+        /* ── Meta ── */
+        .voucher-meta { font-size: 0.78rem; color: #6c757d; display: flex; gap: 12px; flex-wrap: wrap; }
         .voucher-meta i { width: 14px; }
 
-        .badge-qty-ok  { background: #d4edda; color: #155724; font-size: 0.72rem; padding: 3px 8px; border-radius: 50px; font-weight: 700; }
-        .badge-qty-low { background: #fff3cd; color: #856404; font-size: 0.72rem; padding: 3px 8px; border-radius: 50px; font-weight: 700; }
-        .badge-qty-out { background: #f8d7da; color: #721c24; font-size: 0.72rem; padding: 3px 8px; border-radius: 50px; font-weight: 700; }
-        .badge-expired { background: #e9ecef; color: #6c757d; font-size: 0.72rem; padding: 3px 8px; border-radius: 50px; font-weight: 700; }
+        /* ── Badges ── */
+        .badge-qty-ok   { background: #d4edda; color: #155724; font-size: 0.72rem; padding: 3px 8px; border-radius: 50px; font-weight: 700; }
+        .badge-qty-low  { background: #fff3cd; color: #856404; font-size: 0.72rem; padding: 3px 8px; border-radius: 50px; font-weight: 700; }
+        .badge-qty-out  { background: #f8d7da; color: #721c24; font-size: 0.72rem; padding: 3px 8px; border-radius: 50px; font-weight: 700; }
+        .badge-expired  { background: #e9ecef; color: #6c757d;  font-size: 0.72rem; padding: 3px 8px; border-radius: 50px; font-weight: 700; }
+        .badge-used     { background: #e3e3e3; color: #555555;  font-size: 0.72rem; padding: 3px 8px; border-radius: 50px; font-weight: 700; }
 
+        /* ── Toast ── */
         .toast-container-custom {
             position: fixed; top: 24px; right: 24px;
             z-index: 9999; display: flex; flex-direction: column; gap: 10px;
         }
         .toast-custom {
             display: flex; align-items: center; gap: 12px;
-            padding: 14px 18px;
-            border-radius: 14px;
+            padding: 14px 18px; border-radius: 14px;
             box-shadow: 0 8px 28px rgba(0,0,0,0.14);
             font-weight: 600; font-size: 0.9rem;
             min-width: 260px;
@@ -166,17 +139,28 @@
             to   { transform: translateX(0);     opacity: 1; }
         }
         .toast-success { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
-        .toast-close {
-            margin-left: auto; cursor: pointer; opacity: 0.6;
-            background: none; border: none; font-size: 1rem; color: inherit;
-        }
+        .toast-close   { margin-left: auto; cursor: pointer; opacity: 0.6; background: none; border: none; font-size: 1rem; color: inherit; }
 
-        .empty-state { text-align: center; padding: 60px 20px; background: #fff; border-radius: 16px; }
-        .filter-tabs .btn { border-radius: 50px; font-weight: 600; font-size: 0.85rem; }
+        /* ── Misc ── */
+        .empty-state   { text-align: center; padding: 60px 20px; background: #fff; border-radius: 16px; }
+        /* ── Pagination ── */
+        .pagination-wrap { display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 32px; flex-wrap: wrap; }
+        .page-btn {
+            min-width: 38px; height: 38px; padding: 0 10px;
+            border-radius: 10px; border: 1.5px solid #e9ecef;
+            background: #fff; color: #495057;
+            font-size: 0.88rem; font-weight: 600;
+            display: inline-flex; align-items: center; justify-content: center;
+            text-decoration: none; transition: all 0.15s;
+        }
+        .page-btn:hover { border-color: #28a745; color: #28a745; background: #f6fdf8; }
+        .page-btn.active { background: #28a745; border-color: #28a745; color: #fff; pointer-events: none; }
+        .page-btn.disabled { opacity: 0.4; pointer-events: none; }
     </style>
 </head>
 <body>
 
+    <!-- ── Navbar ── -->
     <nav class="navbar navbar-expand-lg sticky-top">
         <div class="container">
             <a class="navbar-brand" href="/home">BEO<span style="color: var(--secondary-color)">BOOKS</span></a>
@@ -232,6 +216,7 @@
         </div>
     </nav>
 
+    <!-- ── Main content ── -->
     <div class="container py-5" style="max-width: 900px;">
 
         <div class="d-flex align-items-center gap-3 mb-4">
@@ -242,17 +227,12 @@
             </div>
         </div>
 
-        <!-- Filter tabs -->
-        <div class="filter-tabs d-flex gap-2 mb-4 flex-wrap">
-            <button class="btn btn-success btn-sm" onclick="filterVouchers('all', this)">
-                Tất cả <span class="badge bg-white text-success ms-1" id="countAll">0</span>
-            </button>
-            <button class="btn btn-outline-secondary btn-sm" onclick="filterVouchers('active', this)">
-                Còn hiệu lực <span class="badge bg-secondary ms-1" id="countActive">0</span>
-            </button>
-            <button class="btn btn-outline-secondary btn-sm" onclick="filterVouchers('expired', this)">
-                Hết hạn <span class="badge bg-secondary ms-1" id="countExpired">0</span>
-            </button>
+        <!-- Info tổng -->
+        <div class="d-flex align-items-center mb-4">
+            <small class="text-muted">
+                Tổng <strong th:text="${totalVouchers}">0</strong> mã giảm giá
+                &nbsp;·&nbsp; Trang <strong th:text="${currentPage}">1</strong> / <strong th:text="${totalPages}">1</strong>
+            </small>
         </div>
 
         <!-- Empty state -->
@@ -262,51 +242,77 @@
             <p class="text-muted">Hãy quay lại sau nhé!</p>
         </div>
 
+        <!-- Danh sách voucher -->
         <div id="voucherList" class="d-flex flex-column gap-3">
             <div th:each="v : ${vouchers}"
-                 th:data-state="${v.active and (v.endAt == null or v.endAt.isAfter(#temporals.createNow())) and (v.quantity == null or v.quantity > 0) ? 'active' : 'expired'}"
+                 th:with="
+                    isExpired=${v.endAt != null and v.endAt.isBefore(#temporals.createNow())},
+                    isInactive=${!v.active},
+                    isOut=${v.quantity != null and v.quantity <= 0},
+                    isUsed=${usedVoucherIds != null and usedVoucherIds.contains(v.id)},
+                    isLow=${v.active and (v.endAt == null or v.endAt.isAfter(#temporals.createNow())) and (v.quantity != null and v.quantity > 0 and v.quantity <= 5)},
+                    isDimmed=${isExpired or isInactive or isOut or isUsed},
+                    vState=${isUsed ? 'used' : ((isExpired or isInactive or isOut) ? 'expired' : 'active')}
+                 "
+                 th:data-state="${vState}"
                  class="voucher-item">
 
-                <div class="voucher-card">
+                <!-- Card — thêm class dimmed khi không dùng được -->
+                <div th:class="${isDimmed ? 'voucher-card dimmed' : 'voucher-card'}">
+
                     <!-- Stripe -->
-                    <div th:class="${v.active and (v.endAt == null or v.endAt.isAfter(#temporals.createNow())) and (v.quantity != null and v.quantity > 0 and v.quantity <= 5) ? 'voucher-stripe low' :
-                                     (!v.active or (v.endAt != null and v.endAt.isBefore(#temporals.createNow())) or (v.quantity != null and v.quantity <= 0)) ? 'voucher-stripe expired' :
-                                     'voucher-stripe'}"></div>
+                    <div th:class="${isExpired or isInactive or isOut ? 'voucher-stripe stripe-expired' :
+                                     isUsed ? 'voucher-stripe stripe-used' :
+                                     isLow  ? 'voucher-stripe stripe-low'  : 'voucher-stripe'}"></div>
 
                     <div class="voucher-cut">
                         <!-- Phần trái: % -->
-                        <div th:class="${!v.active or (v.endAt != null and v.endAt.isBefore(#temporals.createNow())) or (v.quantity != null and v.quantity <= 0) ? 'voucher-left expired' :
-                                         (v.quantity != null and v.quantity <= 5) ? 'voucher-left low' : 'voucher-left'}">
-                            <div th:class="${!v.active or (v.endAt != null and v.endAt.isBefore(#temporals.createNow())) or (v.quantity != null and v.quantity <= 0) ? 'voucher-percent expired' :
-                                             (v.quantity != null and v.quantity <= 5) ? 'voucher-percent low' : 'voucher-percent'}"
+                        <div th:class="${isExpired or isInactive or isOut ? 'voucher-left left-expired' :
+                                         isUsed ? 'voucher-left left-used' :
+                                         isLow  ? 'voucher-left left-low'  : 'voucher-left'}">
+                            <div th:class="${isExpired or isInactive or isOut ? 'voucher-percent pct-expired' :
+                                             isUsed ? 'voucher-percent pct-used' :
+                                             isLow  ? 'voucher-percent pct-low'  : 'voucher-percent'}"
                                  th:text="${v.discount} + '%'">10%</div>
-                            <div th:class="${!v.active or (v.endAt != null and v.endAt.isBefore(#temporals.createNow())) or (v.quantity != null and v.quantity <= 0) ? 'voucher-off expired' :
-                                             (v.quantity != null and v.quantity <= 5) ? 'voucher-off low' : 'voucher-off'}">GIẢM</div>
+                            <div th:class="${isExpired or isInactive or isOut ? 'voucher-off off-expired' :
+                                             isUsed ? 'voucher-off off-used' :
+                                             isLow  ? 'voucher-off off-low'  : 'voucher-off'}">GIẢM</div>
                         </div>
 
                         <!-- Phần phải: thông tin -->
                         <div class="voucher-right">
                             <div class="voucher-name" th:text="${v.name}">Tên voucher</div>
 
-                            <!-- Code + nút copy: dùng data-code và data-vid thay vì th:onclick -->
+                            <!-- Code + nút copy -->
                             <div class="voucher-code-row">
-                                <span th:class="${!v.active or (v.endAt != null and v.endAt.isBefore(#temporals.createNow())) or (v.quantity != null and v.quantity <= 0) ? 'voucher-code expired' :
-                                                  (v.quantity != null and v.quantity <= 5) ? 'voucher-code low' : 'voucher-code'}"
+                                <span th:class="${isExpired or isInactive or isOut ? 'voucher-code code-expired' :
+                                                  isUsed ? 'voucher-code code-used' :
+                                                  isLow  ? 'voucher-code code-low'  : 'voucher-code'}"
                                       th:text="${v.code}"
                                       th:id="'code-' + ${v.id}">CODE</span>
 
-                                <!-- ✅ FIX: dùng data-code + data-vid thay vì th:onclick với String -->
+                                <!--
+                                    Disable copy khi:
+                                    - Hết hạn / bị tắt / hết lượt
+                                    - User đã dùng voucher này rồi
+                                -->
                                 <button class="btn-copy"
                                         th:id="'btn-' + ${v.id}"
                                         th:data-code="${v.code}"
                                         th:data-vid="${v.id}"
-                                        th:disabled="${!v.active or (v.endAt != null and v.endAt.isBefore(#temporals.createNow())) or (v.quantity != null and v.quantity <= 0)}"
+                                        th:disabled="${isDimmed}"
                                         onclick="copyCode(this)">
-                                    <i class="fa-regular fa-copy me-1"></i>Sao chép
+                                    <!-- Khi đã dùng: đổi icon + chữ -->
+                                    <span th:if="${isUsed}">
+                                        <i class="fa-solid fa-check me-1"></i>Đã sử dụng
+                                    </span>
+                                    <span th:if="${!isUsed}">
+                                        <i class="fa-regular fa-copy me-1"></i>Sao chép
+                                    </span>
                                 </button>
                             </div>
 
-                            <!-- Meta -->
+                            <!-- Meta: HSD + số lượng -->
                             <div class="voucher-meta">
                                 <span>
                                     <i class="fa-solid fa-clock"></i>
@@ -323,22 +329,58 @@
 
                             <!-- Badge trạng thái -->
                             <div>
-                                <span th:if="${v.quantity != null and v.quantity <= 0}" class="badge-qty-out">Hết lượt</span>
-                                <span th:if="${v.endAt != null and v.endAt.isBefore(#temporals.createNow())}" class="badge-expired">Hết hạn</span>
-                                <span th:if="${!v.active}" class="badge-expired">Không hoạt động</span>
-                                <span th:if="${v.active and (v.endAt == null or v.endAt.isAfter(#temporals.createNow())) and (v.quantity != null and v.quantity > 0 and v.quantity <= 5)}"
-                                      class="badge-qty-low">
+                                <!-- Đã sử dụng — ưu tiên hiển thị đầu tiên -->
+                                <span th:if="${isUsed}" class="badge-used">
+                                    <i class="fa-solid fa-circle-check me-1"></i>Bạn đã sử dụng
+                                </span>
+                                <!-- Hết lượt -->
+                                <span th:if="${!isUsed and isOut}" class="badge-qty-out">Hết lượt</span>
+                                <!-- Hết hạn -->
+                                <span th:if="${!isUsed and isExpired}" class="badge-expired">Hết hạn</span>
+                                <!-- Không hoạt động -->
+                                <span th:if="${!isUsed and isInactive}" class="badge-expired">Không hoạt động</span>
+                                <!-- Sắp hết lượt -->
+                                <span th:if="${!isUsed and isLow}" class="badge-qty-low">
                                     <i class="fa-solid fa-fire me-1"></i>Sắp hết
                                 </span>
-                                <span th:if="${v.active and (v.endAt == null or v.endAt.isAfter(#temporals.createNow())) and (v.quantity == null or v.quantity > 5)}"
-                                      class="badge-qty-ok">
+                                <!-- Bình thường -->
+                                <span th:if="${!isUsed and !isDimmed and !isLow}" class="badge-qty-ok">
                                     <i class="fa-solid fa-check me-1"></i>Có thể dùng
                                 </span>
                             </div>
                         </div>
                     </div>
                 </div>
+
             </div>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination-wrap" th:if="${totalPages > 1}">
+            <!-- Prev -->
+            <a th:href="@{/vouchers(page=${currentPage - 1})}"
+               th:class="${currentPage == 1 ? 'page-btn disabled' : 'page-btn'}">
+                <i class="fa-solid fa-chevron-left" style="font-size:0.75rem;"></i>
+            </a>
+
+            <!-- Pages -->
+            <th:block th:each="i : ${#numbers.sequence(1, totalPages)}">
+                <!-- Hiển thị: trang đầu, trang cuối, trang hiện tại, và 1 trang kề -->
+                <th:block th:if="${i == 1 or i == totalPages or (i >= currentPage - 1 and i <= currentPage + 1)}">
+                    <a th:href="@{/vouchers(page=${i})}"
+                       th:text="${i}"
+                       th:class="${i == currentPage ? 'page-btn active' : 'page-btn'}">1</a>
+                </th:block>
+                <!-- Dấu ... -->
+                <span th:if="${i == 2 and currentPage > 3}" class="text-muted px-1" style="align-self:center;">…</span>
+                <span th:if="${i == totalPages - 1 and currentPage < totalPages - 2}" class="text-muted px-1" style="align-self:center;">…</span>
+            </th:block>
+
+            <!-- Next -->
+            <a th:href="@{/vouchers(page=${currentPage + 1})}"
+               th:class="${currentPage == totalPages ? 'page-btn disabled' : 'page-btn'}">
+                <i class="fa-solid fa-chevron-right" style="font-size:0.75rem;"></i>
+            </a>
         </div>
 
         <!-- Hướng dẫn -->
@@ -363,11 +405,10 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // ✅ FIX: nhận btn element, đọc data-code và data-vid từ dataset
+        // ── Sao chép mã ──────────────────────────────────────────────────────
         function copyCode(btn) {
+            if (btn.disabled) return;
             const code = btn.dataset.code;
-            const id   = btn.dataset.vid;
-
             navigator.clipboard.writeText(code).then(() => {
                 btn.classList.add('copied');
                 btn.innerHTML = '<i class="fa-solid fa-check me-1"></i>Đã sao chép';
@@ -377,6 +418,7 @@
                     btn.innerHTML = '<i class="fa-regular fa-copy me-1"></i>Sao chép';
                 }, 2500);
             }).catch(() => {
+                // Fallback cho trình duyệt cũ
                 const el = document.createElement('textarea');
                 el.value = code;
                 document.body.appendChild(el);
@@ -387,31 +429,7 @@
             });
         }
 
-        function filterVouchers(state, btnEl) {
-            document.querySelectorAll('.filter-tabs .btn').forEach(b => {
-                b.classList.remove('btn-success');
-                b.classList.add('btn-outline-secondary');
-            });
-            btnEl.classList.remove('btn-outline-secondary');
-            btnEl.classList.add('btn-success');
-
-            document.querySelectorAll('.voucher-item').forEach(item => {
-                item.style.display = (state === 'all' || item.dataset.state === state) ? '' : 'none';
-            });
-        }
-
-        window.addEventListener('DOMContentLoaded', () => {
-            const items = document.querySelectorAll('.voucher-item');
-            let all = 0, active = 0, expired = 0;
-            items.forEach(item => {
-                all++;
-                if (item.dataset.state === 'active') active++; else expired++;
-            });
-            document.getElementById('countAll').textContent     = all;
-            document.getElementById('countActive').textContent  = active;
-            document.getElementById('countExpired').textContent = expired;
-        });
-
+        // ── Toast ─────────────────────────────────────────────────────────────
         function showToast(message) {
             const container = document.getElementById('toastContainer');
             const toast = document.createElement('div');
