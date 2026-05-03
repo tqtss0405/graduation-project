@@ -377,6 +377,7 @@ public class IndexController {
     @GetMapping("/vouchers")
     public String vouchersPage(
             @RequestParam(name = "page", required = false, defaultValue = "1") int page,
+            @RequestParam(name = "tab", required = false, defaultValue = "active") String tab,
             Model model, HttpSession session) {
 
         User currentUser = (User) session.getAttribute("currentUser");
@@ -398,12 +399,28 @@ public class IndexController {
             }
         }
 
-        // ── Sort: ưu tiên voucher còn dùng được lên đầu ────────────────────
-        // Thứ tự: 0 = active & chưa dùng  →  1 = đã dùng  →  2 = hết hạn/tắt/hết lượt
         java.time.LocalDateTime now = java.time.LocalDateTime.now();
         final Set<Integer> finalUsedIds = usedVoucherIds;
 
-        allVouchers.sort((a, b) -> {
+        List<Voucher> activeVouchersList = new java.util.ArrayList<>();
+        List<Voucher> historyVouchersList = new java.util.ArrayList<>();
+
+        for (Voucher v : allVouchers) {
+            int rank = voucherRank(v, finalUsedIds, now);
+            if (rank == 0) {
+                activeVouchersList.add(v);
+            } else {
+                historyVouchersList.add(v);
+            }
+        }
+
+        int activeCount = activeVouchersList.size();
+        int historyCount = historyVouchersList.size();
+
+        List<Voucher> targetList = "history".equals(tab) ? historyVouchersList : activeVouchersList;
+
+        // ── Sort: ưu tiên voucher còn dùng được lên đầu ────────────────────
+        targetList.sort((a, b) -> {
             int rankA = voucherRank(a, finalUsedIds, now);
             int rankB = voucherRank(b, finalUsedIds, now);
             if (rankA != rankB) return Integer.compare(rankA, rankB);
@@ -413,14 +430,14 @@ public class IndexController {
 
         // ── Phân trang 10 voucher/trang ────────────────────────────────────
         final int PAGE_SIZE = 10;
-        int totalVouchers = allVouchers.size();
+        int totalVouchers = targetList.size();
         int totalPages = Math.max(1, (int) Math.ceil((double) totalVouchers / PAGE_SIZE));
         if (page < 1) page = 1;
         if (page > totalPages) page = totalPages;
 
         int fromIdx = (page - 1) * PAGE_SIZE;
         int toIdx   = Math.min(fromIdx + PAGE_SIZE, totalVouchers);
-        List<Voucher> pagedVouchers = allVouchers.subList(fromIdx, toIdx);
+        List<Voucher> pagedVouchers = targetList.subList(fromIdx, toIdx);
 
         model.addAttribute("vouchers",      pagedVouchers);
         model.addAttribute("usedVoucherIds", usedVoucherIds);
@@ -428,6 +445,9 @@ public class IndexController {
         model.addAttribute("currentPage",    page);
         model.addAttribute("totalPages",     totalPages);
         model.addAttribute("totalVouchers",  totalVouchers);
+        model.addAttribute("activeCount",    activeCount);
+        model.addAttribute("historyCount",   historyCount);
+        model.addAttribute("currentTab",     tab);
         return "vouchers";
     }
 

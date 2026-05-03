@@ -143,6 +143,15 @@
 
         /* ── Misc ── */
         .empty-state   { text-align: center; padding: 60px 20px; background: #fff; border-radius: 16px; }
+        /* ── Tabs ── */
+        .voucher-tabs { display: flex; gap: 10px; margin-bottom: 24px; border-bottom: 2px solid #f0f0f0; }
+        .voucher-tab {
+            padding: 10px 20px; font-weight: 600; color: #6c757d; cursor: pointer;
+            border-bottom: 3px solid transparent; margin-bottom: -2px; transition: all 0.2s;
+            text-decoration: none;
+        }
+        .voucher-tab:hover { color: #28a745; }
+        .voucher-tab.active { color: #28a745; border-bottom-color: #28a745; }
         /* ── Pagination ── */
         .pagination-wrap { display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 32px; flex-wrap: wrap; }
         .page-btn {
@@ -227,11 +236,20 @@
             </div>
         </div>
 
+        <!-- Tabs -->
+        <div class="voucher-tabs">
+            <a th:href="@{/vouchers(tab='active')}" th:class="${currentTab == 'active' ? 'voucher-tab active' : 'voucher-tab'}">
+                Có thể sử dụng (<span th:text="${activeCount}">0</span>)
+            </a>
+            <a th:href="@{/vouchers(tab='history')}" th:class="${currentTab == 'history' ? 'voucher-tab active' : 'voucher-tab'}">
+                Lịch sử (<span th:text="${historyCount}">0</span>)
+            </a>
+        </div>
+
         <!-- Info tổng -->
         <div class="d-flex align-items-center mb-4">
             <small class="text-muted">
-                Tổng <strong th:text="${totalVouchers}">0</strong> mã giảm giá
-                &nbsp;·&nbsp; Trang <strong th:text="${currentPage}">1</strong> / <strong th:text="${totalPages}">1</strong>
+                Trang <strong th:text="${currentPage}">1</strong> / <strong th:text="${totalPages}">1</strong>
             </small>
         </div>
 
@@ -358,7 +376,7 @@
         <!-- Pagination -->
         <div class="pagination-wrap" th:if="${totalPages > 1}">
             <!-- Prev -->
-            <a th:href="@{/vouchers(page=${currentPage - 1})}"
+            <a th:href="@{/vouchers(page=${currentPage - 1}, tab=${currentTab})}"
                th:class="${currentPage == 1 ? 'page-btn disabled' : 'page-btn'}">
                 <i class="fa-solid fa-chevron-left" style="font-size:0.75rem;"></i>
             </a>
@@ -367,7 +385,7 @@
             <th:block th:each="i : ${#numbers.sequence(1, totalPages)}">
                 <!-- Hiển thị: trang đầu, trang cuối, trang hiện tại, và 1 trang kề -->
                 <th:block th:if="${i == 1 or i == totalPages or (i >= currentPage - 1 and i <= currentPage + 1)}">
-                    <a th:href="@{/vouchers(page=${i})}"
+                    <a th:href="@{/vouchers(page=${i}, tab=${currentTab})}"
                        th:text="${i}"
                        th:class="${i == currentPage ? 'page-btn active' : 'page-btn'}">1</a>
                 </th:block>
@@ -377,7 +395,7 @@
             </th:block>
 
             <!-- Next -->
-            <a th:href="@{/vouchers(page=${currentPage + 1})}"
+            <a th:href="@{/vouchers(page=${currentPage + 1}, tab=${currentTab})}"
                th:class="${currentPage == totalPages ? 'page-btn disabled' : 'page-btn'}">
                 <i class="fa-solid fa-chevron-right" style="font-size:0.75rem;"></i>
             </a>
