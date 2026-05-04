@@ -70,7 +70,15 @@ public class RegisterController {
                 return "register";
             } else {
                 // Nếu email đã đăng ký nhưng chưa active (chưa xác nhận OTP)
-                // Cập nhật lại thông tin mới và gửi lại OTP
+                // Phân biệt giữa: (A) tài khoản chưa xác thực - có mã OTP / thời gian hết hạn
+                // và (B) tài khoản bị khóa bởi admin - không có mã OTP/expiry
+                boolean appearsAdminLocked = (existingUser.getVerificationCode() == null && existingUser.getCodeExpiry() == null);
+                if (appearsAdminLocked) {
+                    model.addAttribute("errorMessage", "Tài khoản này đã bị khóa bởi quản trị viên. Vui lòng liên hệ quản trị để mở khóa.");
+                    return "register";
+                }
+
+                // Trường hợp tài khoản chưa xác thực: cập nhật thông tin và gửi lại OTP
                 updateAndSendOtp(existingUser, dto);
                 ra.addFlashAttribute("message", "Tài khoản chưa được xác thực. Chúng tôi đã gửi một mã OTP mới đến email của bạn.");
                 ra.addFlashAttribute("alertClass", "alert-warning");
@@ -165,6 +173,13 @@ public class RegisterController {
     public String resendOtp(@RequestParam("email") String email, RedirectAttributes ra) {
         User user = userRepository.findByEmail(email).orElse(null);
         if (user != null && !Boolean.TRUE.equals(user.getActive())) {
+            // Don't resend OTP if the account appears to be admin-locked (no existing verification code/expiry)
+            boolean appearsAdminLocked = (user.getVerificationCode() == null && user.getCodeExpiry() == null);
+            if (appearsAdminLocked) {
+                ra.addFlashAttribute("message", "Tài khoản này đã bị khóa bởi quản trị viên. Không thể gửi mã xác nhận.");
+                ra.addFlashAttribute("alertClass", "alert-danger");
+                return "redirect:/verify-otp?email=" + email;
+            }
             String otp = String.format("%06d", new Random().nextInt(999999));
             user.setVerificationCode(otp);
             user.setCodeExpiry(LocalDateTime.now().plusMinutes(15));

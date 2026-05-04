@@ -389,7 +389,7 @@
                     <i class="fa-solid fa-dollar-sign stat-icon"></i>
                     <div class="stat-label">Doanh thu</div>
                     <div class="stat-value"
-                        th:text="${#numbers.formatDecimal(revenue / 1000000, 1, 'COMMA', 1, 'POINT')} + 'M'">0M</div>
+    th:text="${#numbers.formatInteger(revenue, 1, 'COMMA')} + 'đ'">0</div>
                 </div>
             </div>
 

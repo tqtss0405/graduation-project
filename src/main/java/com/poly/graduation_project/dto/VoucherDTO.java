@@ -25,7 +25,7 @@ public class VoucherDTO {
 
     @NotNull(message = "Giá trị giảm không được để trống")
     @Min(value = 1, message = "Giá trị giảm phải lớn hơn 0")
-    @Max(value = 100, message = "Giá trị giảm không được vượt quá 100")
+    @Max(value = 80, message = "Giá trị giảm không được vượt quá 80%")
     private Integer discount;
 
     @NotNull(message = "Số lượng không được để trống")
@@ -36,7 +36,7 @@ public class VoucherDTO {
     private LocalDateTime startedAt;
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm")
     @NotNull(message = "Ngày hết hạn không được để trống")
-    private LocalDateTime endAt;
+    private LocalDateTime endAt; 
 
     private Boolean active;
 
