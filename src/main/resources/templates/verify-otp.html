@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xác minh OTP - BEOBOOKS</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .otp-input {
+            width: 45px;
+            height: 55px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: 600;
+            border-radius: 8px;
+            border: 2px solid #e0e0e0;
+            margin: 0 5px;
+        }
+        .otp-input:focus {
+            border-color: #28a745;
+            box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+            outline: none;
+        }
+        .otp-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 25px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container auth-container">
+        <div class="col-md-6 col-lg-5">
+            <div class="card card-auth">
+                <div class="card-body p-4 p-md-5">
+                    <div class="text-center mb-4">
+                        <i class="fa-solid fa-envelope-open-text fa-3x text-success mb-3"></i>
+                        <h3 class="fw-bold" style="color: var(--secondary-color);">Xác Thực Email</h3>
+                        <p class="text-muted small">Chúng tôi đã gửi một mã OTP gồm 6 chữ số đến email <br><strong class="text-dark" th:text="${email}"></strong></p>
+                    </div>
+
+                    <!-- Thông báo lỗi hoặc thành công -->
+                    <div th:if="${errorMessage}" class="alert alert-danger rounded-3 text-center mb-4 small">
+                        <i class="fa-solid fa-triangle-exclamation me-1"></i>
+                        <span th:text="${errorMessage}"></span>
+                    </div>
+                    <div th:if="${message}" th:classappend="${alertClass}" class="alert rounded-3 text-center mb-4 small">
+                        <i class="fa-solid fa-circle-info me-1"></i>
+                        <span th:text="${message}"></span>
+                    </div>
+
+                    <form th:action="@{/verify-otp}" method="post" id="otpForm">
+                        <input type="hidden" name="email" th:value="${email}">
+
+                        <div class="otp-container">
+                            <input type="text" name="otp1" class="otp-input" maxlength="1" pattern="[0-9]" required autofocus oninput="moveToNext(this, 'otp2')" onkeydown="moveToPrev(event, this, null)">
+                            <input type="text" name="otp2" id="otp2" class="otp-input" maxlength="1" pattern="[0-9]" required oninput="moveToNext(this, 'otp3')" onkeydown="moveToPrev(event, this, 'otp1')">
+                            <input type="text" name="otp3" id="otp3" class="otp-input" maxlength="1" pattern="[0-9]" required oninput="moveToNext(this, 'otp4')" onkeydown="moveToPrev(event, this, 'otp2')">
+                            <input type="text" name="otp4" id="otp4" class="otp-input" maxlength="1" pattern="[0-9]" required oninput="moveToNext(this, 'otp5')" onkeydown="moveToPrev(event, this, 'otp3')">
+                            <input type="text" name="otp5" id="otp5" class="otp-input" maxlength="1" pattern="[0-9]" required oninput="moveToNext(this, 'otp6')" onkeydown="moveToPrev(event, this, 'otp4')">
+                            <input type="text" name="otp6" id="otp6" class="otp-input" maxlength="1" pattern="[0-9]" required onkeydown="moveToPrev(event, this, 'otp5')">
+                        </div>
+
+                        <button type="submit" class="btn btn-register btn-success w-100 text-white mb-3">Xác Thực</button>
+                    </form>
+
+                    <form th:action="@{/resend-otp}" method="post" id="resendForm">
+                        <input type="hidden" name="email" th:value="${email}">
+                        <div class="text-center mt-3">
+                            <span class="text-muted small">Chưa nhận được mã?</span>
+                            <button type="submit" class="btn btn-link text-success fw-bold text-decoration-none small p-0 align-baseline">Gửi lại mã</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="text-center mt-4">
+                <a href="/login/form" class="text-muted text-decoration-none small"><i
+                        class="fa-solid fa-arrow-left me-1"></i> Quay lại trang đăng nhập</a>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-white py-4 border-top text-center mt-auto">
+        <h5 class="fw-bold text-success">BEOBOOKS</h5>
+        <p class="text-muted small">© 2026 Dự án Tốt nghiệp.</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function moveToNext(current, nextFieldId) {
+            if (current.value.length === 1) {
+                document.getElementById(nextFieldId).focus();
+            }
+        }
+
+        function moveToPrev(event, current, prevFieldId) {
+            if (event.key === 'Backspace' && current.value.length === 0 && prevFieldId != null) {
+                document.getElementById(prevFieldId).focus();
+            }
+        }
+        
+        // Handle pasting OTP
+        document.querySelector('.otp-container').addEventListener('paste', function(e) {
+            e.preventDefault();
+            const pastedData = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6);
+            if (pastedData.length === 6) {
+                const inputs = document.querySelectorAll('.otp-input');
+                inputs.forEach((input, index) => {
+                    input.value = pastedData[index];
+                });
+                inputs[5].focus();
+            }
+        });
+    </script>
+</body>
+
+</html>

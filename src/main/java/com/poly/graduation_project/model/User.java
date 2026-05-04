@@ -38,8 +38,13 @@ public class User {
     private Boolean role;
 
     // true = active
-    // false = blocked
+    // false = blocked / unverified
     private Boolean active;
+
+    @Column(length = 6)
+    private String verificationCode;
+
+    private java.time.LocalDateTime codeExpiry;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @ToString.Exclude

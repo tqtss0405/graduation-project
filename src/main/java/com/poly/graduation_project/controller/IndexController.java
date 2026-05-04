@@ -343,14 +343,28 @@ public class IndexController {
     }
 
     @GetMapping("/user/order-details")
-    public String orderDetails(Model model, HttpSession session) {
+    public String orderDetails(
+            @RequestParam(name = "page", required = false, defaultValue = "1") int page,
+            Model model, HttpSession session) {
         User currentUser = (User) session.getAttribute("currentUser");
         List<CartDetail> cartItems = cartDetailRepository.findByUser(currentUser);
         model.addAttribute("totalQuantity", cartItems.stream().mapToLong(CartDetail::getQuantity).sum());
 
-        List<Order> orders = orderRepository.findByUserOrderByCreateAtDesc(currentUser);
+        List<Order> allOrders = orderRepository.findByUserOrderByCreateAtDesc(currentUser);
+
+        // Phân trang 5 đơn hàng / trang
+        int pageSize = 5;
+        int totalOrders = allOrders.size();
+        int totalPages = Math.max(1, (int) Math.ceil((double) totalOrders / pageSize));
+        if (page < 1) page = 1;
+        if (page > totalPages) page = totalPages;
+
+        int fromIdx = (page - 1) * pageSize;
+        int toIdx = Math.min(fromIdx + pageSize, totalOrders);
+        List<Order> pagedOrders = totalOrders > 0 ? allOrders.subList(fromIdx, toIdx) : allOrders;
+
         Map<Integer, Boolean> reviewedMap = new HashMap<>();
-        for (Order order : orders) {
+        for (Order order : pagedOrders) {
             if (order.getOrderDetails() != null) {
                 for (OrderDetail od : order.getOrderDetails()) {
                     reviewedMap.put(od.getId(), reviewRepository.existsByOrderDetail(od));
@@ -358,16 +372,18 @@ public class IndexController {
             }
         }
         Map<Integer, Boolean> hasUnreviewedMap = new HashMap<>();
-        for (Order order : orders) {
+        for (Order order : pagedOrders) {
             if (order.getStatus() != null && order.getStatus() == 4 && order.getOrderDetails() != null) {
                 boolean hasUnreviewed = order.getOrderDetails().stream()
                         .anyMatch(od -> Boolean.FALSE.equals(reviewedMap.get(od.getId())));
                 hasUnreviewedMap.put(order.getId(), hasUnreviewed);
             }
         }
-        model.addAttribute("orders", orders);
+        model.addAttribute("orders", pagedOrders);
         model.addAttribute("reviewedMap", reviewedMap);
         model.addAttribute("hasUnreviewedMap", hasUnreviewedMap);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", totalPages);
         return "order-details";
     }
 

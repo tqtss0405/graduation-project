@@ -223,6 +223,20 @@
         .toast-success { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
         .toast-error   { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
         .toast-close { margin-left: auto; cursor: pointer; opacity: 0.6; background: none; border: none; font-size: 1rem; color: inherit; }
+        
+        /* Pagination */
+        .pagination-wrap { display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 32px; flex-wrap: wrap; }
+        .page-btn {
+            min-width: 38px; height: 38px; padding: 0 10px;
+            border-radius: 10px; border: 1.5px solid #e9ecef;
+            background: #fff; color: #495057;
+            font-size: 0.88rem; font-weight: 600;
+            display: inline-flex; align-items: center; justify-content: center;
+            text-decoration: none; transition: all 0.15s;
+        }
+        .page-btn:hover { border-color: #28a745; color: #28a745; background: #f6fdf8; }
+        .page-btn.active { background: #28a745; border-color: #28a745; color: #fff; pointer-events: none; }
+        .page-btn.disabled { opacity: 0.4; pointer-events: none; }
     </style>
 </head>
 <body>
@@ -484,6 +498,33 @@
         </script>
 
     </div><!-- end order-card -->
+
+    <!-- Pagination -->
+    <div class="pagination-wrap" th:if="${totalPages > 1}">
+        <!-- Prev -->
+        <a th:href="@{/user/order-details(page=${currentPage - 1})}"
+           th:class="${currentPage == 1 ? 'page-btn disabled' : 'page-btn'}">
+            <i class="fa-solid fa-chevron-left" style="font-size:0.75rem;"></i>
+        </a>
+
+        <!-- Pages -->
+        <th:block th:each="i : ${#numbers.sequence(1, totalPages)}">
+            <th:block th:if="${i == 1 or i == totalPages or (i >= currentPage - 1 and i <= currentPage + 1)}">
+                <a th:href="@{/user/order-details(page=${i})}"
+                   th:text="${i}"
+                   th:class="${i == currentPage ? 'page-btn active' : 'page-btn'}">1</a>
+            </th:block>
+            <!-- Dấu ... -->
+            <span th:if="${i == 2 and currentPage > 3}" class="text-muted px-1" style="align-self:center;">…</span>
+            <span th:if="${i == totalPages - 1 and currentPage < totalPages - 2}" class="text-muted px-1" style="align-self:center;">…</span>
+        </th:block>
+
+        <!-- Next -->
+        <a th:href="@{/user/order-details(page=${currentPage + 1})}"
+           th:class="${currentPage == totalPages ? 'page-btn disabled' : 'page-btn'}">
+            <i class="fa-solid fa-chevron-right" style="font-size:0.75rem;"></i>
+        </a>
+    </div>
 
 </div><!-- end container -->
 
