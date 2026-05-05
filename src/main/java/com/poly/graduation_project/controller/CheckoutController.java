@@ -438,7 +438,7 @@ public class CheckoutController {
             Long newStock = Math.max(0, product.getStockQuantity() - ci.getQuantity());
             product.setStockQuantity(newStock);
             productRepository.save(product);
-        }
+        } 
         for (CartDetail ci : validItems) {
             cartDetailRepository.deleteById(ci.getId());
         }

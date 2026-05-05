@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quản lý Đơn hàng - Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bootstrap-4/bootstrap-4.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -424,7 +425,7 @@
 
                 <a th:href="@{/admin/orders(status=6,keyword=${keyword},fromDate=${fromDate},toDate=${toDate})}"
                     th:class="${selectedStatus == 6} ? 'status-tab active-refund' : 'status-tab refund-tab'">
-                    <i class="fa-solid fa-rotate-left"></i> Y/c hoàn tiền
+                    <i class="fa-solid fa-rotate-left"></i> Y/c xử lý
                     <span
                         th:class="${selectedStatus != 6 and countRefund > 0} ? 'tab-badge tab-badge-warning' : 'tab-badge'"
                         th:text="${countRefund}">0</span>
@@ -478,38 +479,43 @@
             </form>
         </div>
 
-        <!-- Ghi chú theo tab -->
-        <div th:if="${selectedStatus == 0 or selectedStatus == 1}" class="alert alert-warning py-2 mb-3">
-            <i class="fa-solid fa-triangle-exclamation me-2"></i>
-            Admin có thể <strong>hủy đơn</strong> ở trạng thái này. Khách hàng sẽ nhận email thông báo lý do hủy và kho
-            hàng sẽ được hoàn lại tự động.
+        <!-- ===== ALERT CHO MỖI STATUS ===== -->
+        
+        <!-- Tất cả (Overview) -->
+        <div th:if="${selectedStatus == null}" class="alert alert-primary py-2 mb-3">
+            <i class="fa-solid fa-list me-2"></i>
+            <strong>Tất cả đơn hàng</strong> - Sắp xếp theo ưu tiên: Chờ xác nhận → Y/c hoàn tiền → Đã xác nhận → Đang giao → Đã giao → Hoàn thành → Hoàn tiền → Đã hủy
         </div>
+
+        <!-- Status 3 - Đã giao -->
         <div th:if="${selectedStatus == 3}" class="alert alert-info py-2 mb-3">
-            <i class="fa-solid fa-clock me-2"></i>
-            Đơn "Đã giao" sẽ <strong>tự động Hoàn thành sau 7 ngày</strong> nếu khách không xác nhận.
+            <i class="fa-solid fa-package me-2"></i>
+            <strong>Đã giao</strong> - Khách đã xác nhận nhận hàng.
+            <br><small>⏱️ Sẽ <strong>tự động chuyển sang "Hoàn thành" sau 7 ngày</strong> nếu không yêu cầu hoàn tiền</small>
+            <br><small class="text-muted">💡 Khách có thể yêu cầu hoàn tiền / trả hàng trong thời gian này</small>
         </div>
-        <div th:if="${selectedStatus == 5}" class="alert alert-secondary py-2 mb-3">
-    <i class="fa-solid fa-info-circle me-2"></i>
-    Xem chi tiết đơn để biết <strong>lý do hủy</strong> (khách tự hủy hoặc admin hủy).<br>
-    <small class="text-primary fw-semibold">
-        <i class="fa-solid fa-building-columns me-1"></i>
-        Đơn VNPay đã thanh toán: vào 
-        <a href="https://sandbox.vnpayment.vn/merchantv2/" target="_blank" class="text-primary">
-            VNPay Merchant Portal
-        </a> 
-        để hoàn tiền → sau đó bấm nút <strong>"Đã hoàn tiền"</strong> tại đây.
-    </small>
-</div>
+
+        <!-- Status 6 - Yêu cầu xử lý -->
         <div th:if="${selectedStatus == 6}" class="alert alert-warning py-2 mb-3">
-            <i class="fa-solid fa-triangle-exclamation me-2"></i>
-            Khách đã <strong>yêu cầu hoàn tiền / trả hàng</strong>. Xem chi tiết (tài khoản ngân hàng, lý do) rồi xử
-            lý.<br>
-            <small>· <strong>Hoàn tiền thành công</strong> → chuyển sang "Đã hoàn tiền"</small><br>
-            <small>· <strong>Từ chối</strong> → chuyển về "Hoàn thành" — khách giữ hàng, không hoàn kho</small>
+            <i class="fa-solid fa-rotate-left me-2"></i>
+            <strong>Yêu cầu xử lý đơn hàng</strong> - Gồm cả hoàn tiền VNPay và trả hàng COD.
+            <br><small>Bao gồm: Đơn khách hủy VNPay + Yêu cầu hoàn tiền sau giao + Yêu cầu trả hàng COD</small>
+            <br><strong class="d-block mt-2">
+                📋 Hướng dẫn: 
+                <br>1. Xem chi tiết → tài khoản ngân hàng + lý do
+                <br>2. Nếu là VNPay → vào 0
+                <a href="https://sandbox.vnpayment.vn/merchantv2/" target="_blank" class="text-danger fw-bold">
+                    VNPay Merchant Portal
+                </a> 
+                để hoàn tiền
+                <br>3. Nếu là COD trả hàng → xác nhận trả hàng hoặc từ chối yêu cầu
+            </strong>
         </div>
-        <div th:if="${selectedStatus == 7}" class="alert alert-info py-2 mb-3">
-            <i class="fa-solid fa-circle-check me-2"></i>
-            Các đơn đã được <strong>hoàn tiền / hoàn hàng thành công</strong>.
+
+        <!-- Status 7 - Đã hoàn tiền -->
+        <div th:if="${selectedStatus == 7}" class="alert alert-success py-2 mb-3">
+            <i class="fa-solid fa-circle-dollar-to-slot me-2"></i>
+            <strong>Đã hoàn tiền</strong> - Hoàn tiền VNPay thành công, đơn hàng đóng.
         </div>
 
         <!-- ===== BẢNG ===== -->
@@ -546,16 +552,23 @@
                             <span th:if="${order.paymentStatus == 1}" class="badge bg-success mt-1">Đã TT</span>
                         </td>
                         <td>
-                            <span th:switch="${order.status}">
+                                <span th:switch="${order.status}">
                                 <span th:case="0" class="badge bg-warning text-dark">Chờ xác nhận</span>
                                 <span th:case="1" class="badge bg-primary">Đã xác nhận</span>
                                 <span th:case="2" class="badge bg-info text-dark">Đang giao</span>
                                 <span th:case="3" class="badge" style="background:#6f42c1;color:#fff">Đã giao</span>
                                 <span th:case="4" class="badge bg-success">Hoàn thành</span>
                                 <span th:case="5" class="badge bg-danger">Đã hủy</span>
-                                <span th:case="6" class="badge" style="background:#fd7e14;color:#fff">
-                                    <i class="fa-solid fa-rotate-left me-1"></i>Y/c hoàn tiền
-                                </span>
+                                    <span th:case="6">
+                                        <span th:if="${order.note != null and #strings.contains(order.note, '[Yêu cầu trả hàng]')}"
+                                            class="badge bg-warning text-dark">
+                                            <i class="fa-solid fa-box-open me-1"></i>Y/c trả hàng
+                                        </span>
+                                        <span th:unless="${order.note != null and #strings.contains(order.note, '[Yêu cầu trả hàng]')}"
+                                            class="badge" style="background:#fd7e14;color:#fff">
+                                            <i class="fa-solid fa-rotate-left me-1"></i>Y/c hoàn tiền
+                                        </span>
+                                    </span>
                                 <span th:case="7" class="badge bg-primary">
                                     <i class="fa-solid fa-circle-dollar-to-slot me-1"></i>Đã hoàn tiền
                                 </span>
@@ -628,33 +641,36 @@
 
                                 <!-- Yêu cầu hoàn tiền (6) -->
                                 <th:block th:if="${order.status == 6}">
-                                    <form th:action="@{/admin/orders/update-status/{id}(id=${order.id})}" method="post"
-                                        class="d-inline"
-                                        th:onsubmit="'return confirm(\'Xác nhận đã hoàn tiền cho đơn #' + ${order.id} + '?\');'">
-                                        <input type="hidden" name="status" value="7">
-                                        <button type="submit" class="btn btn-sm btn-primary">
+                                    <th:block th:if="${order.note != null and #strings.contains(order.note, '[Yêu cầu trả hàng]')}">
+                                        <button type="button" class="btn btn-sm btn-primary"
+                                            th:attr="onclick=|confirmReturn(${order.id})|">
+                                            <i class="fa-solid fa-box-open"></i> Xác nhận trả hàng
+                                        </button>
+                                    </th:block>
+                                    <th:block th:if="${order.note != null and #strings.contains(order.note, '[Yêu cầu hoàn tiền]')}">
+                                        <button type="button" class="btn btn-sm btn-primary"
+                                            th:attr="onclick=|confirmRefund(${order.id})|">
                                             <i class="fa-solid fa-circle-dollar-to-slot"></i> Hoàn tiền
                                         </button>
-                                    </form>
-                                    <form th:action="@{/admin/orders/update-status/{id}(id=${order.id})}" method="post"
-                                        class="d-inline"
-                                        th:onsubmit="'return confirm(\'Từ chối hoàn tiền đơn #' + ${order.id} + '? Đơn sẽ chuyển về Hoàn thành.\');'">
-                                        <input type="hidden" name="status" value="4">
-                                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                                        <button type="button" class="btn btn-sm btn-outline-danger"
+                                            th:attr="onclick=|confirmRejectRefund(${order.id})|">
                                             <i class="fa-solid fa-xmark"></i> Từ chối
                                         </button>
-                                    </form>
+                                    </th:block>
+                                    <th:block th:if="${order.note != null and #strings.contains(order.note, '[CẦN HOÀN TIỀN VNPAY]')}">
+                                        <button type="button" class="btn btn-sm btn-primary"
+                                            th:attr="onclick=|confirmRefund(${order.id})|">
+                                            <i class="fa-solid fa-circle-dollar-to-slot"></i> Hoàn tiền
+                                        </button>
+                                    </th:block>
                                 </th:block>
                                 <th:block th:if="${order.status == 5 
                   and order.paymentMethod == 1 
                   and order.paymentStatus == 1}">
-    <form th:action="@{/admin/orders/mark-refunded/{id}(id=${order.id})}" 
-          method="post" class="d-inline">
-        <button type="submit" class="btn btn-sm btn-primary"
-                th:onclick="'return confirm(\'Xác nhận đã hoàn tiền VNPay cho đơn #' + ${order.id} + '?\');'">
-            <i class="fa-solid fa-circle-dollar-to-slot me-1"></i>Đã hoàn tiền
-        </button>
-    </form>
+    <button type="button" class="btn btn-sm btn-primary"
+            th:attr="onclick=|confirmRefundVNPay(${order.id})|">
+        <i class="fa-solid fa-circle-dollar-to-slot me-1"></i>Đã hoàn tiền
+    </button>
 </th:block>
                             </div>
                         </td>
@@ -1130,6 +1146,113 @@
         }
 
         document.addEventListener('DOMContentLoaded', renderPagination);
+    </script>
+
+    <!-- ===== SWEETALERT2 ===== -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+    <script>
+        // ── Hoàn tiền (Status 6 → 7) ──────────────────────────────────────
+        function confirmRefund(orderId) {
+            Swal.fire({
+                title: '✅ Hoàn tiền',
+                html: `<b>Đơn #${orderId}</b><br><small>Bạn đã hoàn tiền VNPay chưa?</small>`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#0d6efd',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: '<i class="fa-solid fa-circle-dollar-to-slot me-2"></i> Hoàn tiền',
+                cancelButtonText: 'Hủy'
+            }).then(result => {
+                if (result.isConfirmed) {
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = `/admin/orders/update-status/${orderId}`;
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'status';
+                    input.value = '7';
+                    form.appendChild(input);
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+            });
+        }
+
+        // ── Xác nhận trả hàng (COD) ───────────────────────────────────────
+        function confirmReturn(orderId) {
+            Swal.fire({
+                title: '📦 Xác nhận trả hàng',
+                html: `<b>Đơn #${orderId}</b><br><small>Khách yêu cầu trả hàng COD. Bạn muốn xác nhận xử lý yêu cầu này?</small>`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#fd7e14',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: '<i class="fa-solid fa-box-open me-2"></i> Xác nhận',
+                cancelButtonText: 'Hủy'
+            }).then(result => {
+                if (result.isConfirmed) {
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = `/admin/orders/update-status/${orderId}`;
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'status';
+                    input.value = '4';
+                    form.appendChild(input);
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+            });
+        }
+
+        // ── Từ chối hoàn tiền (Status 6 → 4) ────────────────────────────────
+        function confirmRejectRefund(orderId) {
+            Swal.fire({
+                title: '❌ Từ chối hoàn tiền',
+                html: `<b>Đơn #${orderId}</b> sẽ chuyển về <b>Hoàn thành</b><br><small class="text-danger">Khách sẽ giữ hàng, tiền không hoàn</small>`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: '<i class="fa-solid fa-xmark me-2"></i> Từ chối',
+                cancelButtonText: 'Hủy'
+            }).then(result => {
+                if (result.isConfirmed) {
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = `/admin/orders/update-status/${orderId}`;
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'status';
+                    input.value = '4';
+                    form.appendChild(input);
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+            });
+        }
+
+        // ── Đã hoàn tiền VNPay (Status 5 → 7) ───────────────────────────────
+        function confirmRefundVNPay(orderId) {
+            Swal.fire({
+                title: '💰 Đánh dấu đã hoàn tiền',
+                html: `<b>Đơn #${orderId}</b><br><small>Bạn đã hoàn tiền VNPay chưa?</small>`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#0d6efd',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: '<i class="fa-solid fa-circle-dollar-to-slot me-2"></i> Đã hoàn tiền',
+                cancelButtonText: 'Hủy'
+            }).then(result => {
+                if (result.isConfirmed) {
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = `/admin/orders/mark-refunded/${orderId}`;
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+            });
+        }
     </script>
 </body>
 

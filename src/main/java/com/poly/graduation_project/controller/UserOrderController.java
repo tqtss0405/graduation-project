@@ -96,7 +96,7 @@ public String cancelOrder(
     String currentNote = (order.getNote() != null && !order.getNote().isBlank())
             ? order.getNote() + " | " + cancelNote : cancelNote;
 
-    // ✅ Nếu VNPay đã thanh toán → lưu bank account
+    // ✅ Nếu VNPay đã thanh toán → lưu bank account và chuyển sang status 6 (Y/c hoàn tiền)
     boolean isVnpayPaid = order.getPaymentMethod() != null
             && order.getPaymentMethod() == 1
             && order.getPaymentStatus() != null
@@ -106,18 +106,20 @@ public String cancelOrder(
         if (bankName != null && !bankName.isBlank()
                 && bankNumber != null && !bankNumber.isBlank()
                 && bankHolder != null && !bankHolder.isBlank()) {
-            order.setBankAccount(bankName.trim() + " | " + bankNumber.trim() + " | " + bankHolder.trim());
+            String bankInfo = bankName.trim() + " | " + bankNumber.trim() + " | " + bankHolder.trim();
+            order.setBankAccount(bankInfo);
         }
-        currentNote += " | [CAN HOAN TIEN VNPAY]";
+        currentNote += " | [CẦN HOÀN TIỀN VNPAY]";
     }
 
     order.setNote(currentNote);
-    order.setStatus(5);
+    // Đơn VNPay đã thanh toán → chuyển sang status 6 (Y/c hoàn tiền), ngược lại status 5 (Đã hủy)
+    order.setStatus(isVnpayPaid ? 6 : 5);
     orderRepository.save(order);
 
     ra.addFlashAttribute("successMessage",
             isVnpayPaid
-            ? "Đã hủy đơn! Chúng tôi sẽ hoàn tiền VNPay trong 1-3 ngày làm việc."
+            ? "Đã hủy đơn! Yêu cầu hoàn tiền đã được gửi. Chúng tôi sẽ hoàn tiền VNPay trong 1-3 ngày làm việc."
             : "Đã hủy đơn hàng thành công!");
     return "redirect:/user/order-details";
 }
@@ -152,9 +154,9 @@ public String cancelOrder(
         // Kiểm tra thông tin ngân hàng bắt buộc nếu là VNPay
         boolean isVnpay = order.getPaymentMethod() != null && order.getPaymentMethod() == 1;
         if (isVnpay) {
-            boolean missingBank = (bankName == null || bankName.trim().isEmpty())
-                    || (bankNumber == null || bankNumber.trim().isEmpty())
-                    || (bankHolder == null || bankHolder.trim().isEmpty());
+            boolean missingBank = (bankName == null || bankName.isBlank())
+                    || (bankNumber == null || bankNumber.isBlank())
+                    || (bankHolder == null || bankHolder.isBlank());
             if (missingBank) {
                 ra.addFlashAttribute("errorMessage", "Vui lòng nhập đầy đủ thông tin tài khoản ngân hàng để nhận hoàn tiền!");
                 return "redirect:/user/order-details";

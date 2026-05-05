@@ -201,16 +201,23 @@ public class OrderController {
 
         if (cur == 6 && status != 7 && status != 4) {
             ra.addFlashAttribute("errorMessage",
-                    "Đơn yêu cầu hoàn tiền chỉ có thể 'Hoàn tiền thành công' hoặc 'Từ chối'!");
+                    "Đơn yêu cầu xử lý chỉ có thể 'Hoàn tiền thành công' hoặc 'Xác nhận / từ chối xử lý'!");
             return "redirect:/admin/orders";
         }
 
         order.setStatus(status);
         orderRepository.save(order);
 
-        String msg = (cur == 6 && status == 4)
-                ? "Đã từ chối hoàn tiền đơn #" + id + ". Đơn chuyển về Hoàn thành."
-                : "Cập nhật trạng thái đơn #" + id + " thành công!";
+        String msg;
+        if (cur == 6 && status == 4) {
+            boolean isReturnRequest = order.getNote() != null
+                && order.getNote().contains("[Yêu cầu trả hàng]");
+            msg = isReturnRequest
+                ? "Đã xác nhận trả hàng đơn #" + id + ". Đơn chuyển về Hoàn thành."
+                : "Đã từ chối hoàn tiền đơn #" + id + ". Đơn chuyển về Hoàn thành.";
+        } else {
+            msg = "Cập nhật trạng thái đơn #" + id + " thành công!";
+        }
 
         ra.addFlashAttribute("successMessage", msg);
         return "redirect:/admin/orders";
@@ -265,15 +272,10 @@ public class OrderController {
                 : cancelNote;
         order.setNote(currentNote);
 
-        order.setStatus(5);
-        // Sau khi set order.setStatus(5), thêm đoạn này:
-        // Nếu đã thanh toán VNPay → ghi chú cần hoàn tiền thủ công
-        if (order.getPaymentMethod() != null && order.getPaymentMethod() == 1
-                && order.getPaymentStatus() != null && order.getPaymentStatus() == 1) {
-            String refundNote = "[CẦN HOÀN TIỀN VNPAY] Vào VNPay Merchant Portal để hoàn tiền thủ công.";
-            currentNote = currentNote + " | " + refundNote;
-            order.setNote(currentNote);
-        }
+        // Nếu đã thanh toán VNPay → chuyển sang status 6 (Y/c hoàn tiền), ngược lại status 5 (Đã hủy)
+        boolean isVnpayPaid = order.getPaymentMethod() != null && order.getPaymentMethod() == 1
+                && order.getPaymentStatus() != null && order.getPaymentStatus() == 1;
+        order.setStatus(isVnpayPaid ? 6 : 5);
         orderRepository.save(order);
 
         // Gửi email thông báo cho khách
@@ -296,8 +298,9 @@ public String markRefunded(
         return "redirect:/admin/orders";
     }
 
-    if (order.getStatus() != 5) {
-        ra.addFlashAttribute("errorMessage", "Chỉ đánh dấu được đơn đã hủy (status = 5)!");
+    // Chấp nhận cả status 5 (hủy) và status 6 (Y/c hoàn tiền)
+    if (order.getStatus() != 5 && order.getStatus() != 6) {
+        ra.addFlashAttribute("errorMessage", "Chỉ đánh dấu được đơn yêu cầu hoàn tiền (status = 5 hoặc 6)!");
         return "redirect:/admin/orders";
     }
 
@@ -317,6 +320,6 @@ public String markRefunded(
 
     ra.addFlashAttribute("successMessage",
             "Đã đánh dấu hoàn tiền thành công cho đơn #" + id + "! Email thông báo đã gửi đến khách hàng.");
-    return "redirect:/admin/orders?status=5";
+    return "redirect:/admin/orders?status=6";
 }
 }
