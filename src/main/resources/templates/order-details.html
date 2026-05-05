@@ -446,15 +446,19 @@
                 <!-- Hủy đơn (status=0,1) — chỉ render hidden form tại đây -->
                 <th:block th:if="${order.status == 0 or order.status == 1}">
                     <button type="button" class="btn btn-outline-danger btn-sm rounded-pill fw-bold"
-                            th:onclick="'openCancelModal(' + ${order.id} + ')'">
-                        <i class="fa-solid fa-xmark me-1"></i>Hủy đơn
-                    </button>
+        th:onclick="'openCancelModal(' + ${order.id} + ', ' + ${order.paymentMethod} + ', ' + ${order.paymentStatus} + ')'"
+        th:attrappend="data-order-id=${order.id}">
+    <i class="fa-solid fa-xmark me-1"></i>Hủy đơn
+</button>
                     <!-- Form ẩn submit hủy kèm lý do -->
                     <form th:id="'form-cancel-' + ${order.id}"
-                          th:action="@{/user/order-details/cancel/{id}(id=${order.id})}"
-                          method="post" style="display:none;">
-                        <input type="hidden" name="cancelReason" value="">
-                    </form>
+      th:action="@{/user/order-details/cancel/{id}(id=${order.id})}"
+      method="post" style="display:none;">
+    <input type="hidden" name="cancelReason" value="">
+    <input type="hidden" name="bankName"     value="">
+    <input type="hidden" name="bankNumber"   value="">
+    <input type="hidden" name="bankHolder"   value="">
+</form>
                 </th:block>
 
             </div>
@@ -612,7 +616,42 @@
                 <i class="fa-solid fa-circle-exclamation me-1"></i>Vui lòng chọn lý do hủy!
             </div>
         </div>
-
+        <div class="bank-info-section d-none" id="cancelBankSection">
+    <div class="section-title" style="color:#0c5460;">
+        <i class="fa-solid fa-building-columns text-primary"></i>
+        Tài khoản nhận hoàn tiền
+        <span class="badge bg-info text-dark ms-1" style="font-size:0.72rem;">VNPay</span>
+    </div>
+    <div class="row g-2">
+        <div class="col-12">
+            <select class="bank-input" id="cancelBankName">
+                <option value="">-- Chọn ngân hàng --</option>
+                <option>Vietcombank</option><option>Techcombank</option>
+                <option>MB Bank</option><option>VietinBank</option>
+                <option>BIDV</option><option>Agribank</option>
+                <option>ACB</option><option>TPBank</option>
+                <option>VPBank</option><option>Sacombank</option>
+                <option>Khác</option>
+            </select>
+            <div class="text-danger small mt-1 d-none" id="cancelBankNameError">Vui lòng chọn ngân hàng!</div>
+        </div>
+        <div class="col-12">
+            <input type="text" class="bank-input" id="cancelBankNumber"
+                   placeholder="Số tài khoản..." maxlength="30" inputmode="numeric">
+            <div class="text-danger small mt-1 d-none" id="cancelBankNumberError">Vui lòng nhập số tài khoản!</div>
+        </div>
+        <div class="col-12">
+            <input type="text" class="bank-input" id="cancelBankHolder"
+                   placeholder="Tên chủ tài khoản (IN HOA)..." maxlength="100"
+                   oninput="this.value=this.value.toUpperCase()">
+            <div class="text-danger small mt-1 d-none" id="cancelBankHolderError">Vui lòng nhập tên chủ tài khoản!</div>
+        </div>
+    </div>
+    <div class="mt-2 p-2 rounded-3" style="background:#e8f4fd;font-size:0.78rem;color:#055160;">
+        <i class="fa-solid fa-info-circle me-1"></i>
+        Hoàn tiền trong <strong>1–3 ngày làm việc</strong> sau khi xác nhận.
+    </div>
+</div>
         <div class="d-flex gap-3 justify-content-end">
             <button class="btn btn-light rounded-pill px-4 fw-bold" onclick="closeModal('cancel')">Giữ lại</button>
             <button class="btn btn-danger rounded-pill px-4 fw-bold" onclick="submitCancelWithReason()">
@@ -1060,6 +1099,78 @@ window.addEventListener('DOMContentLoaded', () => {
     if (s) showToast(s, 'success');
     if (e) showToast(e, 'error');
 });
+let cancelIsVnpayPaid = false;
+
+function openCancelModal(orderId, paymentMethod, paymentStatus) {
+    pendingCancelId   = orderId;
+    cancelIsVnpayPaid = (paymentMethod === 1 && paymentStatus === 1);
+
+    // Reset form
+    document.getElementById('cancelReasonSelect').value = '';
+    document.getElementById('cancelReasonError').classList.add('d-none');
+
+    // Hiện/ẩn bank section
+    const bankSection = document.getElementById('cancelBankSection');
+    const vnpayNote   = document.getElementById('cancelVnpayNote');
+
+    if (cancelIsVnpayPaid) {
+        bankSection.classList.remove('d-none');
+        vnpayNote.style.display = 'block';
+        // Reset bank fields
+        ['cancelBankName','cancelBankNumber','cancelBankHolder'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.value = '';
+            const errEl = document.getElementById(id + 'Error');
+            if (errEl) errEl.classList.add('d-none');
+        });
+    } else {
+        bankSection.classList.add('d-none');
+        vnpayNote.style.display = 'none';
+    }
+
+    document.getElementById('modalCancel').classList.add('show');
+}
+
+function submitCancelWithReason() {
+    let hasError = false;
+
+    // Validate lý do
+    const select = document.getElementById('cancelReasonSelect');
+    if (!select.value) {
+        document.getElementById('cancelReasonError').classList.remove('d-none');
+        hasError = true;
+    } else {
+        document.getElementById('cancelReasonError').classList.add('d-none');
+    }
+
+    // Validate bank nếu VNPay
+    if (cancelIsVnpayPaid) {
+        ['cancelBankName','cancelBankNumber','cancelBankHolder'].forEach(id => {
+            const el    = document.getElementById(id);
+            const errEl = document.getElementById(id + 'Error');
+            if (!el.value.trim()) {
+                errEl.classList.remove('d-none');
+                hasError = true;
+            } else {
+                errEl.classList.add('d-none');
+            }
+        });
+    }
+
+    if (hasError) return;
+
+    const form = document.getElementById('form-cancel-' + pendingCancelId);
+    form.querySelector('input[name="cancelReason"]').value = select.value;
+
+    if (cancelIsVnpayPaid) {
+        form.querySelector('input[name="bankName"]').value   = document.getElementById('cancelBankName').value;
+        form.querySelector('input[name="bankNumber"]').value = document.getElementById('cancelBankNumber').value;
+        form.querySelector('input[name="bankHolder"]').value = document.getElementById('cancelBankHolder').value;
+    }
+
+    document.getElementById('modalCancel').classList.remove('show');
+    form.submit();
+}
 </script>
 </body>
 </html>

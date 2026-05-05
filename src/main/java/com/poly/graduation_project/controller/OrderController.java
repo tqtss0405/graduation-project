@@ -285,4 +285,38 @@ public class OrderController {
                 "Đã hủy đơn #" + id + " thành công! Email thông báo đã được gửi đến khách hàng.");
         return "redirect:/admin/orders";
     }
+    @PostMapping("/mark-refunded/{id}")
+public String markRefunded(
+        @PathVariable Integer id,
+        RedirectAttributes ra) {
+
+    Order order = orderRepository.findById(id).orElse(null);
+    if (order == null) {
+        ra.addFlashAttribute("errorMessage", "Không tìm thấy đơn hàng #" + id + "!");
+        return "redirect:/admin/orders";
+    }
+
+    if (order.getStatus() != 5) {
+        ra.addFlashAttribute("errorMessage", "Chỉ đánh dấu được đơn đã hủy (status = 5)!");
+        return "redirect:/admin/orders";
+    }
+
+    if (order.getPaymentMethod() == null || order.getPaymentMethod() != 1
+            || order.getPaymentStatus() == null || order.getPaymentStatus() != 1) {
+        ra.addFlashAttribute("errorMessage", "Đơn này không phải VNPay đã thanh toán!");
+        return "redirect:/admin/orders";
+    }
+
+    order.setStatus(7);
+    orderRepository.save(order);
+
+    // Gửi email thông báo khách đã được hoàn tiền
+    if (order.getUser() != null) {
+        orderEmailService.sendRefundedEmail(order.getUser(), order);
+    }
+
+    ra.addFlashAttribute("successMessage",
+            "Đã đánh dấu hoàn tiền thành công cho đơn #" + id + "! Email thông báo đã gửi đến khách hàng.");
+    return "redirect:/admin/orders?status=5";
+}
 }

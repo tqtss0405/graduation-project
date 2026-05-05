@@ -62,6 +62,9 @@ public class UserOrderController {
 public String cancelOrder(
         @PathVariable Integer id,
         @RequestParam(value = "cancelReason", required = false) String cancelReason,
+        @RequestParam(value = "bankName",    required = false) String bankName,
+        @RequestParam(value = "bankNumber",  required = false) String bankNumber,
+        @RequestParam(value = "bankHolder",  required = false) String bankHolder,
         HttpSession session,
         RedirectAttributes ra) {
 
@@ -86,19 +89,36 @@ public String cancelOrder(
         }
     }
 
-    // Ghi lý do vào note
+    // Ghi lý do
     String reasonText = (cancelReason != null && !cancelReason.trim().isEmpty())
-            ? cancelReason.trim()
-            : "Không có lý do";
-    String cancelNote = "[KHÁCH HỦY] Lý do: " + reasonText;
+            ? cancelReason.trim() : "Không có lý do";
+    String cancelNote = "[KHÁCH HUY] Ly do: " + reasonText;
     String currentNote = (order.getNote() != null && !order.getNote().isBlank())
-            ? order.getNote() + " | " + cancelNote
-            : cancelNote;
-    order.setNote(currentNote);
+            ? order.getNote() + " | " + cancelNote : cancelNote;
 
+    // ✅ Nếu VNPay đã thanh toán → lưu bank account
+    boolean isVnpayPaid = order.getPaymentMethod() != null
+            && order.getPaymentMethod() == 1
+            && order.getPaymentStatus() != null
+            && order.getPaymentStatus() == 1;
+
+    if (isVnpayPaid) {
+        if (bankName != null && !bankName.isBlank()
+                && bankNumber != null && !bankNumber.isBlank()
+                && bankHolder != null && !bankHolder.isBlank()) {
+            order.setBankAccount(bankName.trim() + " | " + bankNumber.trim() + " | " + bankHolder.trim());
+        }
+        currentNote += " | [CAN HOAN TIEN VNPAY]";
+    }
+
+    order.setNote(currentNote);
     order.setStatus(5);
     orderRepository.save(order);
-    ra.addFlashAttribute("successMessage", "Đã hủy đơn hàng thành công!");
+
+    ra.addFlashAttribute("successMessage",
+            isVnpayPaid
+            ? "Đã hủy đơn! Chúng tôi sẽ hoàn tiền VNPay trong 1-3 ngày làm việc."
+            : "Đã hủy đơn hàng thành công!");
     return "redirect:/user/order-details";
 }
 

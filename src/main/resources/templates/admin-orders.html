@@ -489,10 +489,17 @@
             Đơn "Đã giao" sẽ <strong>tự động Hoàn thành sau 7 ngày</strong> nếu khách không xác nhận.
         </div>
         <div th:if="${selectedStatus == 5}" class="alert alert-secondary py-2 mb-3">
-            <i class="fa-solid fa-info-circle me-2"></i>
-            Xem chi tiết đơn để biết <strong>lý do hủy</strong> (khách tự hủy hoặc admin hủy) và trạng thái hoàn tiền
-            VNPay nếu có.
-        </div>
+    <i class="fa-solid fa-info-circle me-2"></i>
+    Xem chi tiết đơn để biết <strong>lý do hủy</strong> (khách tự hủy hoặc admin hủy).<br>
+    <small class="text-primary fw-semibold">
+        <i class="fa-solid fa-building-columns me-1"></i>
+        Đơn VNPay đã thanh toán: vào 
+        <a href="https://sandbox.vnpayment.vn/merchantv2/" target="_blank" class="text-primary">
+            VNPay Merchant Portal
+        </a> 
+        để hoàn tiền → sau đó bấm nút <strong>"Đã hoàn tiền"</strong> tại đây.
+    </small>
+</div>
         <div th:if="${selectedStatus == 6}" class="alert alert-warning py-2 mb-3">
             <i class="fa-solid fa-triangle-exclamation me-2"></i>
             Khách đã <strong>yêu cầu hoàn tiền / trả hàng</strong>. Xem chi tiết (tài khoản ngân hàng, lý do) rồi xử
@@ -638,7 +645,17 @@
                                         </button>
                                     </form>
                                 </th:block>
-
+                                <th:block th:if="${order.status == 5 
+                  and order.paymentMethod == 1 
+                  and order.paymentStatus == 1}">
+    <form th:action="@{/admin/orders/mark-refunded/{id}(id=${order.id})}" 
+          method="post" class="d-inline">
+        <button type="submit" class="btn btn-sm btn-primary"
+                th:onclick="'return confirm(\'Xác nhận đã hoàn tiền VNPay cho đơn #' + ${order.id} + '?\');'">
+            <i class="fa-solid fa-circle-dollar-to-slot me-1"></i>Đã hoàn tiền
+        </button>
+    </form>
+</th:block>
                             </div>
                         </td>
                     </tr>
