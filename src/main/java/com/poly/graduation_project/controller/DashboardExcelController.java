@@ -77,9 +77,13 @@ public class DashboardExcelController {
  
         // ── KPI ───────────────────────────────────────────────────────────────
         BigDecimal revenue = periodOrders.stream()
-                .filter(o -> o.getStatus() != null && o.getStatus() != 5)
-                .map(o -> o.getTotal() != null ? o.getTotal() : BigDecimal.ZERO)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+            .filter(o -> o.getStatus() != null && o.getStatus() == 4)
+            .map(o -> {
+                BigDecimal total = o.getTotal() != null ? o.getTotal() : BigDecimal.ZERO;
+                BigDecimal ship = o.getShippingFee() != null ? o.getShippingFee() : BigDecimal.ZERO;
+                return total.subtract(ship);
+            })
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         long orderCount = periodOrders.size();
 
@@ -102,7 +106,7 @@ public class DashboardExcelController {
         long cntShipping  = countByStatus(periodOrders, 2);
         long cntCancelled = countByStatus(periodOrders, 5);
 
-        // ── Tất cả sản phẩm bán được (không giới hạn Top 5) ──────────────────
+        // ── Tất cả sản phẩm bán được  ──────────────────
         Map<Integer, long[]> productStats = new LinkedHashMap<>();
         periodOrders.stream()
                 .filter(o -> o.getStatus() != null && o.getStatus() != 5 && o.getOrderDetails() != null)
